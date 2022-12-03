@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net20;net30;net35;net40;net46;net48;netstandard2.0;netstandard2.1;net6.0;net7.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net472`))' &gt;= 0">
+    <PackageReference Include="SixLabors.ImageSharp" Version="*" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="*-beta*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
+  </ItemGroup>
+
+</Project>

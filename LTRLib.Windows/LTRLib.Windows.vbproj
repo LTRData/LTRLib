@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net20;net30;net35;net40;net46;net48;netcoreapp3.1;net6.0-windows;net7.0-windows</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0">
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Interop.IWshRuntimeLibrary">
+      <HintPath Condition="'$(TargetFramework.CompareTo(`net4`))' &lt; 0">..\LTRLib20\Interop.IWshRuntimeLibrary.dll</HintPath>
+      <HintPath Condition="'$(TargetFramework.CompareTo(`net4`))' &gt;= 0">..\LTRLib40\Interop.IWshRuntimeLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Forms\AsyncMessageBox.vb" />
+    <Compile Update="Forms\GridDialog.vb" />
+    <Compile Update="Forms\PropertyDialog.vb" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &gt;= 0">
+    <!--<PackageReference Include="System.Drawing.Common">
+      <Version>6.0.0</Version>
+    </PackageReference>-->
+  </ItemGroup>
+
+</Project>

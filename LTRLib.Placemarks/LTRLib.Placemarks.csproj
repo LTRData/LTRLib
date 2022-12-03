@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net30;net40;net46;net48;netcoreapp3.1;netstandard2.0;netstandard2.1;net6.0;net7.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LTRLib.Geodesy\LTRLib.Geodesy.csproj" />
+    <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0">
+    <Reference Include="System.Data.Entity" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0" />
+    <Reference Include="WindowsBase" Condition="'$(TargetFramework.CompareTo(`net30`))' &gt;= 0" />
+    <Reference Include="PresentationCore" Condition="'$(TargetFramework.CompareTo(`net30`))' &gt;= 0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0">
+    <PackageReference Include="NetTopologySuite" Version="2.4.*" />
+    <PackageReference Include="System.Memory">
+      <Version>4.5.*</Version>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

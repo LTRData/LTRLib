@@ -1,0 +1,58 @@
+<Project>
+
+  <PropertyGroup>
+
+    <RootNamespace>LTRLib</RootNamespace>
+    <SignAssembly>true</SignAssembly>
+    <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591</NoWarn>
+    <OutputPath Condition="'$(MSBuildProjectExtension)' != '.shfbproj'">..\$(Configuration)\</OutputPath>
+
+    <LangVersion>Latest</LangVersion>
+    <OptionInfer>On</OptionInfer>
+    <OptionStrict>On</OptionStrict>
+    <OptionExplicit>On</OptionExplicit>
+
+    <AssemblyOriginatorKeyFile>..\LTRLib40\LTRLib40.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+    <RegisterForComInterop Condition="'$(TargetFramework)|$(Configuration)' == 'net48|Release'">true</RegisterForComInterop>
+
+    <DebugType>portable</DebugType>
+
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <RunSGen>false</RunSGen>
+
+    <PackageProjectUrl>https://github.com/LTRData/LTRLib</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <RepositoryType>git</RepositoryType>
+    <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Release'">true</GeneratePackageOnBuild>
+    <PackageOutputPath>$(LocalNuGetPath)</PackageOutputPath>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <Company>LTR Data</Company>
+    <Product>LTRLib</Product>
+    <ProductName>LTRLib</ProductName>
+    <Authors>Olof Lagerkvist</Authors>
+    <Copyright>2011 - 2022, Olof Lagerkvist, LTR Data</Copyright>
+    <PackageVersion>1.0.9</PackageVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Link="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0">
+    <PackageReference Include="Microsoft.XmlSerializer.Generator" Version="6.0.0" />
+    <DotNetCliToolReference Include="Microsoft.XmlSerializer.Generator" Version="6.0.0" />
+  </ItemGroup>  
+  
+</Project>

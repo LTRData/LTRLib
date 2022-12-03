@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net20;net30;net35;net40;net46;net48;netcoreapp3.1;net6.0;net6.0-windows;net7.0;net7.0-windows</TargetFrameworks>
+    <AssemblyName>LTRLib</AssemblyName>
+    <OutputPath>..\$(Configuration)\</OutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <GenerateSerializationAssemblies>false</GenerateSerializationAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LTRLib.Geodesy\LTRLib.Geodesy.csproj" />
+    <ProjectReference Include="..\LTRLib.Graphics\LTRLib.Graphics.csproj" />
+    <ProjectReference Include="..\LTRLib.Placemarks\LTRLib.Placemarks.csproj" Condition="'$(TargetFramework.CompareTo(`net30`))' &gt;= 0" />
+    <ProjectReference Include="..\LTRLib.PolyGeometry\LTRLib.PolyGeometry.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0" />
+    <ProjectReference Include="..\LTRLib.Windows\LTRLib.Windows.vbproj" Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
+    <ProjectReference Include="..\LTRLib.Windows.Extended\LTRLib.Windows.Extended.csproj" Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
+    <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net45`))' &gt;= 0">
+    <PackageReference Include="System.Memory">
+      <Version>4.5.*</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0">
+    <PackageReference Remove="Microsoft.XmlSerializer.Generator" Version="6.0.*" />
+    <DotNetCliToolReference Remove="Microsoft.XmlSerializer.Generator" Version="6.0.*" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net20;net40;net46;netstandard2.0;netstandard2.1;net6.0;net7.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Company>http://blog.sallarp.com and http://ltr-data.se"</Company>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.*" Condition="'$(TargetFramework.CompareTo(`net45`))' &gt;= 0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
+  </ItemGroup>
+  
+</Project>

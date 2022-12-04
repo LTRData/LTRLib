@@ -150,10 +150,7 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
                 throw new KeyNotFoundException("Key not found in dictionary.");
             }
         }
-        set
-        {
-            Cache[key] = (default(DateTime), value);
-        }
+        set => Cache[key] = (default(DateTime), value);
     }
 
     public ICollection<TKey> Keys // Implements IDictionary(Of TKey, TValue).Keys

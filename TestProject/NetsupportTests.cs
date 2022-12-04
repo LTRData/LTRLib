@@ -30,11 +30,11 @@ public class NetsupportTests
 
         Assert.False(ranges.Encompasses(outside));
 
-        var (Mask, Network, End, BitCount) = ranges.CalculateNetwork(IPAddress.Parse("172.16.0.0"), IPAddress.Parse("172.31.255.255"));
+        var (Network, Mask, Broadcast, BitCount) = ranges.CalculateNetwork(IPAddress.Parse("172.16.0.0"), IPAddress.Parse("172.31.255.255"));
 
         Assert.Equal(IPAddress.Parse("172.16.0.0"), Network);
-        Assert.Equal(IPAddress.Parse("172.31.255.255"), End);
-        //Assert.Equal(IPAddress.Parse("255.255.0.0"), Mask);
+        Assert.Equal(IPAddress.Parse("172.31.255.255"), Broadcast);
+        Assert.Equal(IPAddress.Parse("255.240.0.0"), Mask);
         Assert.Equal(12, BitCount);
 
         Assert.Throws<ArgumentException>(() => ranges.CalculateNetwork(IPAddress.Parse("172.16.0.0"), IPAddress.Parse("172.32.255.255")));

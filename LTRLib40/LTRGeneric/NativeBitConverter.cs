@@ -5,11 +5,16 @@
  * http://ltr-data.se   https://github.com/LTRData
  */
 using System;
+using System.Runtime.InteropServices;
 
 namespace LTRLib.LTRGeneric;
 
 public static class NativeBitConverter
 {
+#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+    public static Guid ToGuid(byte[] bytes, int offset)
+        => MemoryMarshal.Read<Guid>(bytes.AsSpan(offset, 16));
+#else
     public static unsafe Guid ToGuid(byte[] bytes, int offset)
     {
         if (bytes is null)
@@ -32,4 +37,5 @@ public static class NativeBitConverter
             return *(Guid*)ptr;
         }
     }
+#endif
 }

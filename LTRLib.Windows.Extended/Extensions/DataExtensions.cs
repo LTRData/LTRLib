@@ -19,14 +19,11 @@ public static class DataExtensions
     /// <typeparam name="T">Type of object to get.</typeparam>
     /// <param name="sender">IDataObject instance to get object from.</param>
     public static T GetDataAsType<T>(this IDataObject sender)
-    {
-        return (T)sender.GetData(typeof(T));
-    }
+         => (T)sender.GetData(typeof(T));
 
-    
+
     public static bool FindRecord<T>(this BindingSource bindingSource, Func<T, bool> filter)
     {
-
         var foundRecord = ((IEnumerable<T>)bindingSource.DataSource).FirstOrDefault(filter);
         if (foundRecord is null)
         {
@@ -34,13 +31,11 @@ public static class DataExtensions
         }
 
         return bindingSource.FindRecord(foundRecord);
-
     }
 
     
     public static bool FindRecord(this BindingSource bindingSource, Func<object, bool> filter)
     {
-
         var foundRecord = ((IEnumerable)bindingSource.DataSource).OfType<object>().FirstOrDefault(filter);
         if (foundRecord is null)
         {
@@ -48,13 +43,11 @@ public static class DataExtensions
         }
 
         return bindingSource.FindRecord(foundRecord);
-
     }
 
     
     public static bool FindRecord(this BindingSource bindingSource, object record)
     {
-
         var position = bindingSource.IndexOf(record);
         if (position < 0)
         {
@@ -63,28 +56,18 @@ public static class DataExtensions
 
         bindingSource.Position = position;
         return true;
-
     }
+        
+    public static int Count(this ChangeSet ChangeSet) => ChangeSet.Deletes.Count + ChangeSet.Inserts.Count + ChangeSet.Updates.Count;
 
-    
-    public static int Count(this ChangeSet ChangeSet)
-    {
-        return ChangeSet.Deletes.Count + ChangeSet.Inserts.Count + ChangeSet.Updates.Count;
-    }
+#if NET40_OR_GREATER
 
-# if NET40_OR_GREATER
+    public static IEnumerable<object> All(this ChangeSet ChangeSet) => ChangeSet.Deletes.Concat(ChangeSet.Inserts).Concat(ChangeSet.Updates);
 
-    public static IEnumerable<object> All(this ChangeSet ChangeSet)
-    {
-        return ChangeSet.Deletes.Concat(ChangeSet.Inserts).Concat(ChangeSet.Updates);
-    }
+#endif
 
-# endif
-
-    
     public static void ClearCachedList<TEntity>(this Table<TEntity> LinqDataTable) where TEntity : class
     {
-
         var binding = BindingFlags.NonPublic | BindingFlags.Instance;
 
         var dstype = LinqDataTable.GetType();
@@ -96,7 +79,6 @@ public static class DataExtensions
         var method = LinqDataTable.Context.GetType().GetMethod("ClearCache", binding);
 
         method.Invoke(LinqDataTable.Context, default);
-
     }
 }
 

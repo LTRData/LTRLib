@@ -44,10 +44,7 @@ public static class MemberwiseMerger<T> where T : class
             CopyValue = copy_source_to_target_lambda.Compile();
         }
 
-        public static FieldAccessors CreateFromFieldInfo(FieldInfo member)
-        {
-            return new FieldAccessors(member);
-        }
+        public static FieldAccessors CreateFromFieldInfo(FieldInfo member) => new FieldAccessors(member);
 
         public readonly string FieldName;
 
@@ -58,10 +55,7 @@ public static class MemberwiseMerger<T> where T : class
 
     internal static readonly ReadOnlyCollection<FieldAccessors> FieldsAccessors;
 
-    public static T? MergeSequence(params T[] sequence)
-    {
-        return MergeSequence((IEnumerable<T>)sequence);
-    }
+    public static T? MergeSequence(params T[] sequence) => MergeSequence((IEnumerable<T>)sequence);
 
     public static T? MergeSequence(IEnumerable<T> sequence)
     {

@@ -444,7 +444,6 @@ public static class StringSupport
 
     public static string? ValidSwedishPersonalIdNumber(IEnumerable<char> Id)
     {
-
         var Result = ValidSwedishIdNumber(Id);
         if (Result is null)
         {
@@ -459,7 +458,6 @@ public static class StringSupport
         {
             return null;
         }
-
     }
 #endif
 

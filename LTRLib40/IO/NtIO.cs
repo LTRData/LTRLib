@@ -300,17 +300,13 @@ public enum FSINFOCLASS
 }
 
 [Serializable]
-public struct IoStatusBlock
+public readonly struct IoStatusBlock
 {
-    public IntPtr Pointer;
+    public IntPtr Pointer { get; }
 
-    public UIntPtr Information;
+    public UIntPtr Information { get; }
 
-    public unsafe int Status
-    {
-        get => Pointer.ToInt32();
-        set => Pointer = new(value);
-    }
+    public int Status => Pointer.ToInt32();
 }
 
 public class FileExtent
@@ -343,28 +339,28 @@ internal struct RETRIEVAL_POINTERS_BUFFER
 }
 
 [Serializable]
-public struct ObjectAttributes
+public readonly struct ObjectAttributes
 {
-    public uint uLength;
+    public uint Length { get; }
 
-    public unsafe void* hRootDirectory;
+    public unsafe void* RootDirectory { get; }
 
-    public unsafe UNICODE_STRING* pObjectName;
+    public unsafe UNICODE_STRING* ObjectName { get; }
 
-    public ObjectAccess uAttributes;
+    public ObjectAccess Attributes { get; }
 
-    public unsafe void* pSecurityDescriptor;
+    public unsafe void* SecurityDescriptor { get; }
 
-    public unsafe void* pSecurityQualityOfService;
+    public unsafe void* SecurityQualityOfService { get; }
 
     public unsafe ObjectAttributes(UNICODE_STRING* pObjectName, ObjectAccess uAttributes, void* hRootDirectory, void* pSecurityDescriptor, void* pSecurityQualityOfService)
     {
-        uLength = (uint)sizeof(ObjectAttributes);
-        this.hRootDirectory = hRootDirectory;
-        this.pObjectName = pObjectName;
-        this.uAttributes = uAttributes;
-        this.pSecurityDescriptor = pSecurityDescriptor;
-        this.pSecurityQualityOfService = pSecurityQualityOfService;
+        Length = (uint)sizeof(ObjectAttributes);
+        RootDirectory = hRootDirectory;
+        ObjectName = pObjectName;
+        Attributes = uAttributes;
+        SecurityDescriptor = pSecurityDescriptor;
+        SecurityQualityOfService = pSecurityQualityOfService;
     }
 
     public unsafe ObjectAttributes(UNICODE_STRING* pObjectName, ObjectAccess uAttributes)

@@ -17,10 +17,13 @@
     <ProjectReference Include="..\LTRLib.Placemarks\LTRLib.Placemarks.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0">
+    <Reference Include="System.Data.Linq" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0">
     <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Data.Linq" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &gt;= 0">

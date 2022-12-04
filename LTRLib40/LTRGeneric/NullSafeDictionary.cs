@@ -25,13 +25,7 @@ public abstract class NullSafeDictionary<TKey, TValue> : IDictionary<TKey, TValu
     /// keys in dictionary</summary>
     protected abstract TValue GetDefaultValue();
 
-    public object SyncRoot
-    {
-        get
-        {
-            return ((ICollection)m_Dictionary).SyncRoot;
-        }
-    }
+    public object SyncRoot => ((ICollection)m_Dictionary).SyncRoot;
 
     /// <summary>
     /// Creates a new NullSafeDictionary object
@@ -70,10 +64,7 @@ public abstract class NullSafeDictionary<TKey, TValue> : IDictionary<TKey, TValu
                 return ItemRet;
             }
         }
-        set
-        {
-            m_Dictionary[key] = value;
-        }
+        set => m_Dictionary[key] = value;
     }
 
     private void ICollection_Add(KeyValuePair<TKey, TValue> item) => ((ICollection<KeyValuePair<TKey, TValue>>)m_Dictionary).Add(item);
@@ -90,21 +81,9 @@ public abstract class NullSafeDictionary<TKey, TValue> : IDictionary<TKey, TValu
 
     void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex) => ICollection_CopyTo(array, arrayIndex);
 
-    public int Count
-    {
-        get
-        {
-            return m_Dictionary.Count;
-        }
-    }
+    public int Count => m_Dictionary.Count;
 
-    public bool IsReadOnly
-    {
-        get
-        {
-            return false;
-        }
-    }
+    public bool IsReadOnly => false;
 
     private bool ICollection_Remove(KeyValuePair<TKey, TValue> item) => ((ICollection<KeyValuePair<TKey, TValue>>)m_Dictionary).Remove(item);
 
@@ -114,25 +93,13 @@ public abstract class NullSafeDictionary<TKey, TValue> : IDictionary<TKey, TValu
 
     public bool ContainsKey(TKey key) => m_Dictionary.ContainsKey(key);
 
-    public ICollection<TKey> Keys
-    {
-        get
-        {
-            return m_Dictionary.Keys;
-        }
-    }
+    public ICollection<TKey> Keys => m_Dictionary.Keys;
 
     public bool Remove(TKey key) => m_Dictionary.Remove(key);
 
     public bool TryGetValue(TKey key, out TValue value) => m_Dictionary.TryGetValue(key, out value!);
 
-    public ICollection<TValue> Values
-    {
-        get
-        {
-            return m_Dictionary.Values;
-        }
-    }
+    public ICollection<TValue> Values => m_Dictionary.Values;
 
     private IEnumerator<KeyValuePair<TKey, TValue>> ICollection_GetEnumerator() => ((ICollection<KeyValuePair<TKey, TValue>>)m_Dictionary).GetEnumerator();
 

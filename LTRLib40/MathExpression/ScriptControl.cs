@@ -24,10 +24,7 @@ public class ScriptControl
 
     public string? Expression
     {
-        get
-        {
-            return m_Expression;
-        }
+        get => m_Expression;
         set
         {
             if (value == m_Expression)
@@ -48,7 +45,7 @@ public class ScriptControl
                 parameters.SingleOrDefault(p => "x" == p.Name),
                 parameters.SingleOrDefault(p => "y" == p.Name)
             };
-            
+
             if (@params[0] is null)
             {
                 @params[0] = LinqExpression.Parameter(typeof(double), "x");

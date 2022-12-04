@@ -62,10 +62,7 @@ public class DiskStream : FileStream
     public override long Length
     {
         [SecuritySafeCritical]
-        get
-        {
-            return NativeFileIO.GetVolumeSize(SafeFileHandle);
-        }
+        get => NativeFileIO.GetVolumeSize(SafeFileHandle);
     }
 
     [SecuritySafeCritical]
@@ -74,27 +71,18 @@ public class DiskStream : FileStream
     public NativeConstants.DISK_GEOMETRY? Geometry
     {
         [SecuritySafeCritical]
-        get
-        {
-            return NativeFileIO.GetDiskGeometry(SafeFileHandle);
-        }
+        get => NativeFileIO.GetDiskGeometry(SafeFileHandle);
     }
 
     public NativeConstants.DiskExtent[] VolumeDiskExtents
     {
         [SecuritySafeCritical]
-        get
-        {
-            return NativeFileIO.GetVolumeDiskExtents(SafeFileHandle);
-        }
+        get => NativeFileIO.GetVolumeDiskExtents(SafeFileHandle);
     }
 
     public bool VolumeOffline
     {
-        set
-        {
-            NativeFileIO.SetVolumeOffline(SafeFileHandle, value);
-        }
+        set => NativeFileIO.SetVolumeOffline(SafeFileHandle, value);
     }
 
 }

@@ -5,12 +5,15 @@
 // http://ltr-data.se   https://github.com/LTRData
 // 
 
+using LTRLib.Extensions;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
+using System.Xml.Serialization;
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable SYSLIB0003 // Type or member is obsolete
 
 namespace LTRLib.IO;
@@ -173,83 +176,22 @@ public static class NativeConstants
 
     [StructLayout(LayoutKind.Sequential)]
     [SecuritySafeCritical]
-    public struct LARGE_INTEGER : IEquatable<LARGE_INTEGER>, IEquatable<long>
+    public readonly struct LARGE_INTEGER : IEquatable<LARGE_INTEGER>, IEquatable<long>
     {
-        public long QuadPart;
+        public long QuadPart { get; }
 
-        public int LowPart
-        {
-            get
-            {
-                if (BitConverter.IsLittleEndian)
-                {
-                    return BitConverter.ToInt32(Bytes, 0);
-                }
-                else
-                {
-                    return BitConverter.ToInt32(Bytes, 4);
-                }
-            }
-            set
-            {
-                var oldBytes = Bytes;
-                var newBytes = BitConverter.GetBytes(value);
-                if (BitConverter.IsLittleEndian)
-                {
-                    Buffer.BlockCopy(newBytes, 0, oldBytes, 0, 4);
-                }
-                else
-                {
-                    Buffer.BlockCopy(newBytes, 0, oldBytes, 4, 4);
-                }
-                Bytes = oldBytes;
-            }
-        }
+        public uint LowPart => (uint)(QuadPart & uint.MaxValue);
 
-        public int HighPart
-        {
-            get
-            {
-                if (BitConverter.IsLittleEndian)
-                {
-                    return BitConverter.ToInt32(Bytes, 4);
-                }
-                else
-                {
-                    return BitConverter.ToInt32(Bytes, 0);
-                }
-            }
-            set
-            {
-                var oldBytes = Bytes;
-                var newBytes = BitConverter.GetBytes(value);
-                if (BitConverter.IsLittleEndian)
-                {
-                    Buffer.BlockCopy(newBytes, 0, oldBytes, 4, 4);
-                }
-                else
-                {
-                    Buffer.BlockCopy(newBytes, 0, oldBytes, 0, 4);
-                }
-                Bytes = newBytes;
-            }
-        }
-
-        public byte[] Bytes
-        {
-            get
-            {
-                return BitConverter.GetBytes(QuadPart);
-            }
-            set
-            {
-                QuadPart = BitConverter.ToInt64(value, 0);
-            }
-        }
+        public int HighPart => (int)(QuadPart >> 32);
 
         public LARGE_INTEGER(long value)
         {
             QuadPart = value;
+        }
+
+        public LARGE_INTEGER(uint LowPart, int HighPart)
+        {
+            QuadPart = LowPart | ((long)HighPart << 32);
         }
 
         [SecuritySafeCritical]
@@ -273,46 +215,28 @@ public static class NativeConstants
         [SecuritySafeCritical]
         public override bool Equals(object? obj)
         {
-            if (obj is LARGE_INTEGER)
+            if (obj is LARGE_INTEGER largeInteger)
             {
-                return Equals((LARGE_INTEGER)obj);
+                return Equals(largeInteger);
             }
-            else if (obj is long)
+            else if (obj is long @long)
             {
-                return Equals((long)obj);
+                return Equals(@long);
             }
             return false;
         }
 
-        public static bool operator ==(LARGE_INTEGER @this, LARGE_INTEGER other)
-        {
-            return @this.Equals(other);
-        }
+        public static bool operator ==(LARGE_INTEGER @this, LARGE_INTEGER other) => @this.Equals(other);
 
-        public static bool operator !=(LARGE_INTEGER @this, LARGE_INTEGER other)
-        {
-            return !@this.Equals(other);
-        }
+        public static bool operator !=(LARGE_INTEGER @this, LARGE_INTEGER other) => !@this.Equals(other);
 
-        public static bool operator ==(LARGE_INTEGER @this, long other)
-        {
-            return @this.Equals(other);
-        }
+        public static bool operator ==(LARGE_INTEGER @this, long other) => @this.Equals(other);
 
-        public static bool operator !=(LARGE_INTEGER @this, long other)
-        {
-            return !@this.Equals(other);
-        }
+        public static bool operator !=(LARGE_INTEGER @this, long other) => !@this.Equals(other);
 
-        public static bool operator ==(long @this, LARGE_INTEGER other)
-        {
-            return @this.Equals(other);
-        }
+        public static bool operator ==(long @this, LARGE_INTEGER other) => @this.Equals(other);
 
-        public static bool operator !=(long @this, LARGE_INTEGER other)
-        {
-            return !@this.Equals(other);
-        }
+        public static bool operator !=(long @this, LARGE_INTEGER other) => !@this.Equals(other);
 
         [SecuritySafeCritical]
         public bool Equals(long other) => QuadPart == other;
@@ -323,84 +247,22 @@ public static class NativeConstants
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct ULARGE_INTEGER : IEquatable<ULARGE_INTEGER>, IEquatable<ulong>
+    public readonly struct ULARGE_INTEGER : IEquatable<ULARGE_INTEGER>, IEquatable<ulong>
     {
+        public ulong QuadPart { get; }
 
-        public ulong QuadPart;
+        public uint LowPart => (uint)(QuadPart & uint.MaxValue);
 
-        public uint LowPart
-        {
-            get
-            {
-                if (BitConverter.IsLittleEndian)
-                {
-                    return BitConverter.ToUInt32(Bytes, 0);
-                }
-                else
-                {
-                    return BitConverter.ToUInt32(Bytes, 4);
-                }
-            }
-            set
-            {
-                var oldBytes = Bytes;
-                var newBytes = BitConverter.GetBytes(value);
-                if (BitConverter.IsLittleEndian)
-                {
-                    Buffer.BlockCopy(newBytes, 0, oldBytes, 0, 4);
-                }
-                else
-                {
-                    Buffer.BlockCopy(newBytes, 0, oldBytes, 4, 4);
-                }
-                Bytes = oldBytes;
-            }
-        }
-
-        public uint HighPart
-        {
-            get
-            {
-                if (BitConverter.IsLittleEndian)
-                {
-                    return BitConverter.ToUInt32(Bytes, 4);
-                }
-                else
-                {
-                    return BitConverter.ToUInt32(Bytes, 0);
-                }
-            }
-            set
-            {
-                var oldBytes = Bytes;
-                var newBytes = BitConverter.GetBytes(value);
-                if (BitConverter.IsLittleEndian)
-                {
-                    Buffer.BlockCopy(newBytes, 0, oldBytes, 4, 4);
-                }
-                else
-                {
-                    Buffer.BlockCopy(newBytes, 0, oldBytes, 0, 4);
-                }
-                Bytes = newBytes;
-            }
-        }
-
-        public byte[] Bytes
-        {
-            get
-            {
-                return BitConverter.GetBytes(QuadPart);
-            }
-            set
-            {
-                QuadPart = BitConverter.ToUInt64(value, 0);
-            }
-        }
+        public uint HighPart => (uint)(QuadPart >> 32);
 
         public ULARGE_INTEGER(ulong value)
         {
             QuadPart = value;
+        }
+
+        public ULARGE_INTEGER(uint LowPart, uint HighPart)
+        {
+            QuadPart = LowPart | ((ulong)HighPart << 32);
         }
 
         [SecuritySafeCritical]
@@ -412,46 +274,28 @@ public static class NativeConstants
         [SecuritySafeCritical]
         public override bool Equals(object? obj)
         {
-            if (obj is ULARGE_INTEGER)
+            if (obj is ULARGE_INTEGER largeInteger)
             {
-                return Equals((ULARGE_INTEGER)obj);
+                return Equals(largeInteger);
             }
-            else if (obj is ulong)
+            else if (obj is ulong @ulong)
             {
-                return Equals((ulong)obj);
+                return Equals(@ulong);
             }
             return false;
         }
 
-        public static bool operator ==(ULARGE_INTEGER @this, ULARGE_INTEGER other)
-        {
-            return @this.Equals(other);
-        }
+        public static bool operator ==(ULARGE_INTEGER @this, ULARGE_INTEGER other) => @this.Equals(other);
 
-        public static bool operator !=(ULARGE_INTEGER @this, ULARGE_INTEGER other)
-        {
-            return !@this.Equals(other);
-        }
+        public static bool operator !=(ULARGE_INTEGER @this, ULARGE_INTEGER other) => !@this.Equals(other);
 
-        public static bool operator ==(ULARGE_INTEGER @this, ulong other)
-        {
-            return @this.Equals(other);
-        }
+        public static bool operator ==(ULARGE_INTEGER @this, ulong other) => @this.Equals(other);
 
-        public static bool operator !=(ULARGE_INTEGER @this, ulong other)
-        {
-            return !@this.Equals(other);
-        }
+        public static bool operator !=(ULARGE_INTEGER @this, ulong other) => !@this.Equals(other);
 
-        public static bool operator ==(ulong @this, ULARGE_INTEGER other)
-        {
-            return @this.Equals(other);
-        }
+        public static bool operator ==(ulong @this, ULARGE_INTEGER other) => @this.Equals(other);
 
-        public static bool operator !=(ulong @this, ULARGE_INTEGER other)
-        {
-            return !@this.Equals(other);
-        }
+        public static bool operator !=(ulong @this, ULARGE_INTEGER other) => !@this.Equals(other);
 
         [SecuritySafeCritical]
         public static implicit operator ULARGE_INTEGER(ulong value)
@@ -470,11 +314,10 @@ public static class NativeConstants
 
         [SecuritySafeCritical]
         public bool Equals(ULARGE_INTEGER other) => QuadPart == other.QuadPart;
-
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct DISK_GEOMETRY
+    public readonly struct DISK_GEOMETRY
     {
         public enum MEDIA_TYPE : int
         {
@@ -506,34 +349,33 @@ public static class NativeConstants
             F3_32M_512 = 0x19
         }
 
-        public long Cylinders;
-        public MEDIA_TYPE MediaType;
-        public int TracksPerCylinder;
-        public int SectorsPerTrack;
-        public int BytesPerSector;
+        public long Cylinders { get; }
+        public MEDIA_TYPE MediaType { get; }
+        public int TracksPerCylinder { get; }
+        public int SectorsPerTrack { get; }
+        public int BytesPerSector { get; }
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct DISK_GROW_PARTITION
+    public readonly struct DISK_GROW_PARTITION
     {
-        public int PartitionNumber;
-        public long BytesToGrow;
+        public int PartitionNumber { get; }
+        public long BytesToGrow { get; }
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct COMMTIMEOUTS
+    public readonly struct COMMTIMEOUTS
     {
-        public uint ReadIntervalTimeout;
-        public uint ReadTotalTimeoutMultiplier;
-        public uint ReadTotalTimeoutConstant;
-        public uint WriteTotalTimeoutMultiplier;
-        public uint WriteTotalTimeoutConstant;
+        public uint ReadIntervalTimeout { get; }
+        public uint ReadTotalTimeoutMultiplier { get; }
+        public uint ReadTotalTimeoutConstant { get; }
+        public uint WriteTotalTimeoutMultiplier { get; }
+        public uint WriteTotalTimeoutConstant { get; }
     }
 
     [StructLayout(LayoutKind.Sequential)]
     internal readonly struct DiskExtents
     {
-
         private readonly int NumberOfExtents;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
@@ -550,13 +392,11 @@ public static class NativeConstants
         {
             Array.Resize(ref Extents, maxExtents);
         }
-
     }
 
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct DiskExtent
     {
-
         public uint DiskNumber { get; }
 
         public long StartingOffset { get; }
@@ -565,59 +405,54 @@ public static class NativeConstants
 
         public DiskExtent(uint DiskNumber, long StartingOffset, long ExtentLength)
         {
-
             this.DiskNumber = DiskNumber;
             this.StartingOffset = StartingOffset;
             this.ExtentLength = ExtentLength;
-
         }
 
         public DiskExtent(long StartingOffset, long ExtentLength)
         {
-
             DiskNumber = uint.MaxValue;
             this.StartingOffset = StartingOffset;
             this.ExtentLength = ExtentLength;
-
         }
-
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct SECURITY_ATTRIBUTES
+    public readonly struct SECURITY_ATTRIBUTES
     {
-        public int nLength;
+        public int Length { get; }
 
-        private IntPtr lpSecurityDescriptor;
-        
-        [MarshalAs(UnmanagedType.Bool)]
-        public bool bInheritHandle;
+        public IntPtr SecurityDescriptor { get; }
+
+        [field: MarshalAs(UnmanagedType.Bool)]
+        public readonly bool InheritHandle { get; }
 
         [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.AllFlags)]
         public SECURITY_ATTRIBUTES(IntPtr SecurityDescriptor, bool InheritHandle)
             : this()
         {
-            lpSecurityDescriptor = SecurityDescriptor;
-            bInheritHandle = InheritHandle;
+            this.SecurityDescriptor = SecurityDescriptor;
+            this.InheritHandle = InheritHandle;
         }
 
         [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.AllFlags)]
         public unsafe SECURITY_ATTRIBUTES()
         {
-            nLength = sizeof(SECURITY_ATTRIBUTES);
+            Length = sizeof(SECURITY_ATTRIBUTES);
         }
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct SERVICE_STATUS
+    public readonly struct SERVICE_STATUS
     {
-        public int dwServiceType;
-        public int dwCurrentState;
-        public int dwControlsAccepted;
-        public int dwWin32ExitCode;
-        public int dwServiceSpecificExitCode;
-        public int dwCheckPoint;
-        public int dwWaitHint;
+        public int dwServiceType { get; }
+        public int dwCurrentState { get; }
+        public int dwControlsAccepted { get; }
+        public int dwWin32ExitCode { get; }
+        public int dwServiceSpecificExitCode { get; }
+        public int dwCheckPoint { get; }
+        public int dwWaitHint { get; }
     }
 
     [Flags]
@@ -659,69 +494,75 @@ public static class NativeConstants
         public short Top { get; }
         public short Right { get; }
         public short Bottom { get; }
-        public short Width
+        public short Width => (short)((short)(Right - Left) + 1);
+        public short Height => (short)((short)(Bottom - Top) + 1);
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public readonly struct CONSOLE_SCREEN_BUFFER_INFO
+    {
+        public COORD Size { get; }
+        public COORD CursorPosition { get; }
+        public short Attributes { get; }
+        public SMALL_RECT Window { get; }
+        public COORD MaximumWindowSize { get; }
+    }
+
+    internal struct CSDVersion
+    {
+        private unsafe fixed char version[128];
+
+        public override unsafe string ToString() => BufferExtensions.CreateString(version[0]);
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public readonly struct OSVERSIONINFO
+    {
+        public int OSVersionInfoSize { get; }
+        public int MajorVersion { get; }
+        public int MinorVersion { get; }
+        public int BuildNumber { get; }
+        public PlatformID PlatformId { get; }
+
+        private readonly CSDVersion csdVersion;
+        public string CSDVersion => csdVersion.ToString();
+
+        public unsafe OSVERSIONINFO()
         {
-            get
-            {
-                return (short)((short)(Right - Left) + 1);
-            }
-        }
-        public short Height
-        {
-            get
-            {
-                return (short)((short)(Bottom - Top) + 1);
-            }
+            OSVersionInfoSize = sizeof(OSVERSIONINFO);
         }
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct CONSOLE_SCREEN_BUFFER_INFO
+    public readonly struct OSVERSIONINFOEX
     {
-        public COORD dwSize;
-        public COORD dwCursorPosition;
-        public short wAttributes;
-        public SMALL_RECT srWindow;
-        public COORD dwMaximumWindowSize;
+        public int OSVersionInfoSize { get; }
+        public int MajorVersion { get; }
+        public int MinorVersion { get; }
+        public int BuildNumber { get; }
+        public PlatformID PlatformId { get; }
+
+        private readonly CSDVersion csdVersion;
+        public string CSDVersion => csdVersion.ToString();
+
+        public ushort ServicePackMajor { get; }
+
+        public ushort ServicePackMinor { get; }
+
+        public short SuiteMask { get; }
+
+        public byte ProductType { get; }
+
+        public byte Reserved { get; }
+
+        public unsafe OSVERSIONINFOEX()
+        {
+            OSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+        }
     }
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct OSVERSIONINFO
-    {
-        public int OSVersionInfoSize;
-        public int MajorVersion;
-        public int MinorVersion;
-        public int BuildNumber;
-        public PlatformID PlatformId;
-
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
-        public string CSDVersion;
-    }
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct OSVERSIONINFOEX
-    {
-        public int OSVersionInfoSize;
-        public int MajorVersion;
-        public int MinorVersion;
-        public int BuildNumber;
-        public PlatformID PlatformId;
-
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
-        public string CSDVersion;
-
-        public ushort ServicePackMajor;
-
-        public ushort ServicePackMinor;
-
-        public short SuiteMask;
-
-        public byte ProductType;
-
-        public byte Reserved;
-    }
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    public struct PARTITION_INFORMATION
+    public readonly struct PARTITION_INFORMATION
     {
         public enum PARTITION_TYPE : byte
         {
@@ -744,14 +585,14 @@ public static class NativeConstants
             PARTITION_NTFT = 0x80      // NTFT partition      
         }
 
-        public long StartingOffset;
-        public long PartitionLength;
-        public uint HiddenSectors;
-        public uint PartitionNumber;
-        public PARTITION_TYPE PartitionType;
-        public byte BootIndicator;
-        public byte RecognizedPartition;
-        public byte RewritePartition;
+        public long StartingOffset { get; }
+        public long PartitionLength { get; }
+        public uint HiddenSectors { get; }
+        public uint PartitionNumber { get; }
+        public PARTITION_TYPE PartitionType { get; }
+        public byte BootIndicator { get; }
+        public byte RecognizedPartition { get; }
+        public byte RewritePartition { get; }
 
         /// <summary>
         /// Indicates whether this partition entry represents a Windows NT fault tolerant partition,
@@ -764,12 +605,7 @@ public static class NativeConstants
         /// <returns>True if this partition entry represents a Windows NT fault tolerant partition,
         /// such as mirror or stripe set. False otherwise.</returns>
         public bool IsFTPartition
-        {
-            get
-            {
-                return (PartitionType & PARTITION_TYPE.PARTITION_NTFT) == PARTITION_TYPE.PARTITION_NTFT;
-            }
-        }
+            => (PartitionType & PARTITION_TYPE.PARTITION_NTFT) == PARTITION_TYPE.PARTITION_NTFT;
 
         /// <summary>
         /// If this partition entry represents a Windows NT fault tolerant partition, such as mirror or stripe,
@@ -785,12 +621,7 @@ public static class NativeConstants
         /// stripe, set, then this property returns partition subtype, such as PARTITION_IFS for NTFS or HPFS
         /// partitions.</returns>
         public PARTITION_TYPE FTPartitionSubType
-        {
-            get
-            {
-                return PartitionType & ~PARTITION_TYPE.PARTITION_NTFT;
-            }
-        }
+            => PartitionType & ~PARTITION_TYPE.PARTITION_NTFT;
 
         /// <summary>
         /// Indicates whether this partition entry represents a container partition, also known as extended
@@ -801,12 +632,8 @@ public static class NativeConstants
         /// </value>
         /// <returns>True if this partition entry represents a container partition. False otherwise.</returns>
         public bool IsContainerPartition
-        {
-            get
-            {
-                return PartitionType == PARTITION_TYPE.PARTITION_EXTENDED || PartitionType == PARTITION_TYPE.PARTITION_XINT13_EXTENDED;
-            }
-        }
+            => PartitionType == PARTITION_TYPE.PARTITION_EXTENDED
+            || PartitionType == PARTITION_TYPE.PARTITION_XINT13_EXTENDED;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
@@ -814,98 +641,68 @@ public static class NativeConstants
     {
         public enum PARTITION_STYLE : byte
         {
-            PARTITION_STYLE_MBRField,
-            PARTITION_STYLE_GPTField,
-            PARTITION_STYLE_RAWField
+            PARTITION_STYLE_MBR,
+            PARTITION_STYLE_GPT,
+            PARTITION_STYLE_RAW
         }
 
-        [MarshalAs(UnmanagedType.U1)]
-        public PARTITION_STYLE PartitionStyle;
-        public long StartingOffset;
-        public long PartitionLength;
-        public uint PartitionNumber;
-        [MarshalAs(UnmanagedType.I1)]
-        public bool RewritePartition;
+        [field: MarshalAs(UnmanagedType.U1)]
+        public PARTITION_STYLE PartitionStyle { get; }
+        public long StartingOffset { get; }
+        public long PartitionLength { get; }
+        public uint PartitionNumber { get; }
+        [field: MarshalAs(UnmanagedType.I1)]
+        public bool RewritePartition { get; }
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 108)]
-        private readonly byte[] fields;
-
+        private unsafe fixed byte fields[108];
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct STORAGE_DEVICE_NUMBER
+    public readonly struct STORAGE_DEVICE_NUMBER
     {
+        public uint DeviceType { get; }
 
-        public uint DeviceType;
+        public uint DeviceNumber { get; }
 
-        public uint DeviceNumber;
-
-        public int PartitionNumber;
-
+        public int PartitionNumber { get; }
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct SCSI_ADDRESS : IEquatable<SCSI_ADDRESS>
+    public readonly struct SCSI_ADDRESS : IEquatable<SCSI_ADDRESS>
     {
-
-        public uint Length;
-        public byte PortNumber;
-        public byte PathId;
-        public byte TargetId;
-        public byte Lun;
+        public int Length { get; }
+        public byte PortNumber { get; }
+        public byte PathId { get; }
+        public byte TargetId { get; }
+        public byte Lun { get; }
 
         public SCSI_ADDRESS(byte PortNumber, uint DWordDeviceNumber)
+            : this(DWordDeviceNumber)
         {
-            Length = (uint)Marshal.SizeOf(this);
             this.PortNumber = PortNumber;
-            this.DWordDeviceNumber = DWordDeviceNumber;
         }
 
-        public SCSI_ADDRESS(uint DWordDeviceNumber)
+        public unsafe SCSI_ADDRESS(uint DWordDeviceNumber)
         {
-            Length = (uint)Marshal.SizeOf(this);
-            this.DWordDeviceNumber = DWordDeviceNumber;
+            Length = sizeof(SCSI_ADDRESS);
+            PathId = (byte)(DWordDeviceNumber & 0xFFL);
+            TargetId = (byte)(DWordDeviceNumber >> 8 & 0xFFL);
+            Lun = (byte)(DWordDeviceNumber >> 16 & 0xFFL);
         }
 
-        public uint DWordDeviceNumber
-        {
-            get
-            {
-                return PathId | (uint)TargetId << 8 | (uint)Lun << 16;
-            }
-            set
-            {
-                PathId = (byte)(value & 0xFFL);
-                TargetId = (byte)(value >> 8 & 0xFFL);
-                Lun = (byte)(value >> 16 & 0xFFL);
-            }
-        }
+        public uint DWordDeviceNumber => PathId | (uint)TargetId << 8 | (uint)Lun << 16;
 
-        public override string ToString() => "Port = " + PortNumber + ", Path = " + PathId + ", Target = " + TargetId + ", Lun = " + Lun;
+        public override string ToString() => $"Port = {PortNumber}, Path = {PathId}, Target = {TargetId}, Lun = {Lun}";
 
         public bool Equals(SCSI_ADDRESS other) => PortNumber.Equals(other.PortNumber) && PathId.Equals(other.PathId) && TargetId.Equals(other.TargetId) && Lun.Equals(other.Lun);
 
-        public override bool Equals(object? obj)
-        {
-            if (!(obj is SCSI_ADDRESS))
-            {
-                return false;
-            }
-
-            return Equals((SCSI_ADDRESS)obj);
-        }
+        public override bool Equals(object? obj) => obj is SCSI_ADDRESS scsiAddress && Equals(scsiAddress);
 
         public override int GetHashCode() => PathId | TargetId << 8 | Lun << 16;
 
-        public static bool operator ==(SCSI_ADDRESS first, SCSI_ADDRESS second)
-        {
-            return first.Equals(second);
-        }
+        public static bool operator ==(SCSI_ADDRESS first, SCSI_ADDRESS second) => first.Equals(second);
 
-        public static bool operator !=(SCSI_ADDRESS first, SCSI_ADDRESS second)
-        {
-            return !first.Equals(second);
-        }
+        public static bool operator !=(SCSI_ADDRESS first, SCSI_ADDRESS second) => !first.Equals(second);
 
     }
 }

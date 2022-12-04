@@ -65,10 +65,7 @@ public class VolumeMountPointEnumerator : IEnumerable<string>
         private object IEnumerator_Current
         {
             [SecuritySafeCritical]
-            get
-            {
-                return Current;
-            }
+            get => Current;
         }
 
         object IEnumerator.Current

@@ -5,6 +5,7 @@
  * http://ltr-data.se   https://github.com/LTRData
  */
 
+using LTRLib.Extensions;
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections;
@@ -98,7 +99,7 @@ public class NativeFileInfo
         Mode = all_info->ModeInformation.Mode;
         AlignmentRequirement = all_info->AlignmentInformation.AlignmentRequirement;
 
-        Name = new string(all_info->NameInformation.FileName, 0,
+        Name = new string(&all_info->NameInformation.FileName, 0,
             (int)all_info->NameInformation.FileNameLength / sizeof(char));
     }
 
@@ -209,197 +210,205 @@ internal enum FILE_INFORMATION_CLASS
     FileMaximumInformation
 }
 
-internal unsafe struct FILE_DIRECTORY_INFORMATION
+internal readonly unsafe struct FILE_DIRECTORY_INFORMATION
 {
-    public uint NextEntryOffset;
-    public uint FileIndex;
-    public long CreationTime;
-    public long LastAccessTime;
-    public long LastWriteTime;
-    public long ChangeTime;
-    public long EndOfFile;
-    public long AllocationSize;
-    public uint FileAttributes;
-    public uint FileNameLength;
-    public fixed char FileName[1];
+    public uint NextEntryOffset { get; }
+    public uint FileIndex { get; }
+    public long CreationTime { get; }
+    public long LastAccessTime { get; }
+    public long LastWriteTime { get; }
+    public long ChangeTime { get; }
+    public long EndOfFile { get; }
+    public long AllocationSize { get; }
+    public uint FileAttributes { get; }
+    public uint FileNameLength { get; }
+    internal readonly char fileName;
 }
 
-internal unsafe struct FILE_FULL_DIR_INFORMATION
+internal readonly unsafe struct FILE_FULL_DIR_INFORMATION
 {
-    public uint NextEntryOffset;
-    public uint FileIndex;
-    public long CreationTime;
-    public long LastAccessTime;
-    public long LastWriteTime;
-    public long ChangeTime;
-    public long EndOfFile;
-    public long AllocationSize;
-    public uint FileAttributes;
-    public uint FileNameLength;
-    public uint EaSize;
-    public fixed char FileName[1];
+    public uint NextEntryOffset { get; }
+    public uint FileIndex { get; }
+    public long CreationTime { get; }
+    public long LastAccessTime { get; }
+    public long LastWriteTime { get; }
+    public long ChangeTime { get; }
+    public long EndOfFile { get; }
+    public long AllocationSize { get; }
+    public uint FileAttributes { get; }
+    public uint FileNameLength { get; }
+    public uint EaSize { get; }
+    internal readonly char fileName;
 }
 
-internal unsafe struct FILE_BOTH_DIR_INFORMATION
+internal readonly unsafe struct FILE_BOTH_DIR_INFORMATION
 {
-    public uint NextEntryOffset;
-    public uint FileIndex;
-    public long CreationTime;
-    public long LastAccessTime;
-    public long LastWriteTime;
-    public long ChangeTime;
-    public long EndOfFile;
-    public long AllocationSize;
-    public uint FileAttributes;
-    public uint FileNameLength;
-    public uint EaSize;
-    public byte ShortNameLength;
-    public fixed char ShortName[12];
-    public fixed char FileName[1];
+    public uint NextEntryOffset { get; }
+    public uint FileIndex { get; }
+    public long CreationTime { get; }
+    public long LastAccessTime { get; }
+    public long LastWriteTime { get; }
+    public long ChangeTime { get; }
+    public long EndOfFile { get; }
+    public long AllocationSize { get; }
+    public uint FileAttributes { get; }
+    public uint FileNameLength { get; }
+    public uint EaSize { get; }
+    public byte ShortNameLength { get; }
+    private readonly ShortName shortName;
+    public string ShortName => shortName.ToString();
+    internal readonly char fileName;
 }
 
-internal struct FILE_BASIC_INFORMATION
+internal unsafe struct ShortName
 {
-    public long CreationTime;
-    public long LastAccessTime;
-    public long LastWriteTime;
-    public long ChangeTime;
-    public uint FileAttributes;
+    private fixed char shortName[12];
+
+    public override string ToString() => BufferExtensions.CreateString(shortName[0]);
 }
 
-internal struct FILE_STANDARD_INFORMATION
+internal readonly struct FILE_BASIC_INFORMATION
 {
-    public long AllocationSize;
-    public long EndOfFile;
-    public uint NumberOfLinks;
-    public byte DeletePending;
-    public byte Directory;
+    public long CreationTime { get; }
+    public long LastAccessTime { get; }
+    public long LastWriteTime { get; }
+    public long ChangeTime { get; }
+    public uint FileAttributes { get; }
 }
 
-internal struct FILE_INTERNAL_INFORMATION
+internal readonly struct FILE_STANDARD_INFORMATION
 {
-    public long IndexNumber;
+    public long AllocationSize { get; }
+    public long EndOfFile { get; }
+    public uint NumberOfLinks { get; }
+    public byte DeletePending { get; }
+    public byte Directory { get; }
 }
 
-internal struct FILE_EA_INFORMATION
+internal readonly struct FILE_INTERNAL_INFORMATION
 {
-    public uint EaSize;
+    public long IndexNumber { get; }
 }
 
-internal struct FILE_ACCESS_INFORMATION
+internal readonly struct FILE_EA_INFORMATION
 {
-    public uint AccessFlags;
+    public uint EaSize { get; }
 }
 
-internal struct FILE_MODE_INFORMATION
+internal readonly struct FILE_ACCESS_INFORMATION
 {
-    public uint Mode;
+    public uint AccessFlags { get; }
 }
 
-internal unsafe struct FILE_RENAME_INFORMATION
+internal readonly struct FILE_MODE_INFORMATION
 {
-    public byte ReplaceIfExists;
-    public IntPtr RootDirectory;
-    public uint FileNameLength;
-    public fixed char FileName[1];
+    public uint Mode { get; }
 }
 
-internal unsafe struct FILE_LINK_INFORMATION
+internal readonly unsafe struct FILE_RENAME_INFORMATION
 {
-    public byte ReplaceIfExists;
-    public IntPtr RootDirectory;
-    public uint FileNameLength;
-    public fixed char FileName[1];
+    public byte ReplaceIfExists { get; }
+    public IntPtr RootDirectory { get; }
+    public uint FileNameLength { get; }
+    internal readonly char FileName;
 }
 
-internal unsafe struct FILE_NAMES_INFORMATION
+internal readonly unsafe struct FILE_LINK_INFORMATION
 {
-    public uint NextEntryOffset;
-    public uint FileIndex;
-    public uint FileNameLength;
-    public fixed char FileName[1];
+    public byte ReplaceIfExists { get; }
+    public IntPtr RootDirectory { get; }
+    public uint FileNameLength { get; }
+    internal readonly char FileName;
 }
 
-internal struct FILE_ALLOCATION_INFORMATION
+internal readonly unsafe struct FILE_NAMES_INFORMATION
 {
-    public long AllocationSize;
+    public uint NextEntryOffset { get; }
+    public uint FileIndex { get; }
+    public uint FileNameLength { get; }
+    internal readonly char FileName;
+}
+
+internal readonly struct FILE_ALLOCATION_INFORMATION
+{
+    public long AllocationSize { get; }
 }
 
 internal unsafe struct FILE_COMPRESSION_INFORMATION
 {
-    public long CompressedFileSize;
-    public ushort CompressionFormat;
-    public byte CompressionUnitShift;
-    public byte ChunkShift;
-    public byte ClusterShift;
-    public fixed byte Reserved[3];
+    public long CompressedFileSize { get; }
+    public ushort CompressionFormat { get; }
+    public byte CompressionUnitShift { get; }
+    public byte ChunkShift { get; }
+    public byte ClusterShift { get; }
+    internal fixed byte Reserved[3];
 }
 
-internal struct FILE_COMPLETION_INFORMATION
+internal readonly struct FILE_COMPLETION_INFORMATION
 {
-    public IntPtr Port;
-    public uint Key;
+    public IntPtr Port { get; }
+    public uint Key { get; }
 }
 
-internal struct FILE_POSITION_INFORMATION
+internal readonly struct FILE_POSITION_INFORMATION
 {
-    public long CurrentByteOffset;
+    public long CurrentByteOffset { get; }
 }
 
-internal struct FILE_ALIGNMENT_INFORMATION
+internal readonly struct FILE_ALIGNMENT_INFORMATION
 {
-    public uint AlignmentRequirement;
+    public uint AlignmentRequirement { get; }
 }
 
-internal unsafe struct FILE_NAME_INFORMATION
+internal readonly unsafe struct FILE_NAME_INFORMATION
 {
-    public uint FileNameLength;
-    public fixed char FileName[1];
+    public uint FileNameLength { get; }
+    internal readonly char FileName;
 }
 
-internal struct FILE_NETWORK_OPEN_INFORMATION
+internal readonly struct FILE_NETWORK_OPEN_INFORMATION
 {
-    public long CreationTime;
-    public long LastAccessTime;
-    public long LastWriteTime;
-    public long ChangeTime;
-    public long AllocationSize;
-    public long EndOfFile;
-    public uint FileAttributes;
+    public long CreationTime { get; }
+    public long LastAccessTime { get; }
+    public long LastWriteTime { get; }
+    public long ChangeTime { get; }
+    public long AllocationSize { get; }
+    public long EndOfFile { get; }
+    public uint FileAttributes { get; }
 }
 
-internal struct FILE_ATTRIBUTE_TAG_INFORMATION
+internal readonly struct FILE_ATTRIBUTE_TAG_INFORMATION
 {
-    public uint FileAttributes;
-    public uint ReparseTag;
+    public uint FileAttributes { get; }
+    public uint ReparseTag { get; }
 }
 
-internal struct FILE_DISPOSITION_INFORMATION
+internal readonly struct FILE_DISPOSITION_INFORMATION
 {
-    public byte DeleteFile;
+    public byte DeleteFile { get; }
 }
 
-internal struct FILE_END_OF_FILE_INFORMATION
+internal readonly struct FILE_END_OF_FILE_INFORMATION
 {
-    public long EndOfFile;
+    public long EndOfFile { get; }
 }
 
-internal struct FILE_VALID_DATA_LENGTH_INFORMATION
+internal readonly struct FILE_VALID_DATA_LENGTH_INFORMATION
 {
-    public long ValidDataLength;
+    public long ValidDataLength { get; }
 }
 
-internal struct FILE_ALL_INFORMATION
+internal readonly struct FILE_ALL_INFORMATION
 {
-    public FILE_BASIC_INFORMATION BasicInformation;
-    public FILE_STANDARD_INFORMATION StandardInformation;
-    public FILE_INTERNAL_INFORMATION InternalInformation;
-    public FILE_EA_INFORMATION EaInformation;
-    public FILE_ACCESS_INFORMATION AccessInformation;
-    public FILE_POSITION_INFORMATION PositionInformation;
-    public FILE_MODE_INFORMATION ModeInformation;
-    public FILE_ALIGNMENT_INFORMATION AlignmentInformation;
-    public FILE_NAME_INFORMATION NameInformation;
+    public readonly FILE_BASIC_INFORMATION BasicInformation;
+    public readonly FILE_STANDARD_INFORMATION StandardInformation;
+    public readonly FILE_INTERNAL_INFORMATION InternalInformation;
+    public readonly FILE_EA_INFORMATION EaInformation;
+    public readonly FILE_ACCESS_INFORMATION AccessInformation;
+    public readonly FILE_POSITION_INFORMATION PositionInformation;
+    public readonly FILE_MODE_INFORMATION ModeInformation;
+    public readonly FILE_ALIGNMENT_INFORMATION AlignmentInformation;
+    public readonly FILE_NAME_INFORMATION NameInformation;
 }
 
 [SupportedOSPlatform("windows")]

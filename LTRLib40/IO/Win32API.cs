@@ -276,7 +276,7 @@ internal static class Win32API
     public static extern SafeServiceHandle OpenService(SafeServiceHandle hSCManager, [MarshalAs(UnmanagedType.LPWStr)][In] string lpServiceName, int dwDesiredAccess);
 
     [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    public static extern bool ControlService(SafeServiceHandle hSCManager, int dwControl, ref NativeConstants.SERVICE_STATUS lpServiceStatus);
+    public static extern bool ControlService(SafeServiceHandle hSCManager, int dwControl, out NativeConstants.SERVICE_STATUS lpServiceStatus);
 
     [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     public static extern bool DeleteService(SafeServiceHandle hSCObject);
@@ -294,7 +294,7 @@ internal static class Win32API
     public static extern int QueryDosDevice([MarshalAs(UnmanagedType.LPTStr)][In] string? lpDeviceName, [MarshalAs(UnmanagedType.LPArray), Out] char[] lpTargetPath, uint ucchMax);
 
     [DllImport("kernel32.dll", SetLastError = true, EntryPoint = "GetFileSizeEx")]
-    public static extern bool GetFileSize(SafeFileHandle hFile, ref long liFileSize);
+    public static extern bool GetFileSize(SafeFileHandle hFile, out long liFileSize);
 
     /// <summary>
     /// Encapsulates a FindVolume handle that is closed by calling FindVolumeClose() Win32 API.
@@ -467,10 +467,10 @@ internal static class Win32API
     public static extern bool DeviceIoControl(SafeFileHandle hDevice, uint dwIoControlCode, in ushort lpInBuffer, uint nInBufferSize, IntPtr lpOutBuffer, uint nOutBufferSize, out uint lpBytesReturned, IntPtr lpOverlapped);
 
     [DllImport("kernel32.dll", SetLastError = true, EntryPoint = "DeviceIoControl")]
-    public static extern bool DeviceIoControl(SafeFileHandle hDevice, uint dwIoControlCode, [In][MarshalAs(UnmanagedType.I1)] ref bool lpInBuffer, uint nInBufferSize, IntPtr lpOutBuffer, uint nOutBufferSize, out uint lpBytesReturned, IntPtr lpOverlapped);
+    public static extern bool DeviceIoControl(SafeFileHandle hDevice, uint dwIoControlCode, [MarshalAs(UnmanagedType.I1)] in bool lpInBuffer, uint nInBufferSize, IntPtr lpOutBuffer, uint nOutBufferSize, out uint lpBytesReturned, IntPtr lpOverlapped);
 
     [DllImport("kernel32.dll", SetLastError = true, EntryPoint = "DeviceIoControl")]
-    public static extern bool DeviceIoControl(SafeFileHandle hDevice, uint dwIoControlCode, IntPtr lpInBuffer, uint nInBufferSize, ref long lpOutBuffer, uint nOutBufferSize, out uint lpBytesReturned, IntPtr lpOverlapped);
+    public static extern bool DeviceIoControl(SafeFileHandle hDevice, uint dwIoControlCode, IntPtr lpInBuffer, uint nInBufferSize, out long lpOutBuffer, uint nOutBufferSize, out uint lpBytesReturned, IntPtr lpOverlapped);
 
     [DllImport("kernel32.dll", SetLastError = true)]
     public static extern bool DeviceIoControl(SafeFileHandle hDevice, uint dwIoControlCode, IntPtr lpInBuffer, uint nInBufferSize, out NativeConstants.PARTITION_INFORMATION lpOutBuffer, uint nOutBufferSize, out uint lpBytesReturned, IntPtr lpOverlapped);
@@ -602,11 +602,11 @@ internal static class Win32API
     public static extern bool GetConsoleScreenBufferInfo(SafeFileHandle hConsoleOutput, out NativeConstants.CONSOLE_SCREEN_BUFFER_INFO lpConsoleScreenBufferInfo);
 
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    public static extern SafeFileMappingHandle CreateFileMapping(IntPtr p1, ref NativeConstants.SECURITY_ATTRIBUTES p2, NativeConstants.PageProtection p3, uint p4, uint p5, [MarshalAs(UnmanagedType.LPTStr)][In] string p6);
+    public static extern SafeFileMappingHandle CreateFileMapping(IntPtr p1, in NativeConstants.SECURITY_ATTRIBUTES p2, NativeConstants.PageProtection p3, uint p4, uint p5, [MarshalAs(UnmanagedType.LPTStr)][In] string p6);
 
     // [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    public static extern SafeFileMappingHandle CreateFileMapping(SafeFileHandle p1, ref NativeConstants.SECURITY_ATTRIBUTES p2, NativeConstants.PageProtection p3, uint p4, uint p5, [MarshalAs(UnmanagedType.LPTStr)][In] string p6);
+    public static extern SafeFileMappingHandle CreateFileMapping(SafeFileHandle p1, in NativeConstants.SECURITY_ATTRIBUTES p2, NativeConstants.PageProtection p3, uint p4, uint p5, [MarshalAs(UnmanagedType.LPTStr)][In] string p6);
 
     // [DllImport Lib "kernel32" ("kernel32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
@@ -630,7 +630,7 @@ internal static class Win32API
 
     // [DllImport Lib "kernel32" ("kernel32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    public static extern UIntPtr VirtualQuery(IntPtr p1, ref NativeConstants.MEMORY_BASIC_INFORMATION p2, UIntPtr p3);
+    public static extern UIntPtr VirtualQuery(IntPtr p1, out NativeConstants.MEMORY_BASIC_INFORMATION p2, UIntPtr p3);
 
     // [DllImport Lib "kernel32" ("kernel32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
@@ -648,10 +648,10 @@ internal static class Win32API
     public static extern int RtlNtStatusToDosError(int ntstatus);
 
     [DllImport("ntdll.dll", CharSet = CharSet.Unicode)]
-    public static extern bool RtlDosPathNameToNtPathName_U([MarshalAs(UnmanagedType.LPTStr)][In] string DosName, ref NativeConstants.UNICODE_STRING NtName, IntPtr DosFilePath, IntPtr NtFilePath);
+    public static extern bool RtlDosPathNameToNtPathName_U([MarshalAs(UnmanagedType.LPTStr)][In] string DosName, out NativeConstants.UNICODE_STRING NtName, IntPtr DosFilePath, IntPtr NtFilePath);
 
     [DllImport("ntdll.dll")]
-    public static extern void RtlFreeUnicodeString(ref NativeConstants.UNICODE_STRING UnicodeString);
+    public static extern void RtlFreeUnicodeString(in NativeConstants.UNICODE_STRING UnicodeString);
 
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     public static extern int SearchPath([MarshalAs(UnmanagedType.LPTStr)][In] string lpPath, [MarshalAs(UnmanagedType.LPTStr)][In] string lpFileName, [MarshalAs(UnmanagedType.LPTStr)][In] string lpExtension, int nBufferLength, [MarshalAs(UnmanagedType.LPTStr), Out] StringBuilder lpBuffer, out IntPtr lpFilePart);
@@ -699,7 +699,7 @@ internal static class Win32API
     public static extern int RtlGetVersion(ref NativeConstants.OSVERSIONINFOEX os_version);
 
     [DllImport("user32.dll", SetLastError = true, EntryPoint = "SystemParametersInfoA", CharSet = CharSet.Ansi)]
-    public static extern int GetSystemParametersDWORD(uint uAction, uint uParam, ref uint lpvParam, uint fuWinIni);
+    public static extern int GetSystemParametersDWORD(uint uAction, uint uParam, out uint lpvParam, uint fuWinIni);
 
     [DllImport("user32.dll", SetLastError = true, EntryPoint = "SystemParametersInfoA", CharSet = CharSet.Ansi)]
     public static extern int SetSystemParametersDWORD(uint uAction, uint uParam, IntPtr lpvParam, uint fuWinIni);

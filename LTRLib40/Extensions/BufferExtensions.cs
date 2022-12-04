@@ -10,6 +10,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.ComponentModel.Design.Serialization;
+using System.Runtime.CompilerServices;
+using System.Globalization;
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Linq;
 #endif
@@ -809,4 +811,123 @@ public static class BufferExtensions
         return hash.ToHashCode();
     }
 #endif
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ReadOnlySpan<T> CreateReadOnlySpan<T>(in T source, int length) =>
+        MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(source), length);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Span<T> CreateSpan<T>(ref T source, int length) =>
+        MemoryMarshal.CreateSpan(ref source, length);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ReadOnlySpan<byte> AsReadOnlyBytes<T>(in T source) where T : unmanaged =>
+        MemoryMarshal.AsBytes(CreateReadOnlySpan(source, 1));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Span<byte> AsBytes<T>(ref T source) where T : unmanaged =>
+        MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref source, 1));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ToHexString<T>(in T source) where T : unmanaged =>
+        ToHexString(AsReadOnlyBytes(source));
+
+    public static string ToHexString(this ReadOnlySpan<byte> bytes, ReadOnlySpan<char> delimiter)
+    {
+        if (bytes.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        var delimiter_length = delimiter.Length;
+        var str = new string('\0', (bytes.Length << 1) + delimiter_length * (bytes.Length - 1));
+
+        var target = MemoryMarshal.AsMemory(str.AsMemory()).Span;
+
+        for (var i = 0; i < bytes.Length; i++)
+        {
+            bytes[i].TryFormat(target.Slice(i * (2 + delimiter_length), 2), out _, "x2");
+            if (delimiter_length > 0 && i < bytes.Length - 1)
+            {
+                delimiter.CopyTo(target[(i * (2 + delimiter_length) + 2)..]);
+            }
+        }
+
+        return target.ToString();
+    }
+
+#elif NET45_OR_GREATER || NETSTANDARD
+
+    public static unsafe ReadOnlySpan<T> CreateReadOnlySpan<T>(in T source, int length) =>
+        new(Unsafe.AsPointer(ref Unsafe.AsRef(source)), length);
+
+    public static unsafe Span<T> CreateSpan<T>(ref T source, int length) =>
+        new(Unsafe.AsPointer(ref source), length);
+
+    public static string ToHexString(this ReadOnlySpan<byte> data, string? delimiter)
+    {
+        if (data.IsEmpty)
+        {
+            return string.Empty;
+        }
+
+        var capacity = data.Length << 1;
+        if (delimiter is not null)
+        {
+            capacity += delimiter.Length * (data.Length - 1);
+        }
+
+        var result = new StringBuilder(capacity);
+
+        foreach (var b in data)
+        {
+            if (delimiter is not null && result.Length > 0)
+            {
+                result.Append(delimiter);
+            }
+
+            result.Append(b.ToString("x2", NumberFormatInfo.InvariantInfo));
+        }
+
+        return result.ToString();
+    }
+
+#endif
+
+    public static unsafe string CreateString(in char source)
+    {
+        fixed (char* chars = &source)
+        {
+            return new(chars);
+        }
+    }
+
+#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+    /// <summary>
+    /// Reads null terminated Unicode string from char buffer.
+    /// </summary>
+    /// <param name="chars">Buffer</param>
+    /// <returns>Managed string</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ReadOnlySpan<char> ReadNullTerminatedUnicode(this ReadOnlySpan<char> chars)
+    {
+        var endpos = chars.IndexOfTerminator();
+        return chars.Slice(0, endpos);
+    }
+
+    /// <summary>
+    /// Return position of first empty element, or the entire span length if
+    /// no empty elements are found.
+    /// </summary>
+    /// <param name="buffer">Span to search</param>
+    /// <returns>Position of first found empty element or entire span length if none found</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int IndexOfTerminator<T>(this ReadOnlySpan<T> buffer) where T : unmanaged, IEquatable<T>
+    {
+        var endpos = buffer.IndexOf(default(T));
+        return endpos >= 0 ? endpos : buffer.Length;
+    }
+#endif
+
 }

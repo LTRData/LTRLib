@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
@@ -256,23 +257,24 @@ public class WTS : IDisposable
 
     public WTS(string serverName) => ServerHandle = WTSOpenServer(serverName);
 
-    public static WTSIsRemote IsRemoteSession => SessionInfo<WTSIsRemote>.Query(LocalServerHandle, _currentSession);
+    public static WTSIsRemote IsRemoteSession => SessionInfoStruct<WTSIsRemote>.Query(LocalServerHandle, _currentSession);
 
-    public static WTSSessionAddress CurrentSessionAddress => SessionInfo<WTSSessionAddress>.Query(LocalServerHandle, _currentSession);
+    public static WTSSessionAddress CurrentSessionAddress => SessionInfoStruct<WTSSessionAddress>.Query(LocalServerHandle, _currentSession);
 
-    public static WTSConfigInfo CurrentConfigInfo => SessionInfo<WTSConfigInfo>.Query(LocalServerHandle, _currentSession);
+    public static WTSConfigInfo CurrentConfigInfo => SessionInfoObject<WTSConfigInfo>.Query(LocalServerHandle, _currentSession);
 
-    public static WTSClient CurrentClient => SessionInfo<WTSClient>.Query(LocalServerHandle, _currentSession);
+    public static WTSClient CurrentClient => SessionInfoObject<WTSClient>.Query(LocalServerHandle, _currentSession);
 
-    public static WTSSessionInfo CurrentSessionInfo => SessionInfo<WTSSessionInfo>.Query(LocalServerHandle, _currentSession);
+    public static WTSSessionInfo CurrentSessionInfo => SessionInfoObject<WTSSessionInfo>.Query(LocalServerHandle, _currentSession);
 
-    public static WTSSessionInfoEx CurrentSessionInfoEx => SessionInfo<WTSSessionInfoEx>.Query(LocalServerHandle, _currentSession);
+    public static WTSSessionInfoEx CurrentSessionInfoEx => SessionInfoObject<WTSSessionInfoEx>.Query(LocalServerHandle, _currentSession);
 
     public static int ChildSession => WTSGetChildSessionId(out var sessionId) ? sessionId : throw new Win32Exception();
 
     public static bool IsChildSessionsEnabled => WTSIsChildSessionsEnabled(out var enabled) ? enabled : throw new Win32Exception();
 
-    public IEnumerable<WTSSessionItem> Sessions => EnumerateObjects<WTSSessionItem>.Query((out SafeWTSBuffer buf, out int count) => ServerHandle.WTSEnumerateSessions(0, 1, out buf, out count));
+    public IEnumerable<WTSSessionItem> Sessions => EnumerateObjects<WTSSessionItem>.Query((out SafeWTSBuffer buf, out int count)
+        => ServerHandle.WTSEnumerateSessions(0, 1, out buf, out count));
 
     public IEnumerable<WTSSessionItemEx> SessionsEx => EnumerateObjects<WTSSessionItemEx>.Query((out SafeWTSBufferEx buf, out int count) =>
     {
@@ -325,7 +327,9 @@ public class WTS : IDisposable
         }, WTSTypeClass.WTSTypeProcessInfoLevel1)
         .Select(item => new WTSProcessItemEx(item));
 
-    public T QuerySessionInfo<T>(int sessionId) => SessionInfo<T>.Query(ServerHandle, sessionId);
+    public TClass QuerySessionInfoObject<TClass>(int sessionId) where TClass : class => SessionInfoObject<TClass>.Query(ServerHandle, sessionId);
+
+    public TStruct QuerySessionInfoStruct<TStruct>(int sessionId) where TStruct : unmanaged => SessionInfoStruct<TStruct>.Query(ServerHandle, sessionId);
 
     public static WTSListenerConfig GetListenerConfig(string listener)
     {
@@ -755,17 +759,17 @@ public sealed class WTSProcessItemEx
 // LTRLib.IO.WTS.WTS
 [SecurityCritical]
 [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.AllFlags)]
-public static class SessionInfo<T>
+public static class SessionInfoObject<TClass> where TClass : class
 {
     internal static InfoClass InfoClass { get; } =
-        (typeof(T).GetCustomAttributes(typeof(InfoClassAttribute), inherit: false).FirstOrDefault() as InfoClassAttribute)?.InfoClass ??
-        throw new Exception($"Attribute {nameof(InfoClassAttribute)} missing on type {typeof(T).FullName}");
+        (typeof(TClass).GetCustomAttributes(typeof(InfoClassAttribute), inherit: false).FirstOrDefault() as InfoClassAttribute)?.InfoClass ??
+        throw new Exception($"Attribute {nameof(InfoClassAttribute)} missing on type {typeof(TClass).FullName}");
 
-    internal static int DataSize { get; } = Marshal.SizeOf<T>();
+    internal static int DataSize { get; } = Marshal.SizeOf<TClass>();
 
     [SecurityCritical]
     [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.AllFlags)]
-    public static T Query(SafeWTSHandle serverHandle, int sessionId)
+    public static TClass Query(SafeWTSHandle serverHandle, int sessionId)
     {
         if (!serverHandle.WTSQuerySessionInformation(sessionId, InfoClass, out var pbuf, out var size))
         {
@@ -776,10 +780,43 @@ public static class SessionInfo<T>
         {
             if (size < DataSize)
             {
-                throw new NotSupportedException($"Unexpected size {size} for type {typeof(T).FullName}. Expected: {DataSize}");
+                throw new NotSupportedException($"Unexpected size {size} for type {typeof(TClass).FullName}. Expected: {DataSize}");
             }
 
-            var obj = Marshal.PtrToStructure<T>(pbuf.DangerousGetHandle())!;
+            var obj = Marshal.PtrToStructure<TClass>(pbuf.DangerousGetHandle())!;
+
+            return obj;
+        }
+    }
+}
+
+[SecurityCritical]
+[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.AllFlags)]
+public static class SessionInfoStruct<TStruct> where TStruct : unmanaged
+{
+    internal static InfoClass InfoClass { get; } =
+        (typeof(TStruct).GetCustomAttributes(typeof(InfoClassAttribute), inherit: false).FirstOrDefault() as InfoClassAttribute)?.InfoClass ??
+        throw new Exception($"Attribute {nameof(InfoClassAttribute)} missing on type {typeof(TStruct).FullName}");
+
+    internal static unsafe int DataSize { get; } = sizeof(TStruct);
+
+    [SecurityCritical]
+    [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.AllFlags)]
+    public static TStruct Query(SafeWTSHandle serverHandle, int sessionId)
+    {
+        if (!serverHandle.WTSQuerySessionInformation(sessionId, InfoClass, out var pbuf, out var size))
+        {
+            throw new Exception("Query session information failed", new Win32Exception());
+        }
+
+        using (pbuf)
+        {
+            if (size < DataSize)
+            {
+                throw new NotSupportedException($"Unexpected size {size} for type {typeof(TStruct).FullName}. Expected: {DataSize}");
+            }
+
+            var obj = pbuf.Read<TStruct>(0);
 
             return obj;
         }
@@ -801,27 +838,35 @@ public readonly struct WTSIsRemote
     public override string ToString() => $"IsRemote: {IsRemote}";
 }
 
-[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+[StructLayout(LayoutKind.Sequential)]
 [InfoClass(InfoClass = InfoClass.WTSSessionAddressV4)]
-public sealed class WTSSessionAddress
+public struct WTSSessionAddress
 {
     public AddressFamily AddressFamily { get; }
 
-    [field: MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
-    public byte[]? RawAddress { get; }
+    private unsafe fixed byte rawAddress[20];
 
-    public IPAddress? Address => RawAddress is not null
-        ? AddressFamily switch
-        {
-            AddressFamily.InterNetwork => new IPAddress(RawAddress),
-            AddressFamily.InterNetworkV6 => new IPAddress(RawAddress),
-            _ => null
-        }
-        : null;
-
-    private WTSSessionAddress()
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
+    public unsafe ReadOnlySpan<byte> RawAddress => MemoryMarshal.CreateReadOnlySpan(ref rawAddress[0], 20);
+#else
+    public unsafe byte[] RawAddress
     {
+        get
+        {
+            fixed (byte* ptr = rawAddress)
+            {
+                return new ReadOnlySpan<byte>(ptr, 20).ToArray();
+            }
+        }
     }
+#endif
+
+    public unsafe IPAddress? Address => AddressFamily switch
+    {
+        AddressFamily.InterNetwork => new(RawAddress),
+        AddressFamily.InterNetworkV6 => new(RawAddress),
+        _ => null
+    };
 }
 
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]

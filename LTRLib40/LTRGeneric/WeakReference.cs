@@ -42,14 +42,8 @@ public partial class WeakReference<T> : WeakReference where T : class
 
     public new T? Target
     {
-        get
-        {
-            return base.Target as T;
-        }
-        set
-        {
-            base.Target = value;
-        }
+        get => base.Target as T;
+        set => base.Target = value;
     }
 
     [SecurityCritical]

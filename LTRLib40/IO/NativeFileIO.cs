@@ -54,15 +54,12 @@ public static class NativeFileIO
 
     public static long GetVolumeSize(SafeFileHandle volume)
     {
-
-        var length = default(long);
-        if (!DeviceIoControl(volume, IOCTL_DISK_GET_LENGTH_INFO, IntPtr.Zero, 0U, ref length, 8U, out _, IntPtr.Zero))
+        if (!DeviceIoControl(volume, IOCTL_DISK_GET_LENGTH_INFO, IntPtr.Zero, 0U, out long length, 8U, out _, IntPtr.Zero))
         {
             throw new Win32Exception();
         }
 
         return length;
-
     }
 
     public static uint ConvertManagedFileAccess(FileAccess DesiredAccess)
@@ -377,25 +374,26 @@ public static class NativeFileIO
     [SecuritySafeCritical]
     public static string GetLongFullPath(string path)
     {
-
         path = GetNtPath(path);
 
         if (path.StartsWith(@"\??\"))
         {
+#if NET6_0_OR_GREATER
+            path = $@"\\?\{path.AsSpan(4)}";
+#elif NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+            path = $@"\\?\{path.AsMemory(4)}";
+#else
             path = $@"\\?\{path.Substring(4)}";
+#endif
         }
 
         return path;
-
     }
 
     [SecuritySafeCritical]
     public static string GetNtPath(string Win32Path)
     {
-
-        var UnicodeString = default(UNICODE_STRING);
-
-        var RC = RtlDosPathNameToNtPathName_U(Win32Path, ref UnicodeString, default, default);
+        var RC = RtlDosPathNameToNtPathName_U(Win32Path, out var UnicodeString, default, default);
         if (!RC)
         {
             throw new IOException($"Invalid path: '{Win32Path}'");
@@ -405,13 +403,10 @@ public static class NativeFileIO
         {
             return UnicodeString.ToString();
         }
-
         finally
         {
-            RtlFreeUnicodeString(ref UnicodeString);
-
+            RtlFreeUnicodeString(UnicodeString);
         }
-
     }
 
 #if NETCOREAPP && !NETCOREAPP3_0_OR_GREATER
@@ -466,7 +461,7 @@ public static class NativeFileIO
 
     }
 
-    #endif
+#endif
 
     /// <summary>
     /// Retrieves disk geometry.
@@ -812,7 +807,14 @@ public static class NativeFileIO
 
     public static PARTITION_INFORMATION? GetPartitionInformation(SafeFileHandle disk)
     {
-        if (DeviceIoControl(disk, IOCTL_DISK_GET_PARTITION_INFO_EX, IntPtr.Zero, 0U, out PARTITION_INFORMATION partition_info, (uint)MarshalSupport<PARTITION_INFORMATION>.Size, out _, IntPtr.Zero))
+        if (DeviceIoControl(disk,
+                            IOCTL_DISK_GET_PARTITION_INFO_EX,
+                            IntPtr.Zero,
+                            0U,
+                            out PARTITION_INFORMATION partition_info,
+                            (uint)MarshalSupport<PARTITION_INFORMATION>.Size,
+                            out _,
+                            IntPtr.Zero))
         {
             return partition_info;
         }
@@ -824,8 +826,14 @@ public static class NativeFileIO
 
     public static PARTITION_INFORMATION_EX? GetPartitionInformationEx(SafeFileHandle disk)
     {
-        if (DeviceIoControl(disk, IOCTL_DISK_GET_PARTITION_INFO_EX, IntPtr.Zero, 0U,
-            out PARTITION_INFORMATION_EX partition_info, (uint)MarshalSupport<PARTITION_INFORMATION_EX>.Size, out _, IntPtr.Zero))
+        if (DeviceIoControl(disk,
+                            IOCTL_DISK_GET_PARTITION_INFO_EX,
+                            IntPtr.Zero,
+                            0U,
+                            out PARTITION_INFORMATION_EX partition_info,
+                            (uint)MarshalSupport<PARTITION_INFORMATION_EX>.Size,
+                            out _,
+                            IntPtr.Zero))
         {
             return partition_info;
         }
@@ -839,7 +847,14 @@ public static class NativeFileIO
     {
         var attribs_size = (byte)16;
         var attribs = new byte[attribs_size];
-        if (DeviceIoControl(disk, IOCTL_DISK_GET_DISK_ATTRIBUTES, IntPtr.Zero, 0U, attribs, attribs_size, out _, IntPtr.Zero))
+        if (DeviceIoControl(disk,
+                            IOCTL_DISK_GET_DISK_ATTRIBUTES,
+                            IntPtr.Zero,
+                            0U,
+                            attribs,
+                            attribs_size,
+                            out _,
+                            IntPtr.Zero))
         {
             return (attribs[8] & 1) != 0;
         }
@@ -851,7 +866,6 @@ public static class NativeFileIO
 
     public static void SetDiskOffline(SafeFileHandle disk, bool offline)
     {
-
         var attribs_size = (byte)40;
         var attribs = new byte[attribs_size];
         attribs[0] = attribs_size;
@@ -862,29 +876,31 @@ public static class NativeFileIO
         }
 
         Win32Try(DeviceIoControl(disk, IOCTL_DISK_SET_DISK_ATTRIBUTES, attribs, attribs_size, IntPtr.Zero, 0U, out _, IntPtr.Zero));
-
     }
 
     public static bool? GetDiskReadOnly(SafeFileHandle disk)
     {
-
         var attribs_size = (byte)16;
         var attribs = new byte[attribs_size];
-        if (DeviceIoControl(disk, IOCTL_DISK_GET_DISK_ATTRIBUTES, IntPtr.Zero, 0U, attribs, attribs_size, out _, IntPtr.Zero))
+        if (DeviceIoControl(disk,
+                            IOCTL_DISK_GET_DISK_ATTRIBUTES,
+                            IntPtr.Zero,
+                            0U,
+                            attribs,
+                            attribs_size,
+                            out _,
+                            IntPtr.Zero))
         {
-
             return (attribs[8] & 2) != 0;
         }
         else
         {
             return default;
         }
-
     }
 
     public static void SetDiskReadOnly(SafeFileHandle disk, bool read_only)
     {
-
         var attribs_size = (byte)40;
         var attribs = new byte[attribs_size];
         attribs[0] = attribs_size;
@@ -895,10 +911,17 @@ public static class NativeFileIO
         }
 
         Win32Try(DeviceIoControl(disk, IOCTL_DISK_SET_DISK_ATTRIBUTES, attribs, attribs_size, IntPtr.Zero, 0U, out _, IntPtr.Zero));
-
     }
 
-    public static void SetVolumeOffline(SafeFileHandle disk, bool offline) => Win32Try(DeviceIoControl(disk, offline ? IOCTL_VOLUME_OFFLINE : IOCTL_VOLUME_ONLINE, IntPtr.Zero, 0U, IntPtr.Zero, 0U, out _, IntPtr.Zero));
+    public static void SetVolumeOffline(SafeFileHandle disk, bool offline)
+        => Win32Try(DeviceIoControl(disk,
+                                    offline ? IOCTL_VOLUME_OFFLINE : IOCTL_VOLUME_ONLINE,
+                                    IntPtr.Zero,
+                                    0U,
+                                    IntPtr.Zero,
+                                    0U,
+                                    out _,
+                                    IntPtr.Zero));
 
     private static class MarshalSupport<T>
     {
@@ -912,9 +935,7 @@ public static class NativeFileIO
 #if NETCOREAPP3_0_OR_GREATER || !NETCOREAPP
     public static OperatingSystem GetOSVersion()
     {
-
-        var os_version = new OSVERSIONINFOEX { OSVersionInfoSize = MarshalSupport<OSVERSIONINFOEX>.Size }
-        ;
+        var os_version = new OSVERSIONINFOEX();
 
         var status = RtlGetVersion(ref os_version);
 
@@ -923,12 +944,16 @@ public static class NativeFileIO
             throw new Win32Exception(RtlNtStatusToDosError(status));
         }
 
-        return new OperatingSystem(os_version.PlatformId, new Version(os_version.MajorVersion, os_version.MinorVersion, os_version.BuildNumber, os_version.ServicePackMajor << 16 | os_version.ServicePackMinor));
-
+        return new OperatingSystem(os_version.PlatformId,
+                                   new Version(os_version.MajorVersion,
+                                               os_version.MinorVersion,
+                                               os_version.BuildNumber,
+                                               os_version.ServicePackMajor << 16 | os_version.ServicePackMinor));
     }
 #endif
 
-    public static void SetFileSparseFlag(SafeFileHandle file, bool flag) => Win32Try(DeviceIoControl(file, FSCTL_SET_SPARSE, ref flag, 1U, default, 0U, out _, IntPtr.Zero));
+    public static void SetFileSparseFlag(SafeFileHandle file, bool flag)
+        => Win32Try(DeviceIoControl(file, FSCTL_SET_SPARSE, flag, 1U, default, 0U, out _, IntPtr.Zero));
 
 #if NETCOREAPP3_0_OR_GREATER || !NETCOREAPP
     /// <summary>

@@ -66,8 +66,11 @@ public static class TaskExtensions
 
 #if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
 
-    public static WaitHandleAwaiter GetAwaiterWithTimeout(this WaitHandle handle, TimeSpan timeout) =>
+    public static WaitHandleAwaiter WithTimeout(this WaitHandle handle, TimeSpan timeout) =>
         new(handle, timeout);
+
+    public static WaitHandleAwaiter WithTimeout(this WaitHandle handle, int msecTimeout) =>
+        new(handle, TimeSpan.FromMilliseconds(msecTimeout));
 
     public static WaitHandleAwaiter GetAwaiter(this WaitHandle handle) =>
         new(handle, new(0, 0, 0, 0, -1));
@@ -181,11 +184,13 @@ public readonly struct ProcessAwaiter : INotifyCompletion
     }
 }
 
-public struct WaitHandleAwaiter : INotifyCompletion
+public sealed class WaitHandleAwaiter : INotifyCompletion
 {
     private readonly WaitHandle handle;
     private readonly TimeSpan timeout;
-    private CompletionValues? completionValues;
+    private RegisteredWaitHandle? callbackHandle;
+    private Action? continuation;
+    private bool result = true;
 
     public WaitHandleAwaiter(WaitHandle handle, TimeSpan timeout)
     {
@@ -197,35 +202,23 @@ public struct WaitHandleAwaiter : INotifyCompletion
 
     public bool IsCompleted => handle.WaitOne(0);
 
-    public bool GetResult() => completionValues?.result ?? true;
-
-    private sealed class CompletionValues
-    {
-        public RegisteredWaitHandle? callbackHandle;
-
-        public Action? continuation;
-
-        public bool result;
-    }
+    public bool GetResult() => result;
 
     public void OnCompleted(Action continuation)
     {
-        completionValues = new CompletionValues
-        {
-            continuation = continuation
-        };
+        this.continuation = continuation;
 
-        completionValues.callbackHandle = ThreadPool.RegisterWaitForSingleObject(
+        callbackHandle = ThreadPool.RegisterWaitForSingleObject(
             waitObject: handle,
             callBack: WaitProc,
-            state: completionValues,
+            state: this,
             timeout: timeout,
             executeOnlyOnce: true);
     }
 
     private static void WaitProc(object? state, bool timedOut)
     {
-        var obj = state as CompletionValues
+        var obj = state as WaitHandleAwaiter
             ?? throw new InvalidAsynchronousStateException();
 
         obj.result = !timedOut;

@@ -164,15 +164,9 @@ public class SimpleWebClient
         return await DownloadResponseData(request).ConfigureAwait(continueOnCapturedContext: false);
     }
 
-    public async Task<string> DownloadStringAsync(Uri uri, Encoding encoding)
-    {
-        return encoding.GetString(await DownloadDataAsync(uri).ConfigureAwait(continueOnCapturedContext: false));
-    }
+    public async Task<string> DownloadStringAsync(Uri uri, Encoding encoding) => encoding.GetString(await DownloadDataAsync(uri).ConfigureAwait(continueOnCapturedContext: false));
 
-    public async Task<string> UploadStringAsync(Uri uri, string str, Encoding encoding)
-    {
-        return encoding.GetString(await UploadFileAsync(uri, new MemoryStream(encoding.GetBytes(str))).ConfigureAwait(continueOnCapturedContext: false));
-    }
+    public async Task<string> UploadStringAsync(Uri uri, string str, Encoding encoding) => encoding.GetString(await UploadFileAsync(uri, new MemoryStream(encoding.GetBytes(str))).ConfigureAwait(continueOnCapturedContext: false));
 
     protected virtual async Task<byte[]> DownloadResponseData(WebRequest request)
     {
@@ -211,20 +205,11 @@ public class SimpleWebClient
         return target.GetBuffer();
     }
 
-    protected virtual void OnFinished(EventArgs e)
-    {
-        Finished?.Invoke(this, e);
-    }
+    protected virtual void OnFinished(EventArgs e) => Finished?.Invoke(this, e);
 
-    protected virtual void OnBeginDownload(EventArgs e)
-    {
-        BeginDownload?.Invoke(this, e);
-    }
+    protected virtual void OnBeginDownload(EventArgs e) => BeginDownload?.Invoke(this, e);
 
-    protected virtual void OnBeginUpload(EventArgs e)
-    {
-        BeginUpload?.Invoke(this, e);
-    }
+    protected virtual void OnBeginUpload(EventArgs e) => BeginUpload?.Invoke(this, e);
 }
 
 #endif

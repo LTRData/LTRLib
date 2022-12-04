@@ -50,7 +50,7 @@ public static class TaskExtensions
     }
 
 #if !NET5_0_OR_GREATER
-    public static Task<string> ReadLineAsync(this StreamReader reader, CancellationToken _) => reader.ReadLineAsync();
+    public static Task<string> ReadLineAsync(this TextReader reader, CancellationToken _) => reader.ReadLineAsync();
 
     public static Task<Stream> GetStreamAsync(this HttpClient httpClient, string uri, CancellationToken _) => httpClient.GetStreamAsync(uri);
 

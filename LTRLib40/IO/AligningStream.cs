@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using LTRLib.LTRGeneric;
 #if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Buffers;
 using System.Threading.Tasks;

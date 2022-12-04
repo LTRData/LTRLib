@@ -6,6 +6,7 @@
  */
 
 using LTRLib.Extensions;
+using LTRLib.LTRGeneric;
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;

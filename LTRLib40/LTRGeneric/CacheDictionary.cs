@@ -22,21 +22,21 @@ namespace LTRLib.LTRGeneric;
 [ComVisible(false)]
 public class CacheDictionary<TKey, TValue> where TKey : notnull
 {
-    private readonly ConcurrentDictionary<TKey, (DateTime ExpiryTime, Task<TValue?> Task)> Cache;
+    private readonly ConcurrentDictionary<TKey, (DateTime ExpiryTime, Task<TValue> Task)> Cache;
 
     public CacheDictionary()
     {
-        Cache = new ConcurrentDictionary<TKey, (DateTime ExpiryTime, Task<TValue?> Task)>();
+        Cache = new ConcurrentDictionary<TKey, (DateTime ExpiryTime, Task<TValue> Task)>();
     }
 
     public CacheDictionary(IEqualityComparer<TKey> Comparer)
     {
-        Cache = new ConcurrentDictionary<TKey, (DateTime ExpiryTime, Task<TValue?> Task)>(Comparer);
+        Cache = new ConcurrentDictionary<TKey, (DateTime ExpiryTime, Task<TValue> Task)>(Comparer);
     }
 
     public void CleanExpired()
     {
-        var toremove = new List<KeyValuePair<TKey, (DateTime ExpiryTime, Task<TValue?> Task)>>();
+        var toremove = new List<KeyValuePair<TKey, (DateTime ExpiryTime, Task<TValue> Task)>>();
 
         lock (Cache)
         {
@@ -72,7 +72,7 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
 
     public void Clear() => Cache.Clear();
 
-    public bool TryGetValue(TKey Key, out Task<TValue?>? Value)
+    public bool TryGetValue(TKey Key, out Task<TValue>? Value)
     {
         CleanExpired();
 
@@ -89,7 +89,7 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
         }
     }
 
-    public void AddOrUpdate(TKey Key, DateTime ExpiryDateTime, Task<TValue?> Task)
+    public void AddOrUpdate(TKey Key, DateTime ExpiryDateTime, Task<TValue> Task)
     {
         CleanExpired();
 
@@ -104,11 +104,11 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
         });
     }
 
-    public void AddOrUpdate(TKey Key, double SecondsToLive, Task<TValue?> Value) => AddOrUpdate(Key, DateTime.UtcNow.AddSeconds(SecondsToLive), Value);
+    public void AddOrUpdate(TKey Key, double SecondsToLive, Task<TValue> Value) => AddOrUpdate(Key, DateTime.UtcNow.AddSeconds(SecondsToLive), Value);
 
-    public void AddOrUpdate(TKey Key, TimeSpan TimeToLive, Task<TValue?> Value) => AddOrUpdate(Key, DateTime.UtcNow + TimeToLive, Value);
+    public void AddOrUpdate(TKey Key, TimeSpan TimeToLive, Task<TValue> Value) => AddOrUpdate(Key, DateTime.UtcNow + TimeToLive, Value);
 
-    public Task<TValue?> GetOrAdd(TKey Key, DateTime ExpiryDateTime, Func<Task<TValue?>> ValueFactory)
+    public Task<TValue> GetOrAdd(TKey Key, DateTime ExpiryDateTime, Func<Task<TValue>> ValueFactory)
     {
         CleanExpired();
 
@@ -117,9 +117,9 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
         return item.Task;
     }
 
-    public Task<TValue?> GetOrAdd(TKey Key, TimeSpan TimeToLive, Func<Task<TValue?>> ValueFactory) => GetOrAdd(Key, DateTime.UtcNow + TimeToLive, ValueFactory);
+    public Task<TValue> GetOrAdd(TKey Key, TimeSpan TimeToLive, Func<Task<TValue>> ValueFactory) => GetOrAdd(Key, DateTime.UtcNow + TimeToLive, ValueFactory);
 
-    public Task<TValue?> GetOrAdd(TKey Key, double SecondsToLive, Func<Task<TValue?>> ValueFactory) => GetOrAdd(Key, TimeSpan.FromSeconds(SecondsToLive), ValueFactory);
+    public Task<TValue> GetOrAdd(TKey Key, double SecondsToLive, Func<Task<TValue>> ValueFactory) => GetOrAdd(Key, TimeSpan.FromSeconds(SecondsToLive), ValueFactory);
 
     public int Count // Implements ICollection(Of KeyValuePair(Of TKey, TValue)).Count
     {
@@ -136,7 +136,7 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
         return Cache.ContainsKey(key);
     }
 
-    public Task<TValue?> this[TKey key] // Implements IDictionary(Of TKey, TValue).Item
+    public Task<TValue> this[TKey key] // Implements IDictionary(Of TKey, TValue).Item
     {
         get
         {
@@ -162,13 +162,13 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
         }
     }
 
-    public bool TryRemove(TKey key, out (DateTime ExpiryTime, Task<TValue?> Task) value) // Implements IDictionary(Of TKey, TValue).Remove
+    public bool TryRemove(TKey key, out (DateTime ExpiryTime, Task<TValue> Task) value) // Implements IDictionary(Of TKey, TValue).Remove
     {
         CleanExpired();
         return Cache.TryRemove(key, out value);
     }
 
-    public IEnumerable<Task<TValue?>> Values // Implements IDictionary(Of TKey, TValue).Values
+    public IEnumerable<Task<TValue>> Values // Implements IDictionary(Of TKey, TValue).Values
     {
         get
         {

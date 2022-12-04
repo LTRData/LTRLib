@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Xunit;
 using LTRLib.Extensions;
 using System.Threading;
+using LTRLib.LTRGeneric;
 
 namespace LTRLib;
 

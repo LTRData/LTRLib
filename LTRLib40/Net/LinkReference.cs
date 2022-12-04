@@ -38,7 +38,7 @@ public class LinkReference<T> : MarshalByRefObject where T : class
         this.@ref = @ref;
     }
 
-    private static readonly CacheDictionary<string, T> ObjCache = new();
+    private static readonly CacheDictionary<string, T?> ObjCache = new();
 
     [XmlIgnore]
     protected TimeSpan Cachetime { get; set; } = new TimeSpan(0, 0, 20);

@@ -12,19 +12,36 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Collections.Generic;
 #if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
 #endif
 #if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Net.Http;
 #endif
 
-namespace LTRLib.Extensions;
+namespace LTRLib.LTRGeneric;
 
-public static class TaskExtensions
+public static class TaskSupport
 {
 #if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+    private static class Immuatables<T>
+    {
+        public static readonly Task<T?> DefaultCompletedTask = Task.FromResult<T?>(default);
+
+        public static readonly Task<T[]> EmptyArrayCompletedTask = Task.FromResult(Array.Empty<T>());
+
+        public static readonly Task<IEnumerable<T>> EmptyEnumerationCompletedTask = Task.FromResult(Enumerable.Empty<T>());
+    }
+
+    public static Task<T?> DefaultCompletedTask<T>() => Immuatables<T>.DefaultCompletedTask;
+
+    public static Task<T[]> EmptyArrayCompletedTask<T>() => Immuatables<T>.EmptyArrayCompletedTask;
+
+    public static Task<IEnumerable<T>> EmptyEnumerationCompletedTask<T>() => Immuatables<T>.EmptyEnumerationCompletedTask;
+
     public static IAsyncResult AsAsyncResult<T>(this Task<T> task, AsyncCallback? callback, object? state)
     {
         var returntask = task.ContinueWith((t, _) => t.Result, state, TaskScheduler.Default);
@@ -103,7 +120,13 @@ public static class TaskExtensions
     private sealed class NativeWaitHandle : WaitHandle
     {
         [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool DuplicateHandle(IntPtr hSourceProcessHandle, IntPtr hSourceHandle, IntPtr hTargetProcessHandle, out SafeWaitHandle lpTargetHandle, uint dwDesiredAccess, bool bInheritHandle, uint dwOptions);
+        private static extern bool DuplicateHandle(IntPtr hSourceProcessHandle,
+                                                   IntPtr hSourceHandle,
+                                                   IntPtr hTargetProcessHandle,
+                                                   out SafeWaitHandle lpTargetHandle,
+                                                   uint dwDesiredAccess,
+                                                   bool bInheritHandle,
+                                                   uint dwOptions);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr GetCurrentProcess();

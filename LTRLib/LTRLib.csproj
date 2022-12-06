@@ -6,6 +6,7 @@
     <OutputPath>..\$(Configuration)\</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateSerializationAssemblies>false</GenerateSerializationAssemblies>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,8 +17,9 @@
     <ProjectReference Include="..\LTRLib.Placemarks\LTRLib.Placemarks.csproj" Condition="'$(TargetFramework.CompareTo(`net30`))' &gt;= 0" />
     <ProjectReference Include="..\LTRLib.PolyGeometry\LTRLib.PolyGeometry.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0" />
     <ProjectReference Include="..\LTRLib.Web\LTRLib.Web.csproj" Condition="'$(TargetFramework.CompareTo(`net40`))' &gt;= 0" />
-    <ProjectReference Include="..\LTRLib.Windows\LTRLib.Windows.vbproj" Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
-    <ProjectReference Include="..\LTRLib.Windows.Extended\LTRLib.Windows.Extended.csproj" Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
+    <ProjectReference Include="..\LTRLib.Windows\LTRLib.Windows.csproj" Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
+    <ProjectReference Include="..\LTRLib.Windows.Shell\LTRLib.Windows.Shell.vbproj" Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
+    <ProjectReference Include="..\LTRLib.Xml\LTRLib.Xml.csproj" />
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
   </ItemGroup>
 

@@ -31,59 +31,62 @@ public static class HttpShared
 
     public static string GetMimeType(string requestExt)
     {
-        switch (requestExt?.ToLowerInvariant())
+        return (requestExt?.ToLowerInvariant()) switch
         {
-            case ".html":
-                {
-                    return "text/html";
-                }
-            case ".txt":
-                {
-                    return "text/plain";
-                }
-            case ".css":
-                {
-                    return "text/css";
-                }
-            case ".js":
-                {
-                    return "application/js";
-                }
-            case ".kml":
-                {
-                    return "application/kml";
-                }
-            case ".kmz":
-                {
-                    return "application/kmz";
-                }
-            case ".xhtml":
-                {
-                    return "text/xhtml";
-                }
-            case ".jpg":
-                {
-                    return "image/jpeg";
-                }
-            case ".gif":
-                {
-                    return "image/gif";
-                }
-            case ".png":
-                {
-                    return "image/png";
-                }
-
-            default:
-                {
-                    return "application/octet-stream";
-                }
-        }
+            ".html" => "text/html",
+            ".txt" => "text/plain",
+            ".css" => "text/css",
+            ".js" => "application/js",
+            ".kml" => "application/kml",
+            ".kmz" => "application/kmz",
+            ".xhtml" => "text/xhtml",
+            ".jpg" => "image/jpeg",
+            ".gif" => "image/gif",
+            ".png" => "image/png",
+            _ => "application/octet-stream",
+        };
     }
 
-    public static readonly string[] PublicCacheableExtensions = { ".html", ".txt", ".css", ".js", ".kml", ".xml", ".xhtml", ".zip", ".7z", ".gz", ".bz2", ".lzma", ".exe", ".sys", ".cpl", ".iso", ".dll", ".pdb", ".jpg", ".gif", ".png" };
+    public static readonly string[] PublicCacheableExtensions =
+    {
+        ".html",
+        ".txt",
+        ".css",
+        ".js",
+        ".kml",
+        ".xml",
+        ".xhtml",
+        ".zip",
+        ".7z",
+        ".gz",
+        ".bz2",
+        ".lzma",
+        ".exe",
+        ".sys",
+        ".cpl",
+        ".iso",
+        ".dll",
+        ".pdb",
+        ".jpg",
+        ".gif",
+        ".png"
+    };
 
-    public static readonly string[] EncodableExtensions = { ".html", ".txt", ".css", ".js", ".kml", ".xml", ".xhtml", ".exe", ".sys", ".cpl", ".dll", ".pdb" };
+    public static readonly string[] EncodableExtensions =
+    {
+        ".html",
+        ".txt",
+        ".css",
+        ".js",
+        ".kml",
+        ".xml",
+        ".xhtml",
+        ".exe",
+        ".sys",
+        ".cpl",
+        ".dll",
+        ".pdb"
+    };
 
     #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
     public static readonly Dictionary<string, Func<HashAlgorithm>> CheckSums = new(StringComparer.OrdinalIgnoreCase)
@@ -96,24 +99,12 @@ public static class HttpShared
 
     public static string GetEncodedFileExtension(string? encoding)
     {
-
-        switch (encoding?.ToLowerInvariant())
+        return (encoding?.ToLowerInvariant()) switch
         {
-            case "gzip":
-                {
-                    return ".gz";
-                }
-
-            case "deflate":
-                {
-                    return ".z";
-                }
-
-            default:
-                {
-                    return string.Concat(".", encoding);
-                }
-        }
+            "gzip" => ".gz",
+            "deflate" => ".z",
+            _ => string.Concat(".", encoding),
+        };
     }
 
     public static string GetDynDocUrl(string UrlScheme, string UrlAuthority, string Path, string Query, string DocName)
@@ -140,6 +131,7 @@ public static class HttpShared
 
 #if NETCOREAPP || NETSTANDARD || NET461_OR_GREATER
 
+    [Obsolete("Use QueryString methods instead")]
     public static string? Get(this IHeaderDictionary dict, string key) => dict[key].FirstOrDefault();
 
     public static void AppendHeader(this HttpResponse response, string key, string value) => response.Headers.Add(key, value);

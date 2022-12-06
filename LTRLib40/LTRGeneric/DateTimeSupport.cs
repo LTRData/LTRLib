@@ -11,28 +11,6 @@ public static class DateTimeSupport
 
     public const long TicksPerMillisecond = 10000L;
 
-#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
-
-    public static DateTime CurrentConfiguredTimeZoneLocalTime => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, ConfiguredTimeZone);
-
-    public static TimeZoneInfo ConfiguredTimeZone { get; set; } = GetConfiguredTimeZone();
-
-    private static TimeZoneInfo GetConfiguredTimeZone()
-    {
-        var tz = System.Configuration.ConfigurationManager.AppSettings["TimeZone"];
-
-        if (string.IsNullOrEmpty(tz))
-        {
-            return TimeZoneInfo.Local;
-        }
-        else
-        {
-            return TimeZoneInfo.FindSystemTimeZoneById(tz);
-        }
-    }
-
-#endif
-
     public static DateTime DateFromUnixTimestamp(long unixTime) => UnixTimeBase.AddTicks(unixTime * TicksPerSecond);
 
     public static DateTime DateFromUnixTimestamp(decimal unixTime) => UnixTimeBase.AddTicks((long)Math.Round(unixTime * TicksPerSecond));

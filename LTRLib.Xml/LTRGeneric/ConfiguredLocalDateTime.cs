@@ -17,7 +17,7 @@ public struct ConfiguredLocalDateTime : IXmlSerializable, IComparable<DateTime>,
 
     public TimeSpan TimeOfDay => DateTime.TimeOfDay;
 
-    public static DateTime Now => DateTimeSupport.CurrentConfiguredTimeZoneLocalTime;
+    public static DateTime Now => TimeZoneSupport.CurrentConfiguredTimeZoneLocalTime;
 
     public static DateTime UtcNow => DateTime.UtcNow;
 
@@ -30,7 +30,7 @@ public struct ConfiguredLocalDateTime : IXmlSerializable, IComparable<DateTime>,
     {
         reader.MoveToContent();
         var dt = reader.ReadElementContentAsDateTime();
-        DateTime = TimeZoneInfo.ConvertTimeFromUtc(dt.ToUniversalTime(), DateTimeSupport.ConfiguredTimeZone);
+        DateTime = TimeZoneInfo.ConvertTimeFromUtc(dt.ToUniversalTime(), TimeZoneSupport.ConfiguredTimeZone);
     }
 
     public void WriteXml(XmlWriter writer) => writer.WriteString(XmlConvert.ToString(DateTime, XmlDateTimeSerializationMode.Unspecified));

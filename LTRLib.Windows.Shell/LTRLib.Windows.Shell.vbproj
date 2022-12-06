@@ -12,13 +12,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Interop.IWshRuntimeLibrary">
-      <HintPath Condition="'$(TargetFramework.CompareTo(`net4`))' &lt; 0">..\LTRLib20\Interop.IWshRuntimeLibrary.dll</HintPath>
-      <HintPath Condition="'$(TargetFramework.CompareTo(`net4`))' &gt;= 0">..\LTRLib40\Interop.IWshRuntimeLibrary.dll</HintPath>
-    </Reference>
+    <COMReference Include="IWshRuntimeLibrary">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
-  
+
   <ItemGroup>
+    <ProjectReference Include="..\LTRLib.Windows\LTRLib.Windows.csproj" />
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
   </ItemGroup>
   
@@ -29,9 +35,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &gt;= 0">
-    <!--<PackageReference Include="System.Drawing.Common">
-      <Version>6.0.0</Version>
-    </PackageReference>-->
   </ItemGroup>
 
 </Project>

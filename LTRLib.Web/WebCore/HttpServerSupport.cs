@@ -43,15 +43,20 @@ namespace LTRLib.WebCore;
 [XmlType("WebCoreHttpServerSupport")]
 public static class HttpServerSupport
 {
-    private static readonly string[] _compressionHeaderIndicators = { "gzip", "deflate" };
+    private static readonly string[] _compressionHeaderIndicators =
+    {
+        "gzip",
+        "deflate"
+    };
 
     public static string GetRequestCompressionEncoding(this HttpRequest Request)
     {
-        var acceptEncoding = Request.Headers.Get("Accept-Encoding") ?? Request.Headers.Get("Transfer-Encoding") ?? Request.Headers.Get("TE");
+        var acceptEncoding = Request.Headers["Accept-Encoding"].FirstOrDefault()
+            ?? Request.Headers["Transfer-Encoding"].FirstOrDefault()
+            ?? Request.Headers["TE"].FirstOrDefault();
 
         if (acceptEncoding is not null && !string.IsNullOrWhiteSpace(acceptEncoding))
         {
-
             var encodings = acceptEncoding
                 .Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .FirstOrDefault(aenc => _compressionHeaderIndicators.Any(ienc => ienc.Equals(aenc, StringComparison.OrdinalIgnoreCase)));
@@ -60,7 +65,6 @@ public static class HttpServerSupport
             {
                 return encodings;
             }
-
         }
 
         return "none";

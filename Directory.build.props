@@ -7,7 +7,7 @@
     <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <!--<EnableWindowsTargeting>true</EnableWindowsTargeting>-->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591</NoWarn>
     <OutputPath Condition="'$(MSBuildProjectExtension)' != '.shfbproj'">..\$(Configuration)\</OutputPath>
@@ -25,7 +25,7 @@
     <DebugType>portable</DebugType>
 
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <RunSGen>false</RunSGen>
+    <RunSGen Condition="'$(TargetFramework.CompareTo(`net5`))' &lt;= 0">true</RunSGen>
 
     <PackageProjectUrl>https://github.com/LTRData/LTRLib</PackageProjectUrl>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
@@ -51,9 +51,9 @@
     <None Include="..\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="\" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0">
+  <!--<ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0">
     <PackageReference Include="Microsoft.XmlSerializer.Generator" Version="6.0.0" />
     <DotNetCliToolReference Include="Microsoft.XmlSerializer.Generator" Version="6.0.0" />
-  </ItemGroup>  
+  </ItemGroup>-->  
   
 </Project>

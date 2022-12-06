@@ -7,7 +7,6 @@
 
 using LTRLib.LTRGeneric;
 using System;
-using System.Drawing;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
@@ -21,7 +20,6 @@ namespace LTRLib.Extensions;
 
 public static class XmlExtensions
 {
-
     /// <summary>
     /// Creates and returns an XML serializer for a specific type. The XML serializer is
     /// cached and returned again the next time an XML serializer is requested for the
@@ -235,40 +233,4 @@ public static class XmlExtensions
     /// <param name="obj">Object to serialize</param>
     /// <param name="writer">Writer that stores output XML data</param>
     public static void XmlSerialize(this object obj, TextWriter writer) => obj.GetType().GetXmlSerializer().Serialize(writer, obj, obj.GetType().GetXmlNamespaces());
-
-#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
-
-    /// <summary>
-    /// Generates keyhole markup language adjusted color string.
-    /// </summary>
-    /// <param name="lineColor">Input color value to convert</param>
-    public static string ToAdjustedKmlColor(this Color lineColor)
-    {
-        var lineColorBytes = BitConverter.GetBytes(lineColor.ToArgb());
-
-        if (BitConverter.IsLittleEndian)
-        {
-            Array.Reverse(lineColorBytes);
-        }
-
-        Array.Reverse(lineColorBytes, 1, 3);
-
-        if (lineColorBytes.Skip(1).All(lineColorByte => lineColorByte < 128))
-        {
-            lineColorBytes[3] += 64;
-            lineColorBytes[2] += 64;
-            lineColorBytes[1] += 128;
-        }
-        else if (lineColorBytes.Skip(1).All(lineColorByte => lineColorByte > 192))
-        {
-            lineColorBytes[3] -= 64;
-            lineColorBytes[2] -= 64;
-        }
-
-        var kmlColor = string.Concat(from lineColorByte in lineColorBytes
-                                     select lineColorByte.ToString("x2"));
-        return kmlColor;
-    }
-
-#endif
 }

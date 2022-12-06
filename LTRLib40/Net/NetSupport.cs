@@ -8,7 +8,6 @@ using System.Text;
 #if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using System.Net.Http;
 #endif
 
 namespace LTRLib.IO;
@@ -90,33 +89,6 @@ public static class NetSupport
         }
 
     }
-
-#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
-
-    private static readonly HttpClient httpClient = new();
-
-    private static readonly ConcurrentDictionary<string, Task<byte[]>> downloadCache = new();
-
-    public static async Task<byte[]?> DownloadAndCacheDataAsync(string str)
-    {
-        if (string.IsNullOrEmpty(str))
-        {
-            return null;
-        }
-
-        try
-        {
-            return await downloadCache.GetOrAdd(str, httpClient.GetByteArrayAsync).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Unable to download image {str}: {ex}");
-            downloadCache.TryRemove(str, out _);
-            return null;
-        }
-    }
-
-#endif
 
     private static readonly Dictionary<string, byte[]> _DownloadAndCacheData_cache = new();
 

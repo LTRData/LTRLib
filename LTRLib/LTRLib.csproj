@@ -9,10 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LTRLib.CodeCompiler\LTRLib.CodeCompiler.csproj" />
+    <ProjectReference Include="..\LTRLib.Data\LTRLib.Data.csproj" />
     <ProjectReference Include="..\LTRLib.Geodesy\LTRLib.Geodesy.csproj" />
     <ProjectReference Include="..\LTRLib.Graphics\LTRLib.Graphics.csproj" />
     <ProjectReference Include="..\LTRLib.Placemarks\LTRLib.Placemarks.csproj" Condition="'$(TargetFramework.CompareTo(`net30`))' &gt;= 0" />
     <ProjectReference Include="..\LTRLib.PolyGeometry\LTRLib.PolyGeometry.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0" />
+    <ProjectReference Include="..\LTRLib.Web\LTRLib.Web.csproj" Condition="'$(TargetFramework.CompareTo(`net40`))' &gt;= 0" />
     <ProjectReference Include="..\LTRLib.Windows\LTRLib.Windows.vbproj" Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
     <ProjectReference Include="..\LTRLib.Windows.Extended\LTRLib.Windows.Extended.csproj" Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />

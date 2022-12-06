@@ -25,7 +25,7 @@ public static class GeoLocators
     /// <param name="metadata">Bitmap metadata</param>
     /// <returns>WGS84 coordinates</returns>
     /// <exception cref="NotSupportedException">Image metadata does not contain any geo tags</exception>
-    public static WGS84Position GetGeoLocation(this BitmapMetadata metadata)
+    public static WGS84Position? GetGeoLocation(this BitmapMetadata? metadata)
     {
         if (metadata is null ||
             metadata.GetQuery("/app1/ifd/gps/{ushort=1}") is not string lat_direction ||
@@ -47,7 +47,7 @@ public static class GeoLocators
     /// <param name="image">Bitmap image</param>
     /// <returns>WGS84 coordinates</returns>
     /// <exception cref="NotSupportedException">Image metadata does not contain any geo tags</exception>
-    public static WGS84Position GetGeoLocation(this ImageSource image) => (image.Metadata as BitmapMetadata).GetGeoLocation();
+    public static WGS84Position? GetGeoLocation(this ImageSource image) => (image.Metadata as BitmapMetadata).GetGeoLocation();
 
     /// <summary>
     /// Gets photo location coordinates from bitmap
@@ -55,7 +55,7 @@ public static class GeoLocators
     /// <param name="image_path">Location of bitmap image</param>
     /// <returns>WGS84 coordinates</returns>
     /// <exception cref="NotSupportedException">Image metadata does not contain any geo tags</exception>
-    public static WGS84Position GetImageGeoLocation(Uri image_path) => BitmapFrame.Create(image_path).GetGeoLocation();
+    public static WGS84Position? GetImageGeoLocation(Uri image_path) => BitmapFrame.Create(image_path).GetGeoLocation();
 
     /// <summary>
     /// Gets photo location coordinates from bitmap
@@ -63,7 +63,7 @@ public static class GeoLocators
     /// <param name="image_path">Location of bitmap image</param>
     /// <returns>WGS84 coordinates</returns>
     /// <exception cref="NotSupportedException">Image metadata does not contain any geo tags</exception>
-    public static WGS84Position GetImageGeoLocation(string image_path) => GetImageGeoLocation(new Uri(image_path));
+    public static WGS84Position? GetImageGeoLocation(string image_path) => GetImageGeoLocation(new Uri(image_path));
 }
 
 #endif

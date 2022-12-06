@@ -100,5 +100,5 @@ public class GridSquare : IXmlSerializable
 
     public virtual void WriteXml(XmlWriter writer) => writer.WriteRaw(Gridsquare);
 
-    public virtual XmlSchema GetSchema() => null;
+    public virtual XmlSchema? GetSchema() => null;
 }

@@ -16,6 +16,7 @@
     <OptionInfer>On</OptionInfer>
     <OptionStrict>On</OptionStrict>
     <OptionExplicit>On</OptionExplicit>
+    <Nullable>enable</Nullable>
 
     <AssemblyOriginatorKeyFile>..\LTRLib40\LTRLib40.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>

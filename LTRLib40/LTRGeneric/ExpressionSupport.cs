@@ -11,7 +11,6 @@ using LTRLib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -335,7 +334,7 @@ public static class ExpressionSupport
     }
 
 #if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
-    private class PropertiesAssigners<T>
+    internal class PropertiesAssigners<T>
     {
         public static Dictionary<string, Func<T, object?>> Getters { get; }
 
@@ -392,23 +391,6 @@ public static class ExpressionSupport
     public static Dictionary<string, Action<T, object?>> GetPropertySetters<T>() where T : new() => new(PropertiesAssigners<T>.Setters);
 
     public static Dictionary<string, Type> GetPropertyTypes<T>() where T : new() => new(PropertiesAssigners<T>.Types);
-
-    public static T RecordToEntityObject<T>(IDataRecord record) where T : new() => RecordToEntityObject(record, new T());
-
-    public static T RecordToEntityObject<T>(IDataRecord record, T obj)
-    {
-        var props = PropertiesAssigners<T>.Setters;
-
-        for (int i = 0, loopTo = record.FieldCount - 1; i <= loopTo; i++)
-        {
-            if (props.TryGetValue(record.GetName(i), out var prop))
-            {
-                prop(obj, record[i] is DBNull ? null : record[i]);
-            }
-        }
-
-        return obj;
-    }
 #endif
 
 }

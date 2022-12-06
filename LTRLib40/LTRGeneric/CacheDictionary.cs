@@ -89,18 +89,18 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
         }
     }
 
-    public void AddOrUpdate(TKey Key, DateTime ExpiryDateTime, Task<TValue> Task)
+    public void AddOrUpdate(TKey Key, DateTime ExpiryDateTimeUtc, Task<TValue> Task)
     {
         CleanExpired();
 
-        var oldRecord = Cache.AddOrUpdate(Key, k => (ExpiryDateTime, Task), (k, old) =>
+        var oldRecord = Cache.AddOrUpdate(Key, k => (ExpiryDateTimeUtc, Task), (k, old) =>
         {
             if (old.Task.IsCompleted && !old.Task.IsFaulted && (old.Task.Result is IDisposable disposable))
             {
                 disposable.Dispose();
             }
 
-            return (ExpiryDateTime, Task);
+            return (ExpiryDateTimeUtc, Task);
         });
     }
 
@@ -108,18 +108,18 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
 
     public void AddOrUpdate(TKey Key, TimeSpan TimeToLive, Task<TValue> Value) => AddOrUpdate(Key, DateTime.UtcNow + TimeToLive, Value);
 
-    public Task<TValue> GetOrAdd(TKey Key, DateTime ExpiryDateTime, Func<Task<TValue>> ValueFactory)
+    public Task<TValue> GetOrAdd(TKey Key, DateTime ExpiryDateTimeUtc, Func<TKey, Task<TValue>> ValueFactory)
     {
         CleanExpired();
 
-        var item = Cache.GetOrAdd(Key, k => (ExpiryDateTime, ValueFactory()));
+        var item = Cache.GetOrAdd(Key, key => (ExpiryDateTimeUtc, ValueFactory(key)));
 
         return item.Task;
     }
 
-    public Task<TValue> GetOrAdd(TKey Key, TimeSpan TimeToLive, Func<Task<TValue>> ValueFactory) => GetOrAdd(Key, DateTime.UtcNow + TimeToLive, ValueFactory);
+    public Task<TValue> GetOrAdd(TKey Key, TimeSpan TimeToLive, Func<TKey, Task<TValue>> ValueFactory) => GetOrAdd(Key, DateTime.UtcNow + TimeToLive, ValueFactory);
 
-    public Task<TValue> GetOrAdd(TKey Key, double SecondsToLive, Func<Task<TValue>> ValueFactory) => GetOrAdd(Key, TimeSpan.FromSeconds(SecondsToLive), ValueFactory);
+    public Task<TValue> GetOrAdd(TKey Key, double SecondsToLive, Func<TKey, Task<TValue>> ValueFactory) => GetOrAdd(Key, TimeSpan.FromSeconds(SecondsToLive), ValueFactory);
 
     public int Count // Implements ICollection(Of KeyValuePair(Of TKey, TValue)).Count
     {

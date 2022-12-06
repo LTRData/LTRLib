@@ -741,7 +741,7 @@ public abstract class LatLonPosition
         //lat -= extsquare_lat * 0.25 / 60;
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-        return string.Create<object>(8, null, (span, o) =>
+        return string.Create<object>(8, null!, (span, _) =>
         {
             span[0] = (char)('A' + field_lon);
             span[1] = (char)('A' + field_lat);

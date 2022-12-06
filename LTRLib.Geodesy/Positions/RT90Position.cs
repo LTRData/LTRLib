@@ -212,7 +212,7 @@ public class RT90Position
 
     public override string ToString() => Point.ToString();
 
-    public bool Equals(RT90Position obj)
+    public bool Equals(RT90Position? obj)
     {
         if (obj is null)
         {
@@ -231,7 +231,7 @@ public class RT90Position
 
     public static bool operator !=(RT90Position p0, RT90Position p1) => !p0.Equals(p1);
 
-    public override bool Equals(Position obj)
+    public override bool Equals(Position? obj)
     {
         if (obj is RT90Position cmpobj)
         {
@@ -241,7 +241,7 @@ public class RT90Position
         return base.Equals(obj);
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is RT90Position cmpobj)
         {

@@ -48,7 +48,6 @@ public static class CodeCompiler
         }
 
         return References.ToArray();
-
     }
 
     private static readonly Dictionary<CompilerLanguage, Dictionary<CompilerVersion, CodeDomProvider>> CodeProviders = new();

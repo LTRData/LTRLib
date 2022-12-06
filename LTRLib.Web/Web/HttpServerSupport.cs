@@ -83,7 +83,7 @@ public static class HttpServerSupport
 
         Func<Stream, Stream> fcompress;
 
-        switch (encoding ?? "")
+        switch (encoding)
         {
 
             case "gzip":

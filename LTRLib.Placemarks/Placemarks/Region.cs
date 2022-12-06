@@ -20,13 +20,13 @@ namespace LTRLib.Placemarks;
 [ClassInterface(ClassInterfaceType.AutoDual)]
 public class Region
 {
-    public string name { get; set; }
+    public string? name { get; set; }
 
-    public string id { get; set; }
+    public string? id { get; set; }
 
-    public Geometry polygons { get; set; }
+    public Geometry polygons { get; set; } = null!;
 
-    public override string ToString()
+    public override string? ToString()
     {
         if ((id is null) || (name is null))
         {

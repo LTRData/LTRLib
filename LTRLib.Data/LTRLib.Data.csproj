@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net20;net30;net35;net40;net46;net48;net6.0;net7.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0">
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data.Linq" Condition="'$(TargetFramework.CompareTo( `net35`))' &gt;= 0" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Data.Entity" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1' Or '$(TargetFramework)' == 'netcoreapp3.1'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.*" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="('$(TargetFramework.CompareTo(`net5`))' &lt;= 0 And '$(TargetFramework.CompareTo(`net461`))' &gt;= 0) Or '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.*" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
+  </ItemGroup>
+
+</Project>

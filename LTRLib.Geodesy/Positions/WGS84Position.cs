@@ -200,9 +200,9 @@ public class WGS84Position
         return bearing * AngleFactor;
     }
 
-    public override bool Equals(WGS84Position obj) => obj is not null && (obj.Latitude == Latitude) && (obj.Longitude == Longitude);
+    public override bool Equals(WGS84Position? obj) => obj is not null && (obj.Latitude == Latitude) && (obj.Longitude == Longitude);
 
-    public override bool Equals(object obj) => obj is WGS84Position other ? Equals(other) : base.Equals(obj);
+    public override bool Equals(object? obj) => obj is WGS84Position other ? Equals(other) : base.Equals(obj);
 
     public override int GetHashCode() => new PointF((float)Latitude, (float)Longitude).GetHashCode();
 

@@ -121,7 +121,7 @@ public abstract partial class CsvReader : MarshalByRefObject, IEnumerable, IEnum
 }
 
 [ComVisible(false)]
-public partial class CsvReader<T> : CsvReader, IEnumerable<T?>, IEnumerator<T?> where T : class, new()
+public partial class CsvReader<T> : CsvReader, IEnumerable<T>, IEnumerator<T> where T : class, new()
 {
     protected readonly Action<T, string>?[] _Properties;
 
@@ -238,7 +238,7 @@ public partial class CsvReader<T> : CsvReader, IEnumerable<T?>, IEnumerator<T?> 
 
     protected override object? IEnumerable_Current => Current;
 
-    public T? Current { get; private set; }
+    public T Current { get; private set; } = null!;
 
     public override bool MoveNext()
     {
@@ -246,13 +246,13 @@ public partial class CsvReader<T> : CsvReader, IEnumerable<T?>, IEnumerator<T?> 
 
         if (line is null)
         {
-            Current = null;
+            Current = null!;
             return false;
         }
 
         if (line.Length == 0)
         {
-            Current = null;
+            Current = null!;
             return true;
         }
 
@@ -300,7 +300,7 @@ public partial class CsvReader<T> : CsvReader, IEnumerable<T?>, IEnumerator<T?> 
         return true;
     }
 
-    public new IEnumerator<T?> GetEnumerator() => this;
+    public new IEnumerator<T> GetEnumerator() => this;
 
 }
 #endif

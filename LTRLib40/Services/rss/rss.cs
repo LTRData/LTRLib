@@ -34,20 +34,6 @@ public partial class rss
         version = 2.0m;
     }
 
-#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
-    private static readonly System.Net.Http.HttpClient httpClient = new();
-
-    public static async System.Threading.Tasks.Task<rss?> DownloadAsync(string url)
-    {
-        return LTRLib.LTRGeneric.XmlSupport.XmlDeserialize<rss>(await httpClient.GetByteArrayAsync(url).ConfigureAwait(false));
-    }
-
-    public static async System.Threading.Tasks.Task<rss?> DownloadAsync(Uri url)
-    {
-        return LTRLib.LTRGeneric.XmlSupport.XmlDeserialize<rss>(await httpClient.GetByteArrayAsync(url).ConfigureAwait(false));
-    }
-#endif
-
     public static rss? FromXml(XmlReader Xml)
     {
         return LTRLib.LTRGeneric.XmlSupport.XmlDeserialize<rss>(Xml);

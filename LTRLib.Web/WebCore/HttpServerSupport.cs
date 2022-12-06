@@ -47,7 +47,6 @@ public static class HttpServerSupport
 
     public static string GetRequestCompressionEncoding(this HttpRequest Request)
     {
-
         var acceptEncoding = Request.Headers.Get("Accept-Encoding") ?? Request.Headers.Get("Transfer-Encoding") ?? Request.Headers.Get("TE");
 
         if (acceptEncoding is not null && !string.IsNullOrWhiteSpace(acceptEncoding))
@@ -65,7 +64,6 @@ public static class HttpServerSupport
         }
 
         return "none";
-
     }
 
     /// <summary>

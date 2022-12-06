@@ -115,7 +115,7 @@ public struct Line : IPolyGeometry, IEquatable<Line>
 
     public override int GetHashCode() => X0Y0.GetHashCode() ^ X1Y1.GetHashCode();
 
-    public override bool Equals(object obj) => obj is Line line && Equals(line);
+    public override bool Equals(object? obj) => obj is Line line && Equals(line);
 
     public bool Equals(Line other) => X0Y0.Equals(other.X0Y0) && X1Y1.Equals(other.X1Y1);
 

@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LTRLib.Geodesy\LTRLib.Geodesy.csproj" />
-    <ProjectReference Include="..\LTRLib.Windows\LTRLib.Windows.vbproj" />
+    <!--<ProjectReference Include="..\LTRLib.Windows\LTRLib.Windows.vbproj" />-->
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
   </ItemGroup>
 
@@ -32,4 +32,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0">
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="6.0.*" />
+  </ItemGroup>
+  
 </Project>

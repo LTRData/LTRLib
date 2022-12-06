@@ -41,12 +41,12 @@ public class CountryBorders
             polygons = PlacemarkSupport.GetKMLReader().Read(item.geometry)
         });
 
-    protected static Coordinates Deserialize(XDocument xdoc) => (xdoc.Nodes().First() as XElement).Name.LocalName switch
+    protected static Coordinates Deserialize(XDocument xdoc) => ((xdoc.Nodes().FirstOrDefault() as XElement)?.Name.LocalName switch
     {
         "MultiGeometry" => XmlSupport.XmlDeserialize<MultiGeometry>(xdoc),
         "Polygon" => XmlSupport.XmlDeserialize<Polygon>(xdoc),
-        _ => throw new NotSupportedException($"XML document not supported: {xdoc}"),
-    };
+        _ => null as Coordinates
+    }) ?? throw new NotSupportedException($"XML document not supported: {xdoc}");
 
     public Region[] Countries => _Countries.Result;
 
@@ -54,8 +54,8 @@ public class CountryBorders
 
     private class WorldCountryCsv
     {
-        public string Name { get; set; }
-        public string geometry { get; set; }
+        public string Name { get; set; } = null!;
+        public string geometry { get; set; } = null!;
     }
 }
 

@@ -131,7 +131,7 @@ public static class IOSupport
 
     public static Stream OpenNetworkStream(this Uri uri, RemoteCertificateValidationCallback userCertificateValidationCallback)
     {
-        switch (uri.Scheme ?? "")
+        switch (uri.Scheme)
         {
             case "https":
                 {

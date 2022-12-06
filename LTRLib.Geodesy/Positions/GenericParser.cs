@@ -65,19 +65,18 @@ public static class GenericParser
 
     }
 
-    public static T ConvertTo<T>(this Position fromPos)
-        where T : Position, new()
+    public static TPosition ConvertTo<TPosition>(this Position fromPos)
+        where TPosition : Position, new()
     {
-        if (fromPos is T)
+        if (fromPos is TPosition position)
         {
-            return fromPos as T;
+            return position;
         }
 
-        var toPos = new T();
+        var toPos = new TPosition();
 
         toPos.FromWGS84(fromPos.ToWGS84());
 
         return toPos;
     }
-
 }

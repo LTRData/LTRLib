@@ -17,10 +17,6 @@ using System.Text;
 using System.Linq;
 #endif
 
-#if NET461_OR_GREATER || NETSTANDARD || NETCOREAPP
-using Microsoft.AspNetCore.Http;
-#endif
-
 namespace LTRLib.Extensions;
 
 public static class StringExtensions
@@ -390,29 +386,6 @@ public static class StringExtensions
         }
 
     }
-
-#if NETFRAMEWORK
-
-    public static string Get(this NameValueCollection dict, string key) => dict[key];
-
-    public static void AppendHeader(this System.Web.HttpResponse response, string key, string value) => response.Headers.Add(key, value);
-
-    public static void AppendHeader(this System.Web.HttpResponse response, string key, DateTime value) => response.Headers.Add(key, value.ToUniversalTime().ToString("R"));
-
-#endif
-
-#if NETCOREAPP || NETSTANDARD || NET461_OR_GREATER
-
-    public static string? Get(this IHeaderDictionary dict, string key) => dict[key].FirstOrDefault();
-
-    public static void AppendHeader(this HttpResponse response, string key, string value) => response.Headers.Add(key, value);
-
-    public static void AppendHeader(this HttpResponse response, string key, DateTime value) => response.Headers.Add(key, value.ToUniversalTime().ToString("R"));
-
-    [Obsolete("Use QueryString methods instead")]
-    public static string? GetParam(this HttpRequest request, string key) => request.Query[key].FirstOrDefault();
-
-#endif
 
 #if !NETSTANDARD2_1_OR_GREATER && !NETCOREAPP
 

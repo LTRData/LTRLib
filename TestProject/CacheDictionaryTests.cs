@@ -23,12 +23,12 @@ public class CacheDictionaryTests
         var found1 = dict["TEST"];
         Assert.Equal("OBJECT1", await found1);
 
-        var found2 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), () => Task.FromResult("OBJECT2"));
+        var found2 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), _ => Task.FromResult("OBJECT2"));
         Assert.Equal("OBJECT1", await found2);
 
         Thread.Sleep(TimeSpan.FromSeconds(4.2));
 
-        var found3 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), () => Task.FromResult("OBJECT3"));
+        var found3 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), _ => Task.FromResult("OBJECT3"));
         Assert.Equal("OBJECT3", await found3);
     }
 
@@ -37,10 +37,10 @@ public class CacheDictionaryTests
     {
         var dict = new CacheDictionary<string, string>();
 
-        var found1 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), () => Task.FromException<string>(new Exception("EXCEPTION1")));
+        var found1 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), _ => Task.FromException<string>(new Exception("EXCEPTION1")));
         await Assert.ThrowsAnyAsync<Exception>(async () => await found1);
 
-        var found2 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), () => Task.FromResult("OBJECT2"));
+        var found2 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), _ => Task.FromResult("OBJECT2"));
         Assert.Equal("OBJECT2", await found2);
     }
 
@@ -53,10 +53,10 @@ public class CacheDictionaryTests
         var cancellationToken = cancellationTokenSource.Token;
         cancellationTokenSource.Cancel();
 
-        var found1 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), () => Task.FromCanceled<string>(cancellationToken));
+        var found1 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), _ => Task.FromCanceled<string>(cancellationToken));
         await Assert.ThrowsAnyAsync<TaskCanceledException>(async () => await found1);
 
-        var found2 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), () => Task.FromResult("OBJECT2"));
+        var found2 = dict.GetOrAdd("TEST", TimeSpan.FromSeconds(4), _ => Task.FromResult("OBJECT2"));
         Assert.Equal("OBJECT2", await found2);
     }
 }

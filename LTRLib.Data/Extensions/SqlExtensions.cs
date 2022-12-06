@@ -22,10 +22,8 @@ namespace LTRLib.Extensions;
 
 public static class SqlExtensions
 {
-
     public static void OpenSqlQuery(this SqlConnection Connection, string Query, bool GetData, out SqlDataAdapter DataAdapter, out DataTable DataTable)
     {
-
         DataAdapter = new SqlDataAdapter(Query, Connection);
         _ = new SqlCommandBuilder(DataAdapter);
 
@@ -38,16 +36,13 @@ public static class SqlExtensions
         {
             DataAdapter.FillSchema(DataTable, SchemaType.Source);
         }
-
     }
 
     public static SqlDataReader GetSqlReader(this SqlConnection Connection, string Query)
     {
-
         using var Command = Connection.CreateCommand();
         Command.CommandText = Query;
         return Command.ExecuteReader();
-
     }
 
     public static DataRow? GetSqlRow(this SqlConnection Connection, string Query)
@@ -61,25 +56,20 @@ public static class SqlExtensions
         {
             return Table.Rows[0];
         }
-
     }
 
     public static object GetSqlValue(this SqlConnection Connection, string Query)
     {
-
         using var Command = Connection.CreateCommand();
         Command.CommandText = Query;
         return Command.ExecuteScalar();
-
     }
 
     public static int RunSqlCommand(this SqlConnection Connection, string Query)
     {
-
         using var Command = Connection.CreateCommand();
         Command.CommandText = Query;
         return Command.ExecuteNonQuery();
-
     }
 
 #if NET40_OR_GREATER
@@ -97,7 +87,7 @@ public static class SqlExtensions
             command.CommandText = query;
             command.Parameters.AddRange(parameters);
 
-            return command.ExecuteReader().OfType<IDataRecord>().Select(ExpressionSupport.RecordToEntityObject<T>).ToArray();
+            return command.ExecuteReader().OfType<IDataRecord>().Select(DataExtensions.RecordToEntityObject<T>).ToArray();
         }
         finally
         {

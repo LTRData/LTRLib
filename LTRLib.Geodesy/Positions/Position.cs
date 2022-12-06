@@ -189,7 +189,7 @@ public abstract class Position
     /// </summary>
     /// <param name="obj">Object to compare to.</param>
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (ReferenceEquals(obj, this))
         {
@@ -214,14 +214,14 @@ public abstract class Position
     /// </summary>
     /// <param name="obj">Object to compare to.</param>
 
-    public virtual bool Equals(Position obj) => obj is not null && Equals(obj.ToWGS84());
+    public virtual bool Equals(Position? obj) => obj is not null && Equals(obj.ToWGS84());
 
     /// <summary>
     /// Specifies whether position objects point to same position.
     /// </summary>
     /// <param name="obj">Object to compare to.</param>
 
-    public virtual bool Equals(WGS84Position obj) => ToWGS84().Equals(obj);
+    public virtual bool Equals(WGS84Position? obj) => ToWGS84().Equals(obj);
 
     /// <summary>
     /// Builds a string representation of current position.
@@ -262,9 +262,9 @@ public abstract class Position
 
     object ICloneable.Clone() => Clone();
 
-    public virtual Position Clone() => MemberwiseClone() as Position;
+    public virtual Position Clone() => (Position)MemberwiseClone();
 
-    public virtual XmlSchema GetSchema() => null;
+    public virtual XmlSchema? GetSchema() => null;
 
     public virtual void ReadXml(XmlReader reader) => FromWKT(reader.ReadElementContentAsString());
 

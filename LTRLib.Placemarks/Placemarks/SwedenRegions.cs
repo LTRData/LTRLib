@@ -21,26 +21,26 @@ namespace LTRLib.Placemarks;
 public class SwedenRegions
 {
     public SwedenRegions(
-        string municipalitiesXmlPath = null,
-        string countiesXmlPath = null,
-        string electoralXmlPath = null)
+        string? municipalitiesXmlPath = null,
+        string? countiesXmlPath = null,
+        string? electoralXmlPath = null)
     {
         _Municipalities = municipalitiesXmlPath is not null ? PlacemarkSupport.ParseKmlRegionsAsync(municipalitiesXmlPath) : null;
         _Counties = countiesXmlPath is not null ? PlacemarkSupport.ParseKmlRegionsAsync(countiesXmlPath) : null;
         _Electoral = electoralXmlPath is not null ? PlacemarkSupport.ParseKmlRegionsAsync(electoralXmlPath) : null;
     }
 
-    public Region[] Municipalities => _Municipalities?.Result;
+    public Region[]? Municipalities => _Municipalities?.Result;
 
-    public Region[] Counties => _Counties?.Result;
+    public Region[]? Counties => _Counties?.Result;
 
-    public Region[] Electoral => _Electoral?.Result;
+    public Region[]? Electoral => _Electoral?.Result;
 
-    private readonly Task<Region[]> _Municipalities;
+    private readonly Task<Region[]>? _Municipalities;
 
-    private readonly Task<Region[]> _Counties;
+    private readonly Task<Region[]>? _Counties;
 
-    private readonly Task<Region[]> _Electoral;
+    private readonly Task<Region[]>? _Electoral;
 }
 
 #endif

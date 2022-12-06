@@ -38,10 +38,10 @@ namespace LTRLib.Placemarks;
 
 public static class PlacemarkSupport
 {
-    private static WKTReader _wktReader;
+    private static WKTReader? _wktReader;
     public static WKTReader GetWKTReader() => _wktReader ??= new();
 
-    private static KMLReader _kmlReader;
+    private static KMLReader? _kmlReader;
     public static KMLReader GetKMLReader() => _kmlReader ??= new();
 
     public static Geometry GeometryFromText(string wkt)
@@ -134,7 +134,7 @@ public static class PlacemarkSupport
         return segmentwgs84;
     }
 
-    public static Region FindRegion(this IEnumerable<Region> list, Geometry point, double distanceTolerance, ref Region last_found)
+    public static Region? FindRegion(this IEnumerable<Region> list, Geometry point, double distanceTolerance, ref Region? last_found)
     {
         if ((last_found is null) || (!last_found.polygons.Contains(point)))
         {
@@ -175,8 +175,8 @@ public static class PlacemarkSupport
     {
         try
         {
-            var id = placemark.ExtendedData.SchemaData.First(data => "ID".Equals(data.name, StringComparison.Ordinal) || "LKFV".Equals(data.name, StringComparison.Ordinal));
-            var name = placemark.ExtendedData.SchemaData.First(data => data.name.EndsWith("NAMN", StringComparison.Ordinal));
+            var id = placemark.ExtendedData?.SchemaData?.First(data => "ID".Equals(data.name, StringComparison.Ordinal) || "LKFV".Equals(data.name, StringComparison.Ordinal));
+            var name = placemark.ExtendedData?.SchemaData?.First(data => data.name.EndsWith("NAMN", StringComparison.Ordinal));
 
             return new Region
             {
@@ -191,11 +191,14 @@ public static class PlacemarkSupport
         }
     }
 
-    public static Region[] ParseKmlRegions(string kmlFile) => ParseKmlRegions(XmlSupport.XmlDeserialize<kml>(kmlFile));
+    public static Region[] ParseKmlRegions(string kmlFile) => ParseKmlRegions(XmlSupport.XmlDeserialize<kml>(kmlFile)
+        ?? throw new ArgumentException($"Invalid XML data in file '{kmlFile}'"));
 
-    public static Region[] ParseKmlRegions(this kml kmlData) => ParseKmlRegions(kmlData.Document.Folders[0].Placemarks);
+    public static Region[] ParseKmlRegions(this kml kmlData) => ParseKmlRegions(kmlData.Document.Folders?[0].Placemarks
+        ?? throw new ArgumentException("Invalid kml document"));
 
-    public static async Task<Region[]> ParseKmlRegions(this Task<kml> kmlData) => ParseKmlRegions((await kmlData.ConfigureAwait(false)).Document.Folders[0].Placemarks);
+    public static async Task<Region[]> ParseKmlRegions(this Task<kml> kmlData) => ParseKmlRegions((await kmlData.ConfigureAwait(false)).Document.Folders?[0].Placemarks
+        ?? throw new ArgumentException("Invalid kml document"));
 
     public static Region[] ParseKmlRegions(this IEnumerable<Placemark> kmlPlacemarks)
     {
@@ -213,7 +216,7 @@ public static class PlacemarkSupport
             .ToArray();
     }
 
-    public static string FindRegionForPoint(this IEnumerable<Region> regions, Geometry point, double distanceTolerance, ref Region last_found)
+    public static string? FindRegionForPoint(this IEnumerable<Region> regions, Geometry point, double distanceTolerance, ref Region? last_found)
     {
         last_found = regions.FindRegion(point, distanceTolerance, ref last_found);
 
@@ -227,14 +230,14 @@ public static class PlacemarkSupport
         }
     }
 
-    public static string FindRegionForPoint(this IEnumerable<Region> regions, double latitude, double longitude, double distanceTolerance, ref Region last_found)
+    public static string? FindRegionForPoint(this IEnumerable<Region> regions, double latitude, double longitude, double distanceTolerance, ref Region? last_found)
     {
         var point = PointFromLatLon(latitude, longitude);
 
         return regions.FindRegionForPoint(point, distanceTolerance, ref last_found);
     }
 
-    public static string FindRegionForPoint(this IEnumerable<Region> regions, string latitude, string longitude, double distanceTolerance, ref Region last_found)
+    public static string? FindRegionForPoint(this IEnumerable<Region> regions, string latitude, string longitude, double distanceTolerance, ref Region? last_found)
     {
         var point = PointFromLatLon(latitude, longitude);
 

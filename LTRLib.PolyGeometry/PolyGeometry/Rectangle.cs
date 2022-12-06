@@ -72,7 +72,7 @@ public struct Rectangle : IPolyGeometry
 
     public override int GetHashCode() => X0Y0.GetHashCode() ^ X1Y1.GetHashCode();
 
-    public override bool Equals(object obj) => obj is Rectangle rectangle && Equals(rectangle);
+    public override bool Equals(object? obj) => obj is Rectangle rectangle && Equals(rectangle);
 
     public bool Equals(Rectangle other) => X0Y0.Equals(other.X0Y0) && X1Y1.Equals(other.X1Y1);
 }

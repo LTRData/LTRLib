@@ -2,14 +2,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
-using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LTRLib.Web;
+#if NETCOREAPP || NETSTANDARD || NET461_OR_GREATER
+using Microsoft.AspNetCore.Http;
+#endif
 
+namespace LTRLib.Web;
 
 public static class HttpShared
 {
@@ -28,7 +31,7 @@ public static class HttpShared
 
     public static string GetMimeType(string requestExt)
     {
-        switch (requestExt?.ToLowerInvariant() ?? "")
+        switch (requestExt?.ToLowerInvariant())
         {
             case ".html":
                 {
@@ -133,6 +136,19 @@ public static class HttpShared
             return address.ToString();
         }
     }
+#endif
+
+#if NETCOREAPP || NETSTANDARD || NET461_OR_GREATER
+
+    public static string? Get(this IHeaderDictionary dict, string key) => dict[key].FirstOrDefault();
+
+    public static void AppendHeader(this HttpResponse response, string key, string value) => response.Headers.Add(key, value);
+
+    public static void AppendHeader(this HttpResponse response, string key, DateTime value) => response.Headers.Add(key, value.ToUniversalTime().ToString("R"));
+
+    [Obsolete("Use QueryString methods instead")]
+    public static string? GetParam(this HttpRequest request, string key) => request.Query[key].FirstOrDefault();
+
 #endif
 }
 

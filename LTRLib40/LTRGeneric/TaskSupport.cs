@@ -18,9 +18,6 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
 #endif
-#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
-using System.Net.Http;
-#endif
 
 namespace LTRLib.LTRGeneric;
 
@@ -68,10 +65,6 @@ public static class TaskSupport
 
 #if !NET5_0_OR_GREATER
     public static Task<string> ReadLineAsync(this TextReader reader, CancellationToken _) => reader.ReadLineAsync();
-
-    public static Task<Stream> GetStreamAsync(this HttpClient httpClient, string uri, CancellationToken _) => httpClient.GetStreamAsync(uri);
-
-    public static Task<Stream> GetStreamAsync(this HttpClient httpClient, Uri uri, CancellationToken _) => httpClient.GetStreamAsync(uri);
 #endif
 #endif
 

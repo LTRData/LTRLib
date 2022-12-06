@@ -35,7 +35,7 @@ public struct Point : IEquatable<Point>, IPolyGeometry
 
     public override int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode();
 
-    public override bool Equals(object obj) => obj is Point point && Equals(point);
+    public override bool Equals(object? obj) => obj is Point point && Equals(point);
 
     public bool Equals(Point other) => X.Equals(other.X) && Y.Equals(other.Y);
 

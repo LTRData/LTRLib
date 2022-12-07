@@ -338,22 +338,35 @@ public static class StringExtensions
 
 #endif
 
-#if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
 
     public static string Join(this IEnumerable<string> strings, string separator) => string.Join(separator, strings);
 
-    public static string Join(this IEnumerable<string> strings) => string.Join(" ", strings);
+    public static string Join(this IEnumerable<string> strArray, char separator) => string.Join(separator, strArray);
+
+    public static string Join(this IEnumerable<string> strArray) => string.Join(' ', strArray);
+
+#elif NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
+
+    public static string Join(this IEnumerable<string> strings, string separator) => string.Join(separator, strings);
+
+    public static string Join(this IEnumerable<string> strArray, char separator) => string.Join(separator.ToString(), strArray);
+
+    public static string Join(this IEnumerable<string> strArray) => string.Join(" ", strArray);
 
 #elif NET35_OR_GREATER
 
-
     public static string Join(this IEnumerable<string> strings, string separator) => string.Join(separator, strings.ToArray());
+
+    public static string Join(this IEnumerable<string> strArray, char separator) => string.Join(separator.ToString(), strArray.ToArray());
 
     public static string Join(this IEnumerable<string> strings) => string.Join(" ", strings.ToArray());
 
 #else
 
     public static string Join(this IEnumerable<string> strings, string separator) => string.Join(separator, new List<string>(strings).ToArray());
+
+    public static string Join(this IEnumerable<string> strArray, char separator) => string.Join(separator.ToString(), new List<string>(strArray).ToArray());
 
     public static string Join(this IEnumerable<string> strings) => string.Join(" ", new List<string>(strings).ToArray());
 
@@ -362,30 +375,6 @@ public static class StringExtensions
     public static string Join(this string[] strArray, string separator) => string.Join(separator, strArray);
 
     public static string Join(this string[] strArray) => string.Join(" ", strArray);
-
-    public static IEnumerable<T[]> Chunks<T>(this IEnumerable<T> sequence, int chunkSize)
-    {
-
-        var chunk = new T[chunkSize];
-
-        var i = 0;
-
-        foreach (var element in sequence)
-        {
-
-            chunk[i] = element;
-
-            i += 1;
-
-            if (i >= chunkSize)
-            {
-                yield return chunk;
-                i = 0;
-            }
-
-        }
-
-    }
 
 #if !NETSTANDARD2_1_OR_GREATER && !NETCOREAPP
 

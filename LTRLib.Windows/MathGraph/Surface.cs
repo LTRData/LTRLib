@@ -170,34 +170,25 @@ public class Surface : IDisposable
     public int VirtualToScreenX(double X)
     {
         var ScreenCoord = (int)Math.Round((X - Xmin) * Area.Width / (Xmax - Xmin));
-        switch (ScreenCoord)
+
+        return ScreenCoord switch
         {
-            case var @case when @case < 0:
-                    return Area.Left - 1;
-
-            case var case1 when case1 > Area.Width:
-                    return Area.Right + 1;
-
-            default:
-                    return Area.Left + ScreenCoord;
-
-        }
+            < 0 => Area.Left - 1,
+            var case1 when case1 > Area.Width => Area.Right + 1,
+            _ => Area.Left + ScreenCoord,
+        };
     }
 
     public int VirtualToScreenY(double Y)
     {
         var ScreenCoord = (int)Math.Round(Area.Height - (Y - Ymin) * Area.Height / (Ymax - Ymin));
-        switch (ScreenCoord)
+        
+        return ScreenCoord switch
         {
-            case var @case when @case < 0:
-                    return Area.Top - 1;
-
-            case var case1 when case1 > Area.Height:
-                    return Area.Bottom + 1;
-
-            default:
-                    return Area.Top + ScreenCoord;
-        }
+            < 0 => Area.Top - 1,
+            var case1 when case1 > Area.Height => Area.Bottom + 1,
+            _ => Area.Top + ScreenCoord,
+        };
     }
     #region IDisposable Support
     private bool disposedValue; // To detect redundant calls

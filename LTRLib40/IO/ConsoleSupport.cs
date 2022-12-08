@@ -141,61 +141,44 @@ public static class ConsoleSupport
 
     public static TraceLevel WriteMsgTraceLevel { get; set; } = TraceLevel.Info;
 
-    public static void WriteMsg(TraceLevel level, string msg)
+    public static void WriteMsg(TraceLevel level, Func<string>? msgFunc)
     {
-        var color = default(ConsoleColor);
-
-        switch (level)
+        var color = level switch
         {
-            case var @case when @case <= TraceLevel.Off:
-                {
-                    color = ConsoleColor.Cyan;
-                    break;
-                }
+            <= TraceLevel.Off => ConsoleColor.Cyan,
+            TraceLevel.Error => ConsoleColor.Red,
+            TraceLevel.Warning => ConsoleColor.Yellow,
+            TraceLevel.Info => ConsoleColor.Gray,
+            >= TraceLevel.Verbose => ConsoleColor.DarkGray
+        };
 
-            case TraceLevel.Error:
-                {
-                    color = ConsoleColor.Red;
-                    break;
-                }
-
-            case TraceLevel.Warning:
-                {
-                    color = ConsoleColor.Yellow;
-                    break;
-                }
-
-            case TraceLevel.Info:
-                {
-                    color = ConsoleColor.Gray;
-                    break;
-                }
-
-            case var case1 when case1 >= TraceLevel.Verbose:
-                {
-                    color = ConsoleColor.DarkGray;
-                    break;
-                }
+        if (level > WriteMsgTraceLevel)
+        {
+            return;
         }
 
-        if (level <= WriteMsgTraceLevel)
+        var msg = msgFunc?.Invoke();
+
+        if (msg is null)
         {
-            lock (_ConsoleSync)
-            {
-                Console.ForegroundColor = color;
+            return;
+        }
+
+        lock (_ConsoleSync)
+        {
+            Console.ForegroundColor = color;
 
 #if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
 
-                Console.WriteLine(msg.LineFormat());
+            Console.WriteLine(msg.LineFormat());
 
 #else
 
-                Console.WriteLine(msg)
+            Console.WriteLine(msg)
 
 #endif
 
-                Console.ResetColor();
-            }
+            Console.ResetColor();
         }
     }
 

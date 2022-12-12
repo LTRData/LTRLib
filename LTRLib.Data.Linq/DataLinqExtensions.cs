@@ -1,6 +1,4 @@
-﻿#if NET35_OR_GREATER
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Linq;
@@ -11,7 +9,7 @@ using System.Windows.Forms;
 
 namespace LTRLib.Extensions;
 
-public static class DataExtensions
+public static class DataLinqExtensions
 {
     /// <summary>
     /// Gets a typed object from an IDataObject instance.
@@ -81,5 +79,3 @@ public static class DataExtensions
         method.Invoke(LinqDataTable.Context, default);
     }
 }
-
-#endif

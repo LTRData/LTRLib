@@ -11,9 +11,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LTRLib.CodeCompiler\LTRLib.CodeCompiler.csproj" />
+    <ProjectReference Include="..\LTRLib.Compat.System.Management\LTRLib.Compat.System.Management.csproj" Condition="'$(TargetFramework.CompareTo(`net46`))' &gt;= 0" />
+    <ProjectReference Include="..\LTRLib.Data.Linq\LTRLib.Data.Linq.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0 And '$(TargetFramework.CompareTo(`net5`))' &lt; 0" />
     <ProjectReference Include="..\LTRLib.Data\LTRLib.Data.csproj" />
     <ProjectReference Include="..\LTRLib.Geodesy\LTRLib.Geodesy.csproj" />
     <ProjectReference Include="..\LTRLib.Graphics\LTRLib.Graphics.csproj" />
+    <ProjectReference Include="..\LTRLib.Management\LTRLib.Management.csproj" />
+    <ProjectReference Include="..\LTRLib.PerformanceCounters\LTRLib.PerformanceCounters.csproj" />
     <ProjectReference Include="..\LTRLib.Placemarks\LTRLib.Placemarks.csproj" Condition="'$(TargetFramework.CompareTo(`net30`))' &gt;= 0" />
     <ProjectReference Include="..\LTRLib.PolyGeometry\LTRLib.PolyGeometry.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0" />
     <ProjectReference Include="..\LTRLib.Web\LTRLib.Web.csproj" Condition="'$(TargetFramework.CompareTo(`net40`))' &gt;= 0" />

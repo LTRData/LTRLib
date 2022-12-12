@@ -432,6 +432,16 @@ public static class HttpServerSupport
 
         return QueryString.FromUriComponent($"?{query}");
     }
+
+    public static QueryString AddIfNotNull(this in QueryString query, string key, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            return query.Add(key, value);
+        }
+
+        return query;
+    }
 }
 
 #endif

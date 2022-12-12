@@ -96,7 +96,18 @@ public class ExtendedData
 // LTRLib.Services.kml.simplified.IconStyle
 public class IconStyle
 {
-	public double scale { get; set; }
+    [XmlAttribute]
+    public string id { get; set; } = null!;
+
+    public Icon? Icon { get; set; }
+}
+
+// LTRLib.Services.kml.simplified.Icon
+public class Icon
+{
+    public string href { get; set; } = "http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png";
+
+    public double scale { get; set; } = 1;
 }
 
 // LTRLib.Services.kml.simplified.kml

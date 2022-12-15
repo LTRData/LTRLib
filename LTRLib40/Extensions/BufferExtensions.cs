@@ -133,6 +133,11 @@ public static class BufferExtensions
         return valuestr;
     }
 
+    /// <summary>
+    /// Returns a string with each byte expressed in two-character hexadecimal notation.
+    /// </summary>
+    public static string ToHexString(this Span<byte> bytes) => ((ReadOnlySpan<byte>)bytes).ToHexString();
+
 #endif
 
     /// <summary>

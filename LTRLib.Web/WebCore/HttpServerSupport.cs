@@ -35,6 +35,8 @@ using static LTRLib.Extensions.NetExtensions;
 using Microsoft.AspNetCore.Http.Extensions;
 
 using HttpUtility = System.Web.HttpUtility;
+using System.Collections.Concurrent;
+using System.Security.Cryptography;
 
 namespace LTRLib.WebCore;
 
@@ -70,8 +72,71 @@ public static class HttpServerSupport
         return "none";
     }
 
+    private static readonly ConcurrentDictionary<string, string> shortLinkDictionary = new(StringComparer.Ordinal);
+
+#if NET5_0_OR_GREATER
+    public static string CreateShortLink(string request)
+    {
+        Span<byte> id = stackalloc byte[20];
+
+        SHA1.HashData(MemoryMarshal.AsBytes(request.AsSpan()), id);
+
+        var value = id.ToHexString();
+
+        shortLinkDictionary.GetOrAdd(value, request);
+
+        return value;
+    }
+#elif NETSTANDARD2_1_OR_GREATER || NETCOREAPP
+    [ThreadStatic]
+    private static SHA1? sha1;
+
+    public static string CreateShortLink(string request)
+    {
+        Span<byte> id = stackalloc byte[20];
+
+        sha1 ??= SHA1.Create();
+
+        sha1.TryComputeHash(MemoryMarshal.AsBytes(request.AsSpan()), id, out _);
+
+        var value = id.ToHexString();
+
+        shortLinkDictionary.GetOrAdd(value, request);
+
+        return value;
+    }
+#else
+    [ThreadStatic]
+    private static SHA1? sha1;
+
+    public static string CreateShortLink(string request)
+    {
+        sha1 ??= SHA1.Create();
+
+        var id = sha1.ComputeHash(Encoding.Unicode.GetBytes(request));
+
+        var value = id.ToHexString()!;
+
+        shortLinkDictionary.GetOrAdd(value, request);
+
+        return value;
+    }
+#endif
+
+    public static string? GetLinkFromShort(string link)
+    {
+        if (shortLinkDictionary.TryGetValue(link, out var request))
+        {
+            return request;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     /// <summary>
-    /// Adds dyndoc features and /reloadapp
+    /// Adds dyndoc features and /redir
     /// feature to a web server request.
     /// </summary>
     /// <returns>True if response is redirected and completed, False if response is allowed to continue</returns>
@@ -115,6 +180,45 @@ public static class HttpServerSupport
                     && !string.IsNullOrWhiteSpace(encodedPath))
                 {
                     var query = Encoding.UTF8.GetString(Convert.FromBase64String(encodedQuery));
+
+                    Request.Path = PathString.FromUriComponent(encodedPath);
+                    Request.QueryString = QueryString.FromUriComponent(query);
+
+                    requestExt = Path.GetExtension(Request.Path);
+                }
+            }
+            catch
+            {
+            }
+        }
+        else if ((Features & DynDocFeatures.DynDoc) != 0 &&
+            Request.Path.StartsWithSegments("/docid", StringComparison.OrdinalIgnoreCase))
+        {
+            try
+            {
+                var encodedPath = Request.Query["path"].FirstOrDefault();
+                var encodedQuery = Request.Query["query"].FirstOrDefault();
+
+                if (string.IsNullOrWhiteSpace(encodedQuery)
+                    || string.IsNullOrWhiteSpace(encodedPath))
+                {
+                    var requestPath = Request.Path.Value;
+                    var docSeparator = requestPath.LastIndexOf('/');
+                    var querySeparator = requestPath.LastIndexOf('/', docSeparator - 1);
+
+                    encodedPath = requestPath.Substring("/docid".Length, querySeparator - "/docid".Length);
+                    encodedQuery = requestPath.Substring(querySeparator + 1, docSeparator - querySeparator - 1).Replace('_', '/');
+                }
+
+                if (!string.IsNullOrWhiteSpace(encodedQuery)
+                    && !string.IsNullOrWhiteSpace(encodedPath))
+                {
+                    var query = GetLinkFromShort(encodedQuery);
+
+                    if (query is null)
+                    {
+                        return false;
+                    }
 
                     Request.Path = PathString.FromUriComponent(encodedPath);
                     Request.QueryString = QueryString.FromUriComponent(query);

@@ -4,6 +4,7 @@ using System.Security;
 using System.Security.Permissions;
 using System.Text;
 using LTRLib.Extensions;
+using LTRLib.IO;
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable SYSLIB0003 // Type or member is obsolete
@@ -14,6 +15,10 @@ namespace LTRLib.LTRGeneric;
 
 public static class ConsoleSupport
 {
+    public static void AllocConsole() => Win32API.AllocConsole();
+
+    public static void FreeConsole() => Win32API.FreeConsole();
+
     [SecuritySafeCritical]
     [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.AllFlags)]
     public static void CreateConsoleProgressBar()

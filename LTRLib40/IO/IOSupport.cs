@@ -337,7 +337,6 @@ public static class IOSupport
 
     public static string FormatBytes(ulong size)
     {
-
         foreach (var m in multipliers)
         {
             if (size >= m.Key)
@@ -347,7 +346,6 @@ public static class IOSupport
         }
 
         return $"{size} byte";
-
     }
 
     public static string FormatBytes(ulong size, int precision)
@@ -367,9 +365,9 @@ public static class IOSupport
     {
         foreach (var m in multipliers)
         {
-            if (Math.Abs(size) >= (decimal)m.Key)
+            if (Math.Abs(size) >= (long)m.Key)
             {
-                return $"{size / (double)m.Key:0.000}{m.Value}";
+                return $"{size / (double)m.Key:0.0}{m.Value}";
             }
         }
 
@@ -382,7 +380,7 @@ public static class IOSupport
 
         foreach (var m in multipliers)
         {
-            if (size >= (decimal)m.Key)
+            if (size >= (long)m.Key)
             {
                 return $"{(size / (double)m.Key).ToString($"0.{new string('0', precision - 1)}")}{m.Value}";
             }

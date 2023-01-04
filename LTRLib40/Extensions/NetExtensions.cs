@@ -22,6 +22,7 @@ public static class NetExtensions
     public static IPAddressRanges BotNetRanges { get; }
         = new(AddressFamily.InterNetwork)
         {
+            { "5.75.128.0", "5.75.255.255" },
             { "5.9.0.0", "5.9.255.255" },
             { "148.251.0.0", "148.251.255.255" },
             { "144.76.0.0", "144.76.126.203" },

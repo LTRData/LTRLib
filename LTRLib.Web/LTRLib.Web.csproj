@@ -19,11 +19,24 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.*" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &gt;= 0 And '$(TargetFramework.CompareTo(`netcoreapp`))' &lt; 0">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="*" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="6.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="*" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="7.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="7.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="*" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LTRLib.Net\LTRLib.Net.csproj" />
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
   </ItemGroup>
 

@@ -72,69 +72,6 @@ public static class HttpServerSupport
         return "none";
     }
 
-    private static readonly ConcurrentDictionary<string, string> shortLinkDictionary = new(StringComparer.Ordinal);
-
-#if NET5_0_OR_GREATER
-    public static string CreateShortLink(string request)
-    {
-        Span<byte> id = stackalloc byte[20];
-
-        SHA1.HashData(MemoryMarshal.AsBytes(request.AsSpan()), id);
-
-        var value = id.ToHexString();
-
-        shortLinkDictionary.GetOrAdd(value, request);
-
-        return value;
-    }
-#elif NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-    [ThreadStatic]
-    private static SHA1? sha1;
-
-    public static string CreateShortLink(string request)
-    {
-        Span<byte> id = stackalloc byte[20];
-
-        sha1 ??= SHA1.Create();
-
-        sha1.TryComputeHash(MemoryMarshal.AsBytes(request.AsSpan()), id, out _);
-
-        var value = id.ToHexString();
-
-        shortLinkDictionary.GetOrAdd(value, request);
-
-        return value;
-    }
-#else
-    [ThreadStatic]
-    private static SHA1? sha1;
-
-    public static string CreateShortLink(string request)
-    {
-        sha1 ??= SHA1.Create();
-
-        var id = sha1.ComputeHash(Encoding.Unicode.GetBytes(request));
-
-        var value = id.ToHexString()!;
-
-        shortLinkDictionary.GetOrAdd(value, request);
-
-        return value;
-    }
-#endif
-
-    public static string? GetLinkFromShort(string link)
-    {
-        if (shortLinkDictionary.TryGetValue(link, out var request))
-        {
-            return request;
-        }
-        else
-        {
-            return null;
-        }
-    }
-
     /// <summary>
     /// Adds dyndoc features and /redir
     /// feature to a web server request.
@@ -523,35 +460,67 @@ public static class HttpServerSupport
         }
     }
 
-    public static string? Get(this in QueryString query, string key)
-    {
-        var buffer = HttpUtility.ParseQueryString(query.Value ?? "");
+    private static readonly ConcurrentDictionary<string, string> shortLinkDictionary = new(StringComparer.Ordinal);
 
-        return buffer[key];
+#if NET5_0_OR_GREATER
+    public static string CreateShortLink(string request)
+    {
+        Span<byte> id = stackalloc byte[20];
+
+        SHA1.HashData(MemoryMarshal.AsBytes(request.AsSpan()), id);
+
+        var value = id.ToHexString();
+
+        shortLinkDictionary.GetOrAdd(value, request);
+
+        return value;
     }
+#elif NETSTANDARD2_1_OR_GREATER || NETCOREAPP
+    [ThreadStatic]
+    private static SHA1? sha1;
 
-    public static QueryString Remove(this in QueryString query, string key)
+    public static string CreateShortLink(string request)
     {
-        var buffer = HttpUtility.ParseQueryString(query.Value ?? "");
+        Span<byte> id = stackalloc byte[20];
 
-        if (buffer[key] is null)
-        {
-            return query;
-        }
+        sha1 ??= SHA1.Create();
 
-        buffer.Remove(key);
+        sha1.TryComputeHash(MemoryMarshal.AsBytes(request.AsSpan()), id, out _);
 
-        return QueryString.FromUriComponent($"?{query}");
+        var value = id.ToHexString();
+
+        shortLinkDictionary.GetOrAdd(value, request);
+
+        return value;
     }
+#else
+    [ThreadStatic]
+    private static SHA1? sha1;
 
-    public static QueryString AddIfNotNull(this in QueryString query, string key, string? value)
+    public static string CreateShortLink(string request)
     {
-        if (!string.IsNullOrWhiteSpace(value))
-        {
-            return query.Add(key, value);
-        }
+        sha1 ??= SHA1.Create();
 
-        return query;
+        var id = sha1.ComputeHash(Encoding.Unicode.GetBytes(request));
+
+        var value = id.ToHexString()!;
+
+        shortLinkDictionary.GetOrAdd(value, request);
+
+        return value;
+    }
+#endif
+
+    public static string? GetLinkFromShort(string link)
+    {
+        if (shortLinkDictionary.TryGetValue(link, out var request))
+        {
+            return request;
+        }
+        else
+        {
+            return null;
+        }
     }
 }
 

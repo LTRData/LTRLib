@@ -12,6 +12,7 @@ using System.Text;
 using System.ComponentModel.Design.Serialization;
 using System.Runtime.CompilerServices;
 using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Linq;
 #endif
@@ -37,7 +38,8 @@ public static class BufferExtensions
     /// <summary>
     /// Returns a string with each byte expressed in two-character hexadecimal notation.
     /// </summary>
-    public static string? ToHexString(this ICollection<byte> bytes)
+    [return: NotNullIfNotNull(nameof(bytes))]
+    public static string? ToHexString(this ICollection<byte>? bytes)
     {
         if (bytes is null)
         {
@@ -65,7 +67,8 @@ public static class BufferExtensions
     /// <summary>
     /// Returns a string with each byte expressed in two-character hexadecimal notation.
     /// </summary>
-    public static string? ToHexString(this ICollection<byte> bytes)
+    [return: NotNullIfNotNull(nameof(bytes))]
+    public static string? ToHexString(this ICollection<byte>? bytes)
     {
         if (bytes is null)
         {
@@ -90,7 +93,7 @@ public static class BufferExtensions
     /// <summary>
     /// Returns a string with each byte expressed in two-character hexadecimal notation.
     /// </summary>
-    public static string? ToHexString(this ICollection<byte> bytes)
+    public static string? ToHexString(this ICollection<byte>? bytes)
     {
         if (bytes is null)
         {
@@ -143,7 +146,7 @@ public static class BufferExtensions
     /// <summary>
     /// Returns a string with each byte expressed in two-character hexadecimal notation.
     /// </summary>
-    public static string? ToHexString(this IEnumerable<byte> bytes)
+    public static string? ToHexString(this IEnumerable<byte>? bytes)
     {
         if (bytes is null)
         {

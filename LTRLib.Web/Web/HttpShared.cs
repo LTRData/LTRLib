@@ -111,7 +111,7 @@ public static class HttpShared
         => $"{UrlScheme}{Uri.SchemeDelimiter}{UrlAuthority}/dyndoc{Path}/{Convert.ToBase64String(Encoding.UTF8.GetBytes(Query)).Replace('/', '_')}/{DocName}";
 
 #if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
-    public static async Task<string?> GetHostNameSafeAsync(this IPAddress address)
+    public static async Task<string?> GetHostNameSafeAsync(this IPAddress? address)
     {
         if (address is null)
         {

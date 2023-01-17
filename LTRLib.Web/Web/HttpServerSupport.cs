@@ -85,26 +85,16 @@ public static class HttpServerSupport
 
         switch (encoding)
         {
-
             case "gzip":
-                {
-
-                    fcompress = f => new GZipStream(f, CompressionMode.Compress);
-                    break;
-                }
+                fcompress = f => new GZipStream(f, CompressionMode.Compress);
+                break;
 
             case "deflate":
-                {
-
-                    fcompress = f => new DeflateStream(f, CompressionMode.Compress);
-                    break;
-                }
+                fcompress = f => new DeflateStream(f, CompressionMode.Compress);
+                break;
 
             default:
-                {
-                    return;
-                }
-
+                return;
         }
 
         Context.Items["encoding"] = encoding;
@@ -113,8 +103,8 @@ public static class HttpServerSupport
         // ' Static file compression
         if (!string.IsNullOrWhiteSpace(requestExt) && PublicCacheableExtensions.Any(ext => requestExt.Equals(ext, StringComparison.OrdinalIgnoreCase)))
         {
-
             var filepath = Request.PhysicalPath;
+
             if (!File.Exists(filepath))
             {
                 return;

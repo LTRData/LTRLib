@@ -165,8 +165,9 @@ public static class HttpServerSupport
                 var encodedPath = Request.Query["path"].FirstOrDefault();
                 var encodedQuery = Request.Query["query"].FirstOrDefault();
 
-                if (string.IsNullOrWhiteSpace(encodedQuery)
+                if ((string.IsNullOrWhiteSpace(encodedQuery)
                     || string.IsNullOrWhiteSpace(encodedPath))
+                    && Request.Path.HasValue)
                 {
                     var requestPath = Request.Path.Value;
                     var docSeparator = requestPath.LastIndexOf('/');
@@ -199,8 +200,9 @@ public static class HttpServerSupport
                 var encodedPath = Request.Query["path"].FirstOrDefault();
                 var encodedQuery = Request.Query["query"].FirstOrDefault();
 
-                if (string.IsNullOrWhiteSpace(encodedQuery)
+                if ((string.IsNullOrWhiteSpace(encodedQuery)
                     || string.IsNullOrWhiteSpace(encodedPath))
+                    && Request.Path.HasValue)
                 {
                     var requestPath = Request.Path.Value;
                     var docSeparator = requestPath.LastIndexOf('/');
@@ -210,7 +212,8 @@ public static class HttpServerSupport
                     encodedQuery = requestPath.Substring(querySeparator + 1, docSeparator - querySeparator - 1).Replace('_', '/');
                 }
 
-                if (!string.IsNullOrWhiteSpace(encodedQuery)
+                if (encodedQuery is not null
+                    && !string.IsNullOrWhiteSpace(encodedQuery)
                     && !string.IsNullOrWhiteSpace(encodedPath))
                 {
                     var query = GetLinkFromShort(encodedQuery);
@@ -233,18 +236,18 @@ public static class HttpServerSupport
 
         if (requestExt.Equals(".aspx", StringComparison.OrdinalIgnoreCase))
         {
-            Request.Path = Request.Path.Value.Remove(Request.Path.Value.Length - requestExt.Length);
+            Request.Path = Request.Path.Value!.Remove(Request.Path.Value.Length - requestExt.Length);
         }
         else if (requestExt.Equals(".asp", StringComparison.OrdinalIgnoreCase))
         {
-            Request.Path = Request.Path.Value.Remove(Request.Path.Value.Length - requestExt.Length);
+            Request.Path = Request.Path.Value!.Remove(Request.Path.Value.Length - requestExt.Length);
         }
         else if ((requestExt.Equals(".html", StringComparison.OrdinalIgnoreCase) ||
             requestExt.Equals(".htm", StringComparison.OrdinalIgnoreCase)) &&
             !FileProvider.GetFileInfo(Request.Path).Exists &&
             !FileProvider.GetDirectoryContents(Request.Path).Exists)
         {
-            Request.Path = Request.Path.Value.Remove(Request.Path.Value.Length - requestExt.Length);
+            Request.Path = Request.Path.Value!.Remove(Request.Path.Value.Length - requestExt.Length);
         }
 
         if ((Features & DynDocFeatures.Redir) != 0 &&
@@ -284,10 +287,11 @@ public static class HttpServerSupport
         if ((Features & DynDocFeatures.Checksum) != 0 && !string.IsNullOrWhiteSpace(requestExt) && CheckSums.ContainsKey(requestExt))
         {
             var checksumFile = FileProvider.GetFileInfo(Request.Path).PhysicalPath;
-            var baseFile = checksumFile.Remove(checksumFile.Length - requestExt.Length);
+            var baseFile = checksumFile?.Remove(checksumFile.Length - requestExt.Length);
             var baseFileExtension = Path.GetExtension(baseFile);
 
-            if (File.Exists(baseFile) &&
+            if (checksumFile is not null &&
+                File.Exists(baseFile) &&
                 PublicCacheableExtensions.Any(ext => ext.Equals(baseFileExtension, StringComparison.OrdinalIgnoreCase)))
             {
 
@@ -317,13 +321,12 @@ public static class HttpServerSupport
         return false;
     }
 
-    public static IPAddress GetClientTrueIPAddress(this HttpContext context)
+    public static IPAddress? GetClientTrueIPAddress(this HttpContext context)
     {
         var address = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
 
-        if (!string.IsNullOrWhiteSpace(address))
+        if (address is not null && !string.IsNullOrWhiteSpace(address))
         {
-
             var delim = address.IndexOf(",", StringComparison.Ordinal);
             if (delim >= 0)
             {
@@ -348,7 +351,9 @@ public static class HttpServerSupport
 
         var proto = request.Headers["X-Forwarded-Proto"].FirstOrDefault();
 
-        if (!string.IsNullOrWhiteSpace(proto) && proto.EndsWith("s", StringComparison.OrdinalIgnoreCase))
+        if (proto is not null &&
+            !string.IsNullOrWhiteSpace(proto) &&
+            proto.EndsWith("s", StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
@@ -366,7 +371,7 @@ public static class HttpServerSupport
         var subpath = $"/css/{prefix}site.css";
         var cssFile = fileProvider.GetFileInfo(subpath);
 
-        if (cssFile.Exists)
+        if (cssFile.Exists && cssFile.PhysicalPath is not null)
         {
             if (inject)
             {
@@ -388,7 +393,7 @@ public static class HttpServerSupport
 
             subpath = $"/css/{prefix}mobile.css";
             cssFile = fileProvider.GetFileInfo(subpath);
-            if (cssFile.Exists)
+            if (cssFile.Exists && cssFile.PhysicalPath is not null)
             {
                 if (inject)
                 {
@@ -431,7 +436,8 @@ public static class HttpServerSupport
                 try
                 {
                     var path = fileprovider.GetFileInfo($"/partial_html/{altFile}");
-                    if (path.Exists)
+                    
+                    if (path.Exists && path.PhysicalPath is not null)
                     {
                         return new HtmlString(File.ReadAllText(path.PhysicalPath));
                     }
@@ -451,7 +457,8 @@ public static class HttpServerSupport
             try
             {
                 var path = fileprovider.GetFileInfo($"/partial_html/{codeFile}");
-                if (path.Exists)
+                
+                if (path.Exists && path.PhysicalPath is not null)
                 {
                     return new HtmlString(File.ReadAllText(path.PhysicalPath));
                 }
@@ -472,7 +479,7 @@ public static class HttpServerSupport
 
         if (!string.IsNullOrWhiteSpace(Request.Headers["X-Wap-Profile"]) ||
             Request.Headers.Keys is not null && Request.Headers.Keys.Any(t => t.StartsWith("X-OperaMini", StringComparison.OrdinalIgnoreCase)) ||
-            !string.IsNullOrWhiteSpace(Request.Headers["Accept"]) && Request.Headers["Accept"].Any(t => t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
+            !string.IsNullOrWhiteSpace(Request.Headers["Accept"]) && Request.Headers["Accept"].Any(t => t is not null && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
         {
 
             return true;
@@ -486,10 +493,10 @@ public static class HttpServerSupport
     public static bool IsMobileBrowser(this HttpRequest Request)
     {
 
-        if (Request.Headers["User-Agent"].Any(t => t.Contains("Mobile", StringComparison.OrdinalIgnoreCase)) ||
+        if (Request.Headers["User-Agent"].Any(t => t is not null && t.Contains("Mobile", StringComparison.OrdinalIgnoreCase)) ||
             !string.IsNullOrWhiteSpace(Request.Headers["X-Wap-Profile"]) ||
             Request.Headers.Keys is not null && Request.Headers.Keys.Any(t => t.StartsWith("X-OperaMini", StringComparison.OrdinalIgnoreCase)) ||
-            !string.IsNullOrWhiteSpace(Request.Headers["Accept"]) && Request.Headers["Accept"].Any(t => t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
+            !string.IsNullOrWhiteSpace(Request.Headers["Accept"]) && Request.Headers["Accept"].Any(t => t is not null && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
         {
 
             return true;
@@ -508,24 +515,24 @@ public static class HttpServerSupport
         }
         else if (value is HtmlString htmlString)
         {
-            return new MarkupString(htmlString.Value);
+            return new MarkupString(htmlString.Value ?? "");
         }
         else
         {
-            return new MarkupString(WebUtility.HtmlEncode(value.ToString()));
+            return new MarkupString(WebUtility.HtmlEncode(value.ToString() ?? ""));
         }
     }
 
     public static string? Get(this in QueryString query, string key)
     {
-        var buffer = HttpUtility.ParseQueryString(query.Value);
+        var buffer = HttpUtility.ParseQueryString(query.Value ?? "");
 
         return buffer[key];
     }
 
     public static QueryString Remove(this in QueryString query, string key)
     {
-        var buffer = HttpUtility.ParseQueryString(query.Value);
+        var buffer = HttpUtility.ParseQueryString(query.Value ?? "");
 
         if (buffer[key] is null)
         {

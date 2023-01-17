@@ -15,8 +15,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-#nullable enable
-
 namespace LTRLib.LTRGeneric;
 
 [ComVisible(false)]

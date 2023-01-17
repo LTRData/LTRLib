@@ -507,8 +507,6 @@ public static class CollectionExtensions
 
 #endif
 
-#nullable enable
-
     public static IEnumerable<Exception> Enumerate(this Exception? ex)
     {
         while (ex is not null)

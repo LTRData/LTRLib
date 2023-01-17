@@ -5,8 +5,6 @@
 // http://ltr-data.se   https://github.com/LTRData
 // 
 
-#nullable enable
-
 #if NET461_OR_GREATER || NETSTANDARD || NETCOREAPP
 
 using LTRLib.LTRGeneric;

@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-#nullable enable
-
 namespace LTRLib.LTRGeneric;
 
 public static class SingleValueEnumerable

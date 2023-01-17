@@ -4,24 +4,6 @@
     <TargetFrameworks>net40;net46;net48;netstandard2.0;netstandard2.1;net6.0;net7.0</TargetFrameworks>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0">
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions">
-      <Version>2.2.*</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions">
-      <Version>3.1.*</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Html.Abstractions">
-      <Version>2.2.*</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Components">
-      <Version>3.1.*</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core">
-      <Version>2.2.*</Version>
-    </PackageReference>
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0">
     <Reference Include="System.Net.Http" Condition="'$(TargetFramework.CompareTo(`net45`))' &gt;= 0" />
     <Reference Include="System.Web" />
@@ -29,8 +11,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net45`))' &gt;= 0">
-    <PackageReference Include="System.Net.Http" Version="4.3.*" />
+  <ItemGroup Condition="('$(TargetFramework.CompareTo(`net461`))' &gt;= 0 And '$(TargetFramework.CompareTo(`net5`))' &lt; 0) Or '$(TargetFramework.CompareTo(`netcoreapp`))' &gt;= 0">
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.*" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="3.1.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &gt;= 0 And '$(TargetFramework.CompareTo(`netcoreapp`))' &lt; 0">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>

@@ -19,6 +19,11 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup Condition="('$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net461`))' &gt;= 0) Or '$(TargetFramework.CompareTo(`netcoreapp`))' &gt;= 0">
+    <PackageReference Include="System.Text.Json" Version="*" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.*" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\LTRLib.Geodesy\LTRLib.Geodesy.csproj" />
     <ProjectReference Include="..\LTRLib.Placemarks\LTRLib.Placemarks.csproj" />

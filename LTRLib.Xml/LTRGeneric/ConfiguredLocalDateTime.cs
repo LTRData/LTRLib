@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Runtime.Serialization;
+#if NET462_OR_GREATER || NETSTANDARD || NETCOREAPP
+using System.Text.Json;
+using System.Text.Json.Serialization;
+#endif
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -8,7 +12,9 @@ using System.Xml.Serialization;
 
 namespace LTRLib.LTRGeneric;
 
-
+#if NET462_OR_GREATER || NETSTANDARD || NETCOREAPP
+[JsonConverter(typeof(ConfiguredLocalDateTimeConverter))]
+#endif
 public struct ConfiguredLocalDateTime : IXmlSerializable, IComparable<DateTime>, IComparable<ConfiguredLocalDateTime>, IEquatable<DateTime>, IEquatable<ConfiguredLocalDateTime>, IConvertible, IFormattable, ISerializable
 {
     public DateTime DateTime { get; private set; }
@@ -135,5 +141,18 @@ public struct ConfiguredLocalDateTime : IXmlSerializable, IComparable<DateTime>,
 
     public void GetObjectData(SerializationInfo info, StreamingContext context) => ((ISerializable)DateTime).GetObjectData(info, context);
 }
+#endif
 
+#if NET462_OR_GREATER || NETSTANDARD || NETCOREAPP
+public class ConfiguredLocalDateTimeConverter : JsonConverter<ConfiguredLocalDateTime>
+{
+    public override ConfiguredLocalDateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var dt = reader.GetDateTime();
+        return TimeZoneInfo.ConvertTimeFromUtc(dt.ToUniversalTime(), TimeZoneSupport.ConfiguredTimeZone);
+    }
+
+    public override void Write(Utf8JsonWriter writer, ConfiguredLocalDateTime value, JsonSerializerOptions options)
+        => writer.WriteStringValue(XmlConvert.ToString(value, XmlDateTimeSerializationMode.Unspecified));
+}
 #endif

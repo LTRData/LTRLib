@@ -17,11 +17,8 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.*" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.*" />
-  </ItemGroup>
-
-  <ItemGroup Condition="('$(TargetFramework.CompareTo(`net5`))' &lt;= 0 And '$(TargetFramework.CompareTo(`net461`))' &gt;= 0) Or '$(TargetFramework)' == 'netstandard2.0'">
+  <ItemGroup Condition="('$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net461`))' &gt;= 0) Or '$(TargetFramework.CompareTo(`netcoreapp`))' &gt;= 0">
+    <PackageReference Include="System.Text.Json" Version="*" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.*" />
   </ItemGroup>
 

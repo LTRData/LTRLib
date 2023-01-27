@@ -653,7 +653,7 @@ public abstract class LatLonPosition
     {
         GeoFormat.DegreesMinutes => ConvToDmString(Latitude, 'N', 'S'),
         GeoFormat.DegreesMinutesSeconds => ConvToDmsString(Latitude, 'N', 'S'),
-        GeoFormat.Degrees => Latitude.ToString("0.0000000", NumberFormatInfo.InvariantInfo),
+        GeoFormat.Degrees => Latitude.ToString("0.00000", NumberFormatInfo.InvariantInfo),
         _ => throw new ArgumentException("Invalid GeoFormat", nameof(format)),
     };
 
@@ -666,7 +666,7 @@ public abstract class LatLonPosition
     {
         GeoFormat.DegreesMinutes => ConvToDmString(Longitude, 'E', 'W'),
         GeoFormat.DegreesMinutesSeconds => ConvToDmsString(Longitude, 'E', 'W'),
-        GeoFormat.Degrees => Longitude.ToString("0.0000000", NumberFormatInfo.InvariantInfo),
+        GeoFormat.Degrees => Longitude.ToString("0.00000", NumberFormatInfo.InvariantInfo),
         _ => throw new ArgumentException("Invalid GeoFormat", nameof(format)),
     };
 
@@ -677,14 +677,12 @@ public abstract class LatLonPosition
             return "";
         }
 
-        var degrees = Math.Floor(Math.Abs(value));
-        var minutes = (Math.Abs(value) - degrees) * 60;
+        var absValue = Math.Abs(value);
+        var degrees = Math.Floor(absValue);
+        var minutes = (absValue - degrees) * 60;
 
         return
-            string.Format(CultureInfo.InvariantCulture, "{0} {1:00}º {2:0.00000}'",
-            value >= 0 ? positiveValue : negativeValue,
-            degrees,
-            Math.Floor(minutes * 10000) / 10000);
+            $"{(value >= 0 ? positiveValue : negativeValue)} {degrees.ToString("00", CultureInfo.InvariantCulture)}º {minutes.ToString("0.000", CultureInfo.InvariantCulture)}'";
     }
 
     private static string ConvToDmsString(double value, char positiveValue, char negativeValue)
@@ -694,28 +692,18 @@ public abstract class LatLonPosition
             return "";
         }
 
-        var degrees = Math.Floor(Math.Abs(value));
-        var minutes = Math.Floor((Math.Abs(value) - degrees) * 60);
-        var seconds = (Math.Abs(value) - degrees - minutes / 60) * 3600;
+        var absValue = Math.Abs(value);
+        var degrees = Math.Floor(absValue);
+        var minutes = Math.Floor((absValue - degrees) * 60);
+        var seconds = (absValue - degrees - minutes / 60) * 3600;
 
         return
-            string.Format(CultureInfo.InvariantCulture, "{0} {1:00}º {2:00}' {3:0.00000}\"",
-            value >= 0 ? positiveValue : negativeValue,
-            degrees,
-            minutes,
-            seconds);
+            $"{(value >= 0 ? positiveValue : negativeValue)} {degrees.ToString("00", CultureInfo.InvariantCulture)}º {minutes.ToString("00", CultureInfo.InvariantCulture)}' {seconds.ToString("0.000", CultureInfo.InvariantCulture)}\"";
     }
-
 
     public override string ToString() => ToString(GeoFormat.Degrees);
 
-    public virtual string ToString(GeoFormat format)
-    {
-        return string.Concat(
-            LatitudeToString(format),
-            ",",
-            LongitudeToString(format));
-    }
+    public virtual string ToString(GeoFormat format) => $"{LatitudeToString(format)},{LongitudeToString(format)}";
 
     public string ToMaidenhead()
     {
@@ -741,29 +729,29 @@ public abstract class LatLonPosition
         //lat -= extsquare_lat * 0.25 / 60;
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-        return string.Create<object>(8, null!, (span, _) =>
+        return string.Create<object?>(8, null, (buffer, _) =>
         {
-            span[0] = (char)('A' + field_lon);
-            span[1] = (char)('A' + field_lat);
-            span[2] = (char)('0' + square_lon);
-            span[3] = (char)('0' + square_lat);
-            span[4] = (char)('A' + subsquare_lon);
-            span[5] = (char)('A' + subsquare_lat);
-            span[6] = (char)('0' + extsquare_lon);
-            span[7] = (char)('0' + extsquare_lat);
+            buffer[0] = (char)('A' + field_lon);
+            buffer[1] = (char)('A' + field_lat);
+            buffer[2] = (char)('0' + square_lon);
+            buffer[3] = (char)('0' + square_lat);
+            buffer[4] = (char)('A' + subsquare_lon);
+            buffer[5] = (char)('A' + subsquare_lat);
+            buffer[6] = (char)('0' + extsquare_lon);
+            buffer[7] = (char)('0' + extsquare_lat);
         });
 #else
-        var span = new char[8];
-        span[0] = (char)('A' + field_lon);
-        span[1] = (char)('A' + field_lat);
-        span[2] = (char)('0' + square_lon);
-        span[3] = (char)('0' + square_lat);
-        span[4] = (char)('A' + subsquare_lon);
-        span[5] = (char)('A' + subsquare_lat);
-        span[6] = (char)('0' + extsquare_lon);
-        span[7] = (char)('0' + extsquare_lat);
+        var buffer = new char[8];
+        buffer[0] = (char)('A' + field_lon);
+        buffer[1] = (char)('A' + field_lat);
+        buffer[2] = (char)('0' + square_lon);
+        buffer[3] = (char)('0' + square_lat);
+        buffer[4] = (char)('A' + subsquare_lon);
+        buffer[5] = (char)('A' + subsquare_lat);
+        buffer[6] = (char)('0' + extsquare_lon);
+        buffer[7] = (char)('0' + extsquare_lat);
 
-        return new string(span);
+        return new string(buffer);
 #endif
     }
 

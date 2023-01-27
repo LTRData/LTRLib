@@ -32,7 +32,8 @@ namespace LTRLib.Geodesy.Positions;
 public class RT90Position
     : Position, IEquatable<RT90Position>
 {
-    public PointF Point;
+    public double PointX { get; set; }
+    public double PointY { get; set; }
 
     public enum RT90Projection
     {
@@ -57,10 +58,34 @@ public class RT90Position
     /// </summary>
     /// <param name="x">X value</param>
     /// <param name="y">Y value</param>
+    public RT90Position(double x, double y)
+    {
+        PointX = x;
+        PointY = y;
+        Projection = RT90Projection.rt90_2_5_gon_v;
+    }
+
+    /// <summary>
+    /// Create a new position using default projection (2.5 gon v)
+    /// </summary>
+    /// <param name="x">X value</param>
+    /// <param name="y">Y value</param>
     public RT90Position(float x, float y)
     {
-        Point.X = x;
-        Point.Y = y;
+        PointX = x;
+        PointY = y;
+        Projection = RT90Projection.rt90_2_5_gon_v;
+    }
+
+    /// <summary>
+    /// Create a new position using default projection (2.5 gon v)
+    /// </summary>
+    /// <param name="x">X value</param>
+    /// <param name="y">Y value</param>
+    public RT90Position(int x, int y)
+    {
+        PointX = x;
+        PointY = y;
         Projection = RT90Projection.rt90_2_5_gon_v;
     }
 
@@ -72,16 +97,29 @@ public class RT90Position
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
     public RT90Position(ReadOnlySpan<char> x, ReadOnlySpan<char> y)
     {
-        Point.X = float.Parse(x, provider: NumberFormatInfo.InvariantInfo);
-        Point.Y = float.Parse(y, provider: NumberFormatInfo.InvariantInfo);
+        PointX = double.Parse(x, provider: NumberFormatInfo.InvariantInfo);
+        PointY = double.Parse(y, provider: NumberFormatInfo.InvariantInfo);
         Projection = RT90Projection.rt90_2_5_gon_v;
     }
 #endif
     public RT90Position(string x, string y)
     {
-        Point.X = float.Parse(x, NumberFormatInfo.InvariantInfo);
-        Point.Y = float.Parse(y, NumberFormatInfo.InvariantInfo);
+        PointX = double.Parse(x, NumberFormatInfo.InvariantInfo);
+        PointY = double.Parse(y, NumberFormatInfo.InvariantInfo);
         Projection = RT90Projection.rt90_2_5_gon_v;
+    }
+
+    /// <summary>
+    /// Create a new position
+    /// </summary>
+    /// <param name="x">X value</param>
+    /// <param name="y">Y value</param>
+    /// <param name="projection">RT90 projection</param>
+    public RT90Position(double x, double y, RT90Projection projection)
+    {
+        PointX = x;
+        PointY = y;
+        Projection = projection;
     }
 
     /// <summary>
@@ -92,8 +130,8 @@ public class RT90Position
     /// <param name="projection">RT90 projection</param>
     public RT90Position(float x, float y, RT90Projection projection)
     {
-        Point.X = x;
-        Point.Y = y;
+        PointX = x;
+        PointY = y;
         Projection = projection;
     }
 
@@ -105,8 +143,8 @@ public class RT90Position
     /// <param name="projection">RT90 projection</param>
     public RT90Position(string x, string y, RT90Projection projection)
     {
-        Point.X = int.Parse(x);
-        Point.Y = int.Parse(y);
+        PointX = double.Parse(x, NumberFormatInfo.InvariantInfo);
+        PointY = double.Parse(y, NumberFormatInfo.InvariantInfo);
         Projection = projection;
     }
 
@@ -139,8 +177,8 @@ public class RT90Position
         var gkProjection = new GaussKreuger();
         gkProjection.swedish_params(GetProjectionString(rt90projection));
         var lat_lon = gkProjection.geodetic_to_grid(position.Latitude, position.Longitude);
-        Point.X = (float)lat_lon[0];
-        Point.Y = (float)lat_lon[1];
+        PointX = lat_lon[0];
+        PointY = lat_lon[1];
         Projection = rt90projection;
     }
 
@@ -153,8 +191,8 @@ public class RT90Position
         var gkProjection = new GaussKreuger();
         gkProjection.swedish_params(GetProjectionString(Projection));
         var lat_lon = gkProjection.geodetic_to_grid(position.Latitude, position.Longitude);
-        Point.X = (float)lat_lon[0];
-        Point.Y = (float)lat_lon[1];
+        PointX = lat_lon[0];
+        PointY = lat_lon[1];
     }
 
     /// <summary>
@@ -165,7 +203,7 @@ public class RT90Position
     {
         var gkProjection = new GaussKreuger();
         gkProjection.swedish_params(ProjectionString);
-        var lat_lon = gkProjection.grid_to_geodetic(Point.X, Point.Y);
+        var lat_lon = gkProjection.grid_to_geodetic(PointX, PointY);
 
         var newPos = new WGS84Position()
         {
@@ -192,25 +230,25 @@ public class RT90Position
 
     public string X
     {
-        get => Point.X.ToString("0", NumberFormatInfo.InvariantInfo);
-        set => Point.X = float.Parse(value, NumberFormatInfo.InvariantInfo);
+        get => PointX.ToString("0.0", NumberFormatInfo.InvariantInfo);
+        set => PointX = double.Parse(value, NumberFormatInfo.InvariantInfo);
     }
 
     public string Y
     {
-        get => Point.Y.ToString("0", NumberFormatInfo.InvariantInfo);
-        set => Point.Y = float.Parse(value, NumberFormatInfo.InvariantInfo);
+        get => PointY.ToString("0.0", NumberFormatInfo.InvariantInfo);
+        set => PointY = double.Parse(value, NumberFormatInfo.InvariantInfo);
     }
 
-    public static implicit operator RT90Position(PointF point) => new((float)point.X, (float)point.Y);
+    public static implicit operator RT90Position(PointF point) => new(point.X, point.Y);
 
     public static implicit operator RT90Position(Point point) => new(point.X, point.Y);
 
-    public static implicit operator PointF(RT90Position point) => point.Point;
+    public static implicit operator PointF(RT90Position point) => new((float)point.PointX, (float)point.PointY);
 
-    public static implicit operator Point(RT90Position point) => new((int)point.Point.X, (int)point.Point.Y);
+    public static implicit operator Point(RT90Position point) => new((int)point.PointX, (int)point.PointY);
 
-    public override string ToString() => Point.ToString();
+    public override string ToString() => $"X={X},Y={Y}";
 
     public bool Equals(RT90Position? obj)
     {
@@ -224,7 +262,7 @@ public class RT90Position
             return base.Equals(obj);
         }
 
-        return obj.Point == Point;
+        return obj.PointX == PointX && obj.PointY == PointY;
     }
 
     public static bool operator ==(RT90Position p0, RT90Position p1) => p0.Equals(p1);
@@ -251,7 +289,11 @@ public class RT90Position
         return base.Equals(obj);
     }
 
-    public override int GetHashCode() => Point.GetHashCode();
+#if NETCOREAPP || NETSTANDARD || NET461_OR_GREATER
+    public override int GetHashCode() => HashCode.Combine(PointX, PointY);
+#else
+    public override int GetHashCode() => (int)(PointX * 10) ^ (int)(PointY * 10);
+#endif
 
 #if NETCOREAPP || NETSTANDARD2_1_OR_GREATER
     public override void FromWKT(ReadOnlySpan<char> str)

@@ -234,7 +234,6 @@ public class SWEREF99Position
         return newPos;
     }
 
-
     private static string GetProjectionString(SWEREFProjection projection) => projection switch
     {
         SWEREFProjection.sweref_99_tm => "sweref_99_tm",
@@ -257,9 +256,5 @@ public class SWEREF99Position
 
     public string ProjectionString => GetProjectionString(Projection);
 
-    public override string ToString() => string.Format(CultureInfo.InvariantCulture, "N: {0:00.00000} E: {1:00.00000} Projection: {2}",
-            Latitude,
-            Longitude,
-            ProjectionString);
-
+    public override string ToString() => $"N: {Latitude.ToString("00.000", CultureInfo.InvariantCulture)} E: {Longitude.ToString("00.000", CultureInfo.InvariantCulture)} Projection: {ProjectionString}";
 }

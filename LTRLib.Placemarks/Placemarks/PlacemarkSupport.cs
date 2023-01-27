@@ -130,7 +130,19 @@ public static class PlacemarkSupport
             .OrderBy(s => s.Distance(poscoordinate))
             .First();
         var segmentwgs84 = (P0: new WGS84Position(segment.P0.Y, segment.P0.X), P1: new WGS84Position(segment.P1.Y, segment.P1.X));
-        var segmentbearing = segmentwgs84.P0.GetBearing(segmentwgs84.P1);
+        return segmentwgs84;
+    }
+
+    public static (WGS84Position P0, WGS84Position P1) GetNearestGeographicalSegment(this Geometry geometry, Point position)
+    {
+        var poscoordinate = position.Coordinate;
+        var coordinates = geometry.Coordinates;
+        var segment = coordinates
+            .Take(coordinates.Length - 1)
+            .Select((item, i) => new LineSegment(item, coordinates[i + 1]))
+            .OrderBy(s => s.Distance(poscoordinate))
+            .First();
+        var segmentwgs84 = (P0: new WGS84Position(segment.P0.Y, segment.P0.X), P1: new WGS84Position(segment.P1.Y, segment.P1.X));
         return segmentwgs84;
     }
 

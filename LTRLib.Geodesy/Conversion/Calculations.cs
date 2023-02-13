@@ -27,6 +27,8 @@ public static class Calculations
 
         var sunTime = new SunTime(dt, position);
 
-        return dt.TimeOfDay > sunTime.Sunrise && dt.TimeOfDay < sunTime.Sunset;
+        return sunTime.Sunset > sunTime.Sunrise
+            ? dt.TimeOfDay > sunTime.Sunrise && dt.TimeOfDay < sunTime.Sunset
+            : dt.TimeOfDay > sunTime.Sunrise || dt.TimeOfDay < sunTime.Sunset;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.NetworkInformation;
 
 namespace LTRLib.Extensions;
 
@@ -60,5 +61,23 @@ public static class StreamExtensions
     /// of input stream. Out: Number of bytes actually copied.</param>
     public static void CopyTo(this Stream SourceStream, Stream TargetStream, int BufferSize, ref int Length) => IO.IOSupport.CopyStream(SourceStream, TargetStream, BufferSize, ref Length);
 
+#endif
+
+#if NET7_0_OR_GREATER
+    /// <summary>
+    /// Formats Unix file permissions as octal notation
+    /// </summary>
+    /// <param name="fileMode">Unix file permissions</param>
+    /// <returns>Octal string</returns>
+    public static string FormatOctal(this UnixFileMode fileMode)
+        => Convert.ToString((int)fileMode, 8);
+
+    /// <summary>
+    /// Parses Unix file permissions in octal notation
+    /// </summary>
+    /// <param name="fileMode">Octal string</param>
+    /// <returns>Unix file permissions</returns>
+    public static UnixFileMode ParseOctal(string fileMode)
+        => (UnixFileMode)Convert.ToInt32(fileMode, 8);
 #endif
 }

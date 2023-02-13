@@ -238,10 +238,10 @@ public abstract class Position
     public abstract override string ToString();
 
     /// <summary>
-    /// Returns hash code for string representation of current position.
+    /// Returns hash code for current position.
     /// </summary>
 
-    public override int GetHashCode() => ToWGS84().ToString().GetHashCode();
+    public override int GetHashCode() => ToWGS84().GetHashCode();
 
     /// <summary>
     /// Converts this position to a latitude and longitude based position in the WGS84 positioning system.
@@ -253,10 +253,33 @@ public abstract class Position
     /// </summary>
     public abstract void FromWGS84(WGS84Position position);
 
+    /// <summary>
+    /// Finds WGS84 position at a certain distance and bearing away from this instance.
+    /// </summary>
+    /// <param name="distance">Distance in meters</param>
+    /// <param name="bearing">Bearing in degrees</param>
+    /// <returns></returns>
+    public virtual WGS84Position AddDistance(double distance, double bearing) => ToWGS84().AddDistance(distance, bearing);
+
+    /// <summary>
+    /// Calculates direct distance in meters between this and another point on earth's surface.
+    /// </summary>
+    /// <param name="ToPos">The other position to calculate distance to from this position.</param>
+    /// <returns>Distance in meters.</returns>
     public virtual double GetDistanceThroughEarth(Position ToPos) => ToWGS84().GetDistanceThroughEarth(ToPos);
 
+    /// <summary>
+    /// Calculates distance in meters along surface of earth between this and another point on earth's surface.
+    /// </summary>
+    /// <param name="ToPos">The other position to calculate distance to from this position.</param>
+    /// <returns>Distance in meters.</returns>
     public virtual double GetSurfaceDistance(Position ToPos) => GetSurfaceDistance(GetDistanceThroughEarth(ToPos), EarthRadius);
 
+    /// <summary>
+    /// Calculates bearing in degrees from this position to another position on earth's surface.
+    /// </summary>
+    /// <param name="ToPos">The other position to calculate bearing to from this position.</param>
+    /// <returns>Bearing in degrees.</returns>
     public virtual double GetBearing(Position ToPos) => ToWGS84().GetBearing(ToPos);
 
 

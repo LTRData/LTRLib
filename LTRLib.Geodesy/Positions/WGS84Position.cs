@@ -171,27 +171,51 @@ public class WGS84Position
         Longitude = position.Longitude;
     }
 
+    public override WGS84Position AddDistance(double distance, double bearing)
+    {
+        var R = EarthRadius;
+        var d = distance;
+        var lat1 = Latitude / AngleFactor;
+        var lon1 = Longitude / AngleFactor;
+        var brng = bearing / AngleFactor;
+
+        var lat2 = Math.Asin(Math.Sin(lat1) * Math.Cos(d / R) +
+                                    Math.Cos(lat1) * Math.Sin(d / R) * Math.Cos(brng));
+        var lon2 = lon1 + Math.Atan2(Math.Sin(brng) * Math.Sin(d / R) * Math.Cos(lat1),
+                                        Math.Cos(d / R) - Math.Sin(lat1) * Math.Sin(lat2));
+
+        return new(lat2 * AngleFactor, lon2 * AngleFactor);
+    }
+
     public override double GetDistanceThroughEarth(Position ToPosObj)
     {
         var ToPos = ToPosObj.ToWGS84();
 
-        var x1 = EarthRadius * DegCos(Latitude) * DegCos(Longitude);
-        var y1 = EarthRadius * DegSin(Latitude);
-        var z1 = EarthRadius * DegCos(Latitude) * DegSin(Longitude);
+        var degCosLat = DegCos(Latitude);
 
-        var x2 = EarthRadius * DegCos(ToPos.Latitude) * DegCos(ToPos.Longitude);
+        var x1 = EarthRadius * degCosLat * DegCos(Longitude);
+        var y1 = EarthRadius * DegSin(Latitude);
+        var z1 = EarthRadius * degCosLat * DegSin(Longitude);
+
+        var degCosToLat = DegCos(ToPos.Latitude);
+
+        var x2 = EarthRadius * degCosToLat * DegCos(ToPos.Longitude);
         var y2 = EarthRadius * DegSin(ToPos.Latitude);
-        var z2 = EarthRadius * DegCos(ToPos.Latitude) * DegSin(ToPos.Longitude);
+        var z2 = EarthRadius * degCosToLat * DegSin(ToPos.Longitude);
 
         return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2) + Math.Pow(z2 - z1, 2));
     }
 
     public override double GetBearing(Position ToPosObj)
     {
+        const double piDiv4 = Math.PI / 4;
+
         var ToPos = ToPosObj.ToWGS84();
 
-        var f = Math.Log(Math.Tan(ToPos.Latitude / AngleFactor / 2 + Math.PI / 4) / Math.Tan(Latitude / AngleFactor / 2 + Math.PI / 4));
+        var f = Math.Log(Math.Tan(ToPos.Latitude / AngleFactor / 2 + piDiv4) / Math.Tan(Latitude / AngleFactor / 2 + piDiv4));
+        
         var bearing = Math.Atan2(ToPos.Longitude / AngleFactor - Longitude / AngleFactor, f);
+        
         if (bearing < 0)
         {
             bearing += 2 * Math.PI;
@@ -204,7 +228,14 @@ public class WGS84Position
 
     public override bool Equals(object? obj) => obj is WGS84Position other ? Equals(other) : base.Equals(obj);
 
-    public override int GetHashCode() => new PointF((float)Latitude, (float)Longitude).GetHashCode();
+    /// <summary>
+    /// Returns hash code for current position.
+    /// </summary>
+#if NET461_OR_GREATER || NETSTANDARD || NETCOREAPP
+    public override int GetHashCode() => HashCode.Combine(Latitude, Longitude);
+#else
+    public override int GetHashCode() => new { Latitude, Longitude }.GetHashCode();
+#endif
 
     public static bool operator ==(WGS84Position p0, WGS84Position p1) => ReferenceEquals(p0, p1) || (p0 is not null && p0.Equals(p1));
 

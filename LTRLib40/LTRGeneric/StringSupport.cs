@@ -136,10 +136,10 @@ public static class StringSupport
             {
                 return data.Split(lineBreaks, StringSplitOptions.None);
             }
-            
+
             var StringArray = data.Split(lineBreaks, StringSplitOptions.RemoveEmptyEntries);
             var NewArray = Array.CreateInstance(t.GetElementType()!, StringArray.Length);
-            
+
             for (int i = 0, loopTo = StringArray.Length - 1; i <= loopTo; i++)
             {
                 NewArray.SetValue(ParseValueType(StringArray[i], t.GetElementType()!, format), i);
@@ -175,58 +175,128 @@ public static class StringSupport
         }
     }
 
-    public static long? ParseSuffixedSize(string Str)
+    private static readonly Dictionary<ulong, string> multipliers = new()
     {
-        long? ParseSuffixedSizeRet;
+        { 1UL << 60, " EB" },
+        { 1UL << 50, " PB" },
+        { 1UL << 40, " TB" },
+        { 1UL << 30, " GB" },
+        { 1UL << 20, " MB" },
+        { 1UL << 10, " KB" },
+        { 2UL, " bytes" }
+    };
+
+    public static string FormatBytes(ulong size)
+    {
+        foreach (var m in multipliers)
+        {
+            if (size >= m.Key)
+            {
+                return $"{size / (double)m.Key:0.0}{m.Value}";
+            }
+        }
+
+        return $"{size} byte";
+    }
+
+    public static string FormatBytes(ulong size, int precision)
+    {
+        foreach (var m in multipliers)
+        {
+            if (size >= m.Key)
+            {
+                return $"{(size / (double)m.Key).ToString($"0.{new string('0', precision - 1)}")}{m.Value}";
+            }
+        }
+
+        return $"{size} byte";
+    }
+
+    public static string FormatBytes(long size)
+    {
+        foreach (var m in multipliers)
+        {
+            if (Math.Abs(size) >= (long)m.Key)
+            {
+                return $"{size / (double)m.Key:0.0}{m.Value}";
+            }
+        }
+
+        return $"{size} byte";
+
+    }
+
+    public static string FormatBytes(long size, int precision)
+    {
+
+        foreach (var m in multipliers)
+        {
+            if (size >= (long)m.Key)
+            {
+                return $"{(size / (double)m.Key).ToString($"0.{new string('0', precision - 1)}")}{m.Value}";
+            }
+        }
+
+        return $"{size} byte";
+
+    }
+
+    public static long? ParseSuffixedSize(string Str)
+        => TryParseSuffixedSize(Str, out var result) ? result : null;
+
+    public static bool TryParseSuffixedSize(string Str, out long ParseSuffixedSizeRet)
+    {
+        ParseSuffixedSizeRet = 0;
 
         if (string.IsNullOrEmpty(Str))
         {
-            return default;
+            return false;
         }
 
         if (Str.StartsWith("0x", StringComparison.Ordinal) || Str.StartsWith("&H", StringComparison.Ordinal))
         {
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-            return long.Parse(Str.AsSpan(2), NumberStyles.AllowHexSpecifier);
+            return long.TryParse(Str.AsSpan(2), NumberStyles.AllowHexSpecifier, provider: null, out ParseSuffixedSizeRet);
 #else
-            return long.Parse(Str.Substring(2), NumberStyles.AllowHexSpecifier);
+            return long.TryParse(Str.Substring(2), NumberStyles.AllowHexSpecifier, provider: null, out ParseSuffixedSizeRet);
 #endif
         }
 
         var Suffix = Str[Str.Length - 1];
+
         if (char.IsLetter(Suffix))
         {
-            switch (char.ToUpper(Suffix))
+            var factor = char.ToUpper(Suffix) switch
             {
-                case 'T':
-                        ParseSuffixedSizeRet = 1024L << 30;
-                        break;
+                'E' => 1L << 60,
+                'P' => 1L << 50,
+                'T' => 1L << 40,
+                'G' => 1L << 30,
+                'M' => 1L << 20,
+                'K' => 1L << 10,
+                _ => throw new FormatException($"Bad suffix: {Suffix}"),
+            };
 
-                case 'G':
-                        ParseSuffixedSizeRet = 1024L << 20;
-                        break;
-
-                case 'M':
-                        ParseSuffixedSizeRet = 1024L << 10;
-                        break;
-
-                case 'K':
-                        ParseSuffixedSizeRet = 1024L;
-                        break;
-
-                default:
-                        throw new FormatException($"Bad suffix: {Suffix}");
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
+            if (long.TryParse(Str.AsSpan(0, Str.Length - 1), NumberStyles.Any, provider: null, out ParseSuffixedSizeRet))
+            {
+                ParseSuffixedSizeRet *= factor;
+                return true;
             }
+#else
+            if (long.TryParse(Str.Substring(0, Str.Length - 1), NumberStyles.Any, provider: null, out ParseSuffixedSizeRet))
+            {
+                ParseSuffixedSizeRet *= factor;
+                return true;
+            }
+#endif
 
-            Str = Str.Remove(Str.Length - 1);
+            return false;
         }
         else
         {
-            ParseSuffixedSizeRet = 1L;
+            return long.TryParse(Str, NumberStyles.Any, provider: null, out ParseSuffixedSizeRet);
         }
-
-        ParseSuffixedSizeRet *= long.Parse(Str, NumberStyles.Any);
-        return ParseSuffixedSizeRet;
     }
 
     public static byte[] ParseHexString(string str)

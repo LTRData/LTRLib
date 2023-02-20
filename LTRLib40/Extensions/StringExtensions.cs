@@ -340,11 +340,11 @@ public static class StringExtensions
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
 
-    public static string Join(this IEnumerable<string> strings, string separator) => string.Join(separator, strings);
+    public static string Join(this IEnumerable<string?> strings, string separator) => string.Join(separator, strings);
 
-    public static string Join(this IEnumerable<string> strArray, char separator) => string.Join(separator, strArray);
+    public static string Join(this IEnumerable<string?> strArray, char separator) => string.Join(separator, strArray);
 
-    public static string Join(this IEnumerable<string> strArray) => string.Join(' ', strArray);
+    public static string Join(this IEnumerable<string?> strArray) => string.Join(' ', strArray);
 
 #elif NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
 

@@ -17,6 +17,9 @@ using System.Text;
 using System.Linq;
 #endif
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable IDE0057 // Use range operator
+
 namespace LTRLib.Extensions;
 
 public static class StringExtensions
@@ -143,9 +146,8 @@ public static class StringExtensions
     /// <param name="Msg"></param>
     /// <param name="LineWidth">Display width. If omitted, defaults to console window width.</param>
     /// <param name="WordDelimiter">Word separator character.</param>
-    /// <param name="FillChar">Fill character.</param>
     [SecuritySafeCritical]
-    public static string LineFormat(this string Msg, int? LineWidth = default, char WordDelimiter = ' ', char FillChar = ' ')
+    public static string LineFormat(this string Msg, int? LineWidth = default, char WordDelimiter = ' ')
     {
         int Width;
 

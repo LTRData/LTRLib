@@ -28,6 +28,15 @@ public class Positions
     }
 
     [Fact]
+    public void WWLDistancePoints()
+    {
+        var pos1 = new WGS84Position("JO67TU");
+        var pos2 = new WGS84Position("JO45VX");
+        var points = pos1.GetWWLDistancePoints(pos2);
+        Assert.Equal(313, points);
+    }
+
+    [Fact]
     public void AddDistance()
     {
         var pos1 = new WGS84Position("JO67LR21");

@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using static System.Collections.Specialized.BitVector32;
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable IDE0057 // Use range operator
@@ -166,7 +167,7 @@ public abstract class Position
     /// <summary>
     /// Earth radius.
     /// </summary>
-    public double EarthRadius = 6394121.6; // 6367442.5
+    public double EarthRadius = 6371008.7714; // 6394121.6; // 6367442.5;
 
     /// <summary>
     /// Sine function with angle measured in degrees.
@@ -274,6 +275,29 @@ public abstract class Position
     /// <param name="ToPos">The other position to calculate distance to from this position.</param>
     /// <returns>Distance in meters.</returns>
     public virtual double GetSurfaceDistance(Position ToPos) => GetSurfaceDistance(GetDistanceThroughEarth(ToPos), EarthRadius);
+
+    /// <summary>
+    /// Calculates distance points according to WWL REG 1 rules (111.2 km/degree, 1 point per started km).
+    /// </summary>
+    /// <param name="ToPos">The other position to calculate distance to from this position.</param>
+    /// <returns>Distance in points.</returns>
+    public virtual int GetWWLDistancePoints(Position ToPos)
+    {
+        var pos1 = ToWGS84();
+        var pos2 = ToPos.ToWGS84();
+
+        var Bm = pos1.Latitude / AngleFactor;
+        var Lm = pos1.Longitude / AngleFactor;
+        
+        var Bn = pos2.Latitude / AngleFactor;
+        var Ln = pos2.Longitude / AngleFactor;
+
+        var distance = 111.2 * AngleFactor * Math.Acos(Math.Sin(Bm) * Math.Sin(Bn) + Math.Cos(Bm) * Math.Cos(Bn) * Math.Cos(Lm - Ln));
+
+        var points = (int)Math.Truncate(distance + 1);
+
+        return points;
+    }
 
     /// <summary>
     /// Calculates bearing in degrees from this position to another position on earth's surface.

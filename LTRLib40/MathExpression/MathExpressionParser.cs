@@ -267,6 +267,18 @@ public class MathExpressionParser : IMathExpressionParser
             if ((operands.Count >= 3) &&
                 IsKnownOperator(operands[1], 2))
             {
+                while (operands.Count > 3)
+                {
+                    key = ParseExpression(operands.Take(3).ToList(), subExpr);
+                    if (key is null)
+                    {
+                        throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
+                    }
+
+                    operands.RemoveRange(0, 3);
+                    operands.Insert(0, key);
+                }
+
                 if (!subExpr.ContainsKey(operands[2]))
                 {
                     key = ParseExpression(operands.Skip(2).ToList(), subExpr);

@@ -40,6 +40,15 @@ Public Class AsyncMessageBox
 
     End Sub
 
+    Public Sub New(owner As IWin32Window, message As String)
+        Me.New()
+
+        MsgText = message
+        MyBase.Show(owner)
+        MyBase.Activate()
+
+    End Sub
+
     Public Property MsgText() As String
         Get
             Return m_Text

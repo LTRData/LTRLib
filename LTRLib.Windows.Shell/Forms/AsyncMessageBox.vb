@@ -43,6 +43,7 @@ Public Class AsyncMessageBox
     Public Sub New(owner As IWin32Window, message As String)
         Me.New()
 
+        StartPosition = FormStartPosition.CenterParent
         MsgText = message
         MyBase.Show(owner)
         MyBase.Activate()

@@ -28,5 +28,25 @@ public class MathExpressions
         var expr4 = math.ParseExpression<Func<double>>("169 - 5 - 3 - 1");
         var value4 = expr4();
         Assert.Equal(169 - 5 - 3 - 1, value4);
+
+        var expr5 = math.ParseExpression<Func<double>>("169 - (5 - 3 - 1)");
+        var value5 = expr5();
+        Assert.Equal(169 - (5 - 3 - 1), value5);
+
+        var expr6 = math.ParseExpression<Func<double>>("169 (5 - 3 - 1)");
+        var value6 = expr6();
+        Assert.Equal(169 * (5 - 3 - 1), value6);
+
+        var expr7 = math.ParseExpression<Func<double>>("169 - 5 * 3 - 1");
+        var value7 = expr7();
+        Assert.Equal(169 - 5 * 3 - 1, value7);
+
+        var expr8 = math.ParseExpression<Func<double>>("169 - 5 - 3 * 1");
+        var value8 = expr8();
+        Assert.Equal(169 - 5 - 3 * 1, value8);
+
+        var expr9 = math.ParseExpression<Func<double>>("169 * 5 - 3 - 1");
+        var value9 = expr9();
+        Assert.Equal(169 * 5 - 3 - 1, value9);
     }
 }

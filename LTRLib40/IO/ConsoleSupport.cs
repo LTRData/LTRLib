@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Security;
 using System.Security.Permissions;
 using System.Text;
@@ -15,8 +16,10 @@ namespace LTRLib.LTRGeneric;
 
 public static class ConsoleSupport
 {
+    [SupportedOSPlatform("windows")]
     public static void AllocConsole() => Win32API.AllocConsole();
 
+    [SupportedOSPlatform("windows")]
     public static void FreeConsole() => Win32API.FreeConsole();
 
     [SecuritySafeCritical]

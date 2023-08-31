@@ -15,7 +15,7 @@ public static class AsyncExtensions
     /// allocations. Otherwise as Task object is created for waiting and for re-throwing any exceptions etc.
     /// </summary>
     /// <param name="task">ValueTask</param>
-    public static void Wait(this ValueTask task)
+    public static void Wait(this in ValueTask task)
     {
         if (!task.IsCompletedSuccessfully)
         {
@@ -29,7 +29,7 @@ public static class AsyncExtensions
     /// any further allocations. Otherwise as Task object is created for waiting for results, exceptions etc.
     /// </summary>
     /// <param name="task">ValueTask</param>
-    public static void Wait<T>(this ValueTask<T> task)
+    public static void Wait<T>(this in ValueTask<T> task)
     {
         if (!task.IsCompletedSuccessfully)
         {
@@ -43,7 +43,7 @@ public static class AsyncExtensions
     /// any further allocations. Otherwise as Task object is created for waiting for results, exceptions etc.
     /// </summary>
     /// <param name="task">ValueTask</param>
-    public static T WaitForResult<T>(this ValueTask<T> task)
+    public static T WaitForResult<T>(this in ValueTask<T> task)
     {
         if (task.IsCompletedSuccessfully)
         {

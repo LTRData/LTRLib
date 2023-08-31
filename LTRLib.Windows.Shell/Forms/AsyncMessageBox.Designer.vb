@@ -36,7 +36,7 @@ Partial Class AsyncMessageBox
         Me.Name = "AsyncMessageBox"
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.ResumeLayout(False)
 
     End Sub

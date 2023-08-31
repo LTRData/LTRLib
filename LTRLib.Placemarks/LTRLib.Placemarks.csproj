@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net30;net40;net46;net48;netcoreapp3.1;netstandard2.0;netstandard2.1;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net30;net40;net46;net48;netstandard2.0;netstandard2.1;net6.0;net7.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,9 +18,7 @@
 
   <ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0">
     <PackageReference Include="NetTopologySuite" Version="2.4.*" />
-    <PackageReference Include="System.Memory">
-      <Version>4.5.*</Version>
-    </PackageReference>
+    <PackageReference Include="System.Memory" Version="4.5.*" />
   </ItemGroup>
 
 </Project>

@@ -33,8 +33,8 @@ public class Surface : IDisposable
 
     public void DrawAxis(IImageProcessingContext Image, Pen Pen)
     {
-        Image.DrawLines(Pen, new PointF(VirtualToScreenX(Xmin), VirtualToScreenY(0d)), new PointF(VirtualToScreenX(Xmax), VirtualToScreenY(0d)));
-        Image.DrawLines(Pen, new PointF(VirtualToScreenX(0d), VirtualToScreenY(Ymin)), new PointF(VirtualToScreenX(0d), VirtualToScreenY(Ymax)));
+        Image.DrawLine(Pen, new PointF(VirtualToScreenX(Xmin), VirtualToScreenY(0d)), new PointF(VirtualToScreenX(Xmax), VirtualToScreenY(0d)));
+        Image.DrawLine(Pen, new PointF(VirtualToScreenX(0d), VirtualToScreenY(Ymin)), new PointF(VirtualToScreenX(0d), VirtualToScreenY(Ymax)));
     }
 
     public void DrawGraph(IImageProcessingContext Image, Pen Pen) => Image.Draw(Pen, GraphPath);

@@ -1,16 +1,13 @@
 ﻿using LTRLib.LTRGeneric;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace LTRLib;
 
 public class TimeZoneSupport
 {
+#if NET48_OR_GREATER || NETSTANDARD || NETCOREAPP
     [Fact]
     public void Json()
     {
@@ -26,4 +23,5 @@ public class TimeZoneSupport
 
         Assert.Equal(dateTime, cldt2.DateTime);
     }
+#endif
 }

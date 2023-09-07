@@ -29,9 +29,9 @@ public struct Rectangle : IPolyGeometry
 
     public Point X1Y1 { get; set; }
 
-    public Point X1Y0 => new(X1Y1.X, X0Y0.Y);
+    public readonly Point X1Y0 => new(X1Y1.X, X0Y0.Y);
 
-    public Point X0Y1 => new(X0Y0.X, X1Y1.Y);
+    public readonly Point X0Y1 => new(X0Y0.X, X1Y1.Y);
 
     public static implicit operator Polygon(Rectangle rect) => rect.AsPolygon();
 
@@ -52,15 +52,15 @@ public struct Rectangle : IPolyGeometry
 
     public override string ToString() => Corners.Select(point => point.ToString()).Join(", ");
 
-    public double MinX => Math.Min(X0Y0.X, X1Y1.X);
+    public readonly double MinX => Math.Min(X0Y0.X, X1Y1.X);
 
-    public double MinY => Math.Min(X0Y0.Y, X1Y1.Y);
+    public readonly double MinY => Math.Min(X0Y0.Y, X1Y1.Y);
 
-    public double MaxX => Math.Max(X0Y0.X, X1Y1.X);
+    public readonly double MaxX => Math.Max(X0Y0.X, X1Y1.X);
 
-    public double MaxY => Math.Max(X0Y0.Y, X1Y1.Y);
+    public readonly double MaxY => Math.Max(X0Y0.Y, X1Y1.Y);
 
-    public bool Contains(Point point) => this.MBRContains(point);
+    public readonly bool Contains(Point point) => this.MBRContains(point);
 
     public double Length => 2 * (MaxY - MinY + MaxX - MinX);
 
@@ -70,9 +70,9 @@ public struct Rectangle : IPolyGeometry
 
     public static bool operator !=(Rectangle line1, Rectangle line2) => !line1.Equals(line2);
 
-    public override int GetHashCode() => X0Y0.GetHashCode() ^ X1Y1.GetHashCode();
+    public override readonly int GetHashCode() => X0Y0.GetHashCode() ^ X1Y1.GetHashCode();
 
     public override bool Equals(object? obj) => obj is Rectangle rectangle && Equals(rectangle);
 
-    public bool Equals(Rectangle other) => X0Y0.Equals(other.X0Y0) && X1Y1.Equals(other.X1Y1);
+    public readonly bool Equals(Rectangle other) => X0Y0.Equals(other.X0Y0) && X1Y1.Equals(other.X1Y1);
 }

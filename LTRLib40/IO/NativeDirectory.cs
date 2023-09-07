@@ -493,8 +493,8 @@ public static class NativeDirectory
             if (entry.IsDirectory &&
                 (subdirectoriesOption != IncludeSubdirectoriesOption.ExceptReparsePoints ||
                 (entry.Attributes & FileAttributes.ReparsePoint) != FileAttributes.ReparsePoint) &&
-                !entry.FileName.Equals(".", StringComparison.Ordinal) &&
-                !entry.FileName.Equals("..", StringComparison.Ordinal))
+                entry.FileName != "." &&
+                entry.FileName != "..")
             {
                 foreach (var subEntry in EnumerateEntries(entry.FullPath, pattern, subdirectoriesOption, entriesOption, returnHardLinkedOnce, linkList))
                 {

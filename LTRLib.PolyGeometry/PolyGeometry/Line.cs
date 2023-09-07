@@ -29,7 +29,7 @@ public struct Line : IPolyGeometry, IEquatable<Line>
 
     public Point X0Y0
     {
-        get => x0y0_;
+        readonly get => x0y0_;
         set
         {
             x0y0_ = value;
@@ -40,7 +40,7 @@ public struct Line : IPolyGeometry, IEquatable<Line>
 
     public Point X1Y1
     {
-        get => x1y1_;
+        readonly get => x1y1_;
         set
         {
             x1y1_ = value;
@@ -79,9 +79,9 @@ public struct Line : IPolyGeometry, IEquatable<Line>
 
     public double MaxY => Math.Max(X0Y0.Y, X1Y1.Y);
 
-    public double GetXForY(double y) => (y - Base) / Gradient;
+    public readonly double GetXForY(double y) => (y - Base) / Gradient;
 
-    public double GetYForX(double x) => Gradient * x + Base;
+    public readonly double GetYForX(double x) => Gradient * x + Base;
 
     public bool Contains(Point point)
     {
@@ -119,7 +119,7 @@ public struct Line : IPolyGeometry, IEquatable<Line>
 
     public bool Equals(Line other) => X0Y0.Equals(other.X0Y0) && X1Y1.Equals(other.X1Y1);
 
-    double IPolyGeometry.Area => 0;
+    readonly double IPolyGeometry.Area => 0;
 
     public static implicit operator Path(Line line) => new(line.X0Y0, line.X1Y1);
 
@@ -132,7 +132,7 @@ public struct Line : IPolyGeometry, IEquatable<Line>
         }
     }
 
-    IEnumerable<Line> IPolyGeometry.Bounds
+    readonly IEnumerable<Line> IPolyGeometry.Bounds
     {
         get
         {

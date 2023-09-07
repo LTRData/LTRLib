@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace LTRLib.LTRGeneric;
 
@@ -34,11 +33,11 @@ public readonly struct SingleValueEnumerable<T> : IEnumerable<T?>
 
         public bool Started { get; private set; }
 
-        public T? Current => Started ? Value : default;
+        public readonly T? Current => Started ? Value : default;
 
         object? IEnumerator.Current => Current;
 
-        void IDisposable.Dispose() { }
+        readonly void IDisposable.Dispose() { }
 
         public bool MoveNext()
         {

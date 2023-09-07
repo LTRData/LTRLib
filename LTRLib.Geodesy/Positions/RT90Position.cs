@@ -18,7 +18,6 @@ using System;
 using System.Drawing;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Security.Permissions;
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable IDE0057 // Use range operator

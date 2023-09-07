@@ -224,12 +224,8 @@ public partial class CsvReader<T> : CsvReader, IEnumerable<T>, IEnumerator<T> wh
 
     public CsvReader(TextReader Reader, char[]? delimiters, char[]? textquotes) : base(Reader, delimiters, textquotes)
     {
-        var line = BaseReader.ReadLine();
-
-        if (line is null)
-        {
-            throw new InvalidOperationException("Empty input file");
-        }
+        var line = BaseReader.ReadLine()
+            ?? throw new InvalidOperationException("Empty input file");
 
         var field_names = line.Split(_Delimiters, StringSplitOptions.None);
 

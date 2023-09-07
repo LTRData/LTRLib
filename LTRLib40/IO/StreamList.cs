@@ -10,7 +10,6 @@ using System.Threading;
 #if NET40_OR_GREATER || NETCOREAPP || NETSTANDARD
 using System.Threading.Tasks;
 #endif
-using LTRLib.Extensions;
 using LTRLib.LTRGeneric;
 
 namespace LTRLib.IO;

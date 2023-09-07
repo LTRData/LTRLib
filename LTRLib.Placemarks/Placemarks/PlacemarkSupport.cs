@@ -187,7 +187,7 @@ public static class PlacemarkSupport
     {
         try
         {
-            var id = placemark.ExtendedData?.SchemaData?.First(data => "ID".Equals(data.name, StringComparison.Ordinal) || "LKFV".Equals(data.name, StringComparison.Ordinal));
+            var id = placemark.ExtendedData?.SchemaData?.First(data => "ID" == data.name || "LKFV" == data.name);
             var name = placemark.ExtendedData?.SchemaData?.First(data => data.name.EndsWith("NAMN", StringComparison.Ordinal));
 
             return new Region

@@ -140,7 +140,7 @@ public static class HttpServerSupport
 
             var ifNoneMatch = Request.Headers.Get("If-None-Match");
 
-            var eTagHit = !string.IsNullOrWhiteSpace(ifNoneMatch) && ifNoneMatch.Trim('"').Equals(etag, StringComparison.Ordinal);
+            var eTagHit = !string.IsNullOrWhiteSpace(ifNoneMatch) && ifNoneMatch.Trim('"') == etag;
 
             if (modifiedSinceHit && (eTagHit || string.IsNullOrWhiteSpace(ifNoneMatch)) || eTagHit && string.IsNullOrWhiteSpace(ifModifiedSince))
             {

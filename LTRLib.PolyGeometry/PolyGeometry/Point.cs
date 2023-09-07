@@ -29,17 +29,17 @@ public struct Point : IEquatable<Point>, IPolyGeometry
 
     public double Y { get; set; }
 
-    public bool MBRWithin(IPolyGeometry geometry) => geometry.MBRContains(this);
+    public readonly bool MBRWithin(IPolyGeometry geometry) => geometry.MBRContains(this);
 
-    public bool Within(IPolyGeometry geometry) => geometry.Contains(this);
+    public readonly bool Within(IPolyGeometry geometry) => geometry.Contains(this);
 
-    public override int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode();
+    public override readonly int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode();
 
     public override bool Equals(object? obj) => obj is Point point && Equals(point);
 
-    public bool Equals(Point other) => X.Equals(other.X) && Y.Equals(other.Y);
+    public readonly bool Equals(Point other) => X.Equals(other.X) && Y.Equals(other.Y);
 
-    public override string ToString() => $"{X.ToString(NumberFormatInfo.InvariantInfo)} {Y.ToString(NumberFormatInfo.InvariantInfo)}";
+    public override readonly string ToString() => $"{X.ToString(NumberFormatInfo.InvariantInfo)} {Y.ToString(NumberFormatInfo.InvariantInfo)}";
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
     public static Point Parse(ReadOnlyMemory<char> text)
@@ -80,19 +80,19 @@ public struct Point : IEquatable<Point>, IPolyGeometry
 
     public static bool operator !=(Point point1, Point point2) => !point1.Equals(point2);
 
-    double IPolyGeometry.MinX => X;
+    readonly double IPolyGeometry.MinX => X;
 
-    double IPolyGeometry.MinY => Y;
+    readonly double IPolyGeometry.MinY => Y;
 
-    double IPolyGeometry.MaxX => X;
+    readonly double IPolyGeometry.MaxX => X;
 
-    double IPolyGeometry.MaxY => Y;
+    readonly double IPolyGeometry.MaxY => Y;
 
-    double IPolyGeometry.Area => 0;
+    readonly double IPolyGeometry.Area => 0;
 
-    double IPolyGeometry.Length => 0;
+    readonly double IPolyGeometry.Length => 0;
 
-    IEnumerable<Point> IPolyGeometry.Corners
+    readonly IEnumerable<Point> IPolyGeometry.Corners
     {
         get
         {
@@ -100,7 +100,7 @@ public struct Point : IEquatable<Point>, IPolyGeometry
         }
     }
 
-    IEnumerable<Line> IPolyGeometry.Bounds
+    readonly IEnumerable<Line> IPolyGeometry.Bounds
     {
         get
         {

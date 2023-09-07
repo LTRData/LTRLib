@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 #endif
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace LTRLib.Extensions;
 

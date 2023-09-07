@@ -48,12 +48,8 @@ public static class ExpressionSupport
 
         var staticArgsTypes = Array.ConvertAll(staticArgs, arg => arg.Type);
 
-        var newMethod = GetCompatibleMethod(typeof(Enumerable), true, MethodName, GenericArguments, ReturnType, staticArgsTypes);
-
-        if (newMethod is null)
-        {
-            throw new NotSupportedException("Expression calls unsupported method " + MethodName + ".");
-        }
+        var newMethod = GetCompatibleMethod(typeof(Enumerable), true, MethodName, GenericArguments, ReturnType, staticArgsTypes)
+            ?? throw new NotSupportedException($"Expression calls unsupported method {MethodName}.");
 
         // ' Substitute first argument (extension method source object) with a parameter that
         // ' will be substituted with the result sequence when resulting lambda conversion

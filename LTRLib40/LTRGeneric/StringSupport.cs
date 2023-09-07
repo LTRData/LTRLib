@@ -549,11 +549,11 @@ public static class StringSupport
             if (switches_finished)
             {
             }
-            else if (arg.Length == 0 || arg.Equals("-", StringComparison.Ordinal))
+            else if (arg.Length == 0 || arg == "-")
             {
                 switches_finished = true;
             }
-            else if (arg.Equals("--", StringComparison.Ordinal))
+            else if (arg == "--")
             {
                 switches_finished = true;
                 continue;

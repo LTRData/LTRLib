@@ -12,7 +12,6 @@
  */
 
 using System;
-using System.Drawing;
 using System.Runtime.InteropServices;
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression

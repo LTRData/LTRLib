@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.ComponentModel.Design.Serialization;
 using System.Runtime.CompilerServices;
 using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
@@ -236,7 +235,7 @@ public static class BufferExtensions
         private ReadOnlySpan<char> chars;
         private ReadOnlySpan<char> current;
 
-        public ReadOnlySpan<char> Current => current;
+        public readonly ReadOnlySpan<char> Current => current;
 
         public bool MoveNext() => reverse ? MoveNextReverse() : MoveNextForward();
 
@@ -381,7 +380,7 @@ public static class BufferExtensions
             return current;
         }
 
-        public StringSplitByCharEnumerator GetEnumerator() => this;
+        public readonly StringSplitByCharEnumerator GetEnumerator() => this;
 
         public StringSplitByCharEnumerator(ReadOnlySpan<char> chars, char delimiter, StringSplitOptions options, bool reverse)
         {
@@ -402,7 +401,7 @@ public static class BufferExtensions
         private ReadOnlySpan<char> chars;
         private ReadOnlySpan<char> current;
 
-        public ReadOnlySpan<char> Current => current;
+        public readonly ReadOnlySpan<char> Current => current;
 
         public bool MoveNext() => reverse ? MoveNextReverse() : MoveNextForward();
 
@@ -547,7 +546,7 @@ public static class BufferExtensions
             return current;
         }
 
-        public StringSplitByStringEnumerator GetEnumerator() => this;
+        public readonly StringSplitByStringEnumerator GetEnumerator() => this;
 
         public StringSplitByStringEnumerator(ReadOnlySpan<char> chars, ReadOnlySpan<char> delimiter, StringSplitOptions options, bool reverse)
         {

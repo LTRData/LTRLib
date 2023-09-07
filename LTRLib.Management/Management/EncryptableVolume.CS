@@ -1,6 +1,7 @@
 ﻿#pragma warning disable
 
-namespace ROOT.CIMV2.SECURITY.MICROSOFTVOLUMEENCRYPTION.Win32 {
+namespace ROOT.CIMV2.SECURITY.MICROSOFTVOLUMEENCRYPTION.Win32
+{
     using System;
     using System.ComponentModel;
     using System.Management;

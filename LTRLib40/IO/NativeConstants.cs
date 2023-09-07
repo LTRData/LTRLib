@@ -11,7 +11,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
-using System.Xml.Serialization;
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable SYSLIB0003 // Type or member is obsolete

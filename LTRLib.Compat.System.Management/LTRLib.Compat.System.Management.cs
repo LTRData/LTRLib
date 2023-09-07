@@ -209,7 +209,9 @@ public class ManagementObject : ManagementBaseObject
 
     public override string? ClassPath => Path?.ClassName;
 
-    public void Delete() => (CimSession ?? throw new InvalidOperationException("CimSession object needed for this operation")).DeleteInstance(CimInstance);
+    public void Delete()
+        => (CimSession ?? throw new InvalidOperationException("CimSession object needed for this operation"))
+        .DeleteInstance(CimInstance);
 
     public void Get()
     {
@@ -224,9 +226,12 @@ public class ManagementObject : ManagementBaseObject
         CimInstance = CimSession.GetInstance(Path?.NamespacePath, CimInstance);
     }
 
-    public void Put() => (CimSession ?? throw new InvalidOperationException("CimSession object needed for this operation")).ModifyInstance(CimInstance);
+    public void Put()
+        => (CimSession ?? throw new InvalidOperationException("CimSession object needed for this operation"))
+        .ModifyInstance(CimInstance);
 
-    public void Put(PutOptions options) => CimSession?.ModifyInstance(Path?.NamespacePath, CimInstance, options.Options);
+    public void Put(PutOptions options)
+        => CimSession?.ModifyInstance(Path?.NamespacePath, CimInstance, options.Options);
 
     public ManagementParameters GetMethodParameters(string methodName)
     {

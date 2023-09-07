@@ -1,6 +1,5 @@
 using LTRLib.MathExpression;
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using Xunit;
 
@@ -48,5 +47,9 @@ public class MathExpressions
         var expr9 = math.ParseExpression<Func<double>>("169 * 5 - 3 - 1");
         var value9 = expr9();
         Assert.Equal(169 * 5 - 3 - 1, value9);
+
+        var expr10 = math.ParseExpression<Func<double>>("2.5 + 400 / (.1 - .01) * 2");
+        var value10 = expr10();
+        Assert.Equal(2.5 + 400 / (.1 - .01) * 2, value10);
     }
 }

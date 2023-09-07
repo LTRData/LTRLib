@@ -140,7 +140,7 @@ public class MathExpressionParser : IMathExpressionParser
                 sub_operands.Count >= 1 &&
                 sub_operands
                 .Where((op, i) => (i & 1) == 1)
-                .All(op => op.Equals(",", StringComparison.Ordinal)))
+                .All(op => op == ","))
             {
                 startidx--;
                 count++;
@@ -151,16 +151,13 @@ public class MathExpressionParser : IMathExpressionParser
                     sub_operands
                     .Where((op, i) => (i & 1) == 0)
                     .Select(op =>
-                        {
-                            var operand = new List<string>(1) { op };
-                            var subkey = ParseExpression(operand, subExpr);
-                            if (subkey is null)
-                            {
-                                throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operand, subExpr)}'");
-                            }
+                    {
+                        var operand = new List<string>(1) { op };
+                        var subkey = ParseExpression(operand, subExpr)
+                            ?? throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operand, subExpr)}'");
 
-                            return subExpr[subkey];
-                        })
+                        return subExpr[subkey];
+                    })
                     .ToArray());
             }
             else
@@ -180,9 +177,9 @@ public class MathExpressionParser : IMathExpressionParser
         // Priority operators with implicit parentheses
         while (operands.Count > 3)
         {
-            var prioIdx = prioOperators
-                .Select(o => new int?(operands.IndexOf(o)))
-                .FirstOrDefault(i => i!.Value >= 0);
+            var prioIdx = operands
+                .Select((operand, i) => new int?(i))
+                .FirstOrDefault(i => Array.IndexOf(prioOperators, operands[i!.Value]) >= 0);
 
             if (prioIdx.HasValue &&
                 prioIdx.Value >= 1 &&
@@ -190,16 +187,15 @@ public class MathExpressionParser : IMathExpressionParser
             {
                 var startIdx = prioIdx.Value - 1;
                 var count = 3 + operands.Skip(prioIdx.Value + 1).TakeWhile(o => IsKnownOperator(o, 1)).Count();
+                
                 if (startIdx + count <= operands.Count)
                 {
-                    var key = ParseExpression(operands.Skip(startIdx).Take(count).ToList(), subExpr);
-                    if (key is null)
-                    {
-                        throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
-                    }
+                    var key = ParseExpression(operands.Skip(startIdx).Take(count).ToList(), subExpr)
+                        ?? throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
 
                     operands.RemoveRange(startIdx, count);
                     operands.Insert(startIdx, key);
+                    
                     continue;
                 }
             }
@@ -208,21 +204,15 @@ public class MathExpressionParser : IMathExpressionParser
         }
 
         // Priority unary suffix operators
-        if (operands.Count >= 2)
+        if (operands.Count >= 2
+            && UnarySuffixOperators.TryGetValue(operands[1], out var unaryOp))
         {
-            if (UnarySuffixOperators.TryGetValue(operands[1], out var op))
-            {
-                operands[1] = operands[0];
-                operands[0] = op;
-            }
+            operands[1] = operands[0];
+            operands[0] = unaryOp;
         }
 
-        var newLine = ParseExpression(operands, subExpr);
-
-        if (newLine is null)
-        {
-            throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
-        }
+        var newLine = ParseExpression(operands, subExpr)
+            ?? throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
 
         return newLine;
     }

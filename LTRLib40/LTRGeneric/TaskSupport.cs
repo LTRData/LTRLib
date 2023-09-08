@@ -143,7 +143,7 @@ public static class TaskSupport
 
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 
-public readonly struct ProcessAwaiter : INotifyCompletion
+public readonly struct ProcessAwaiter : ICriticalNotifyCompletion
 {
     public Process? Process { get; }
 
@@ -176,7 +176,9 @@ public readonly struct ProcessAwaiter : INotifyCompletion
 
     public int GetResult() => Process?.ExitCode ?? 0;
 
-    public void OnCompleted(Action continuation)
+    public void OnCompleted(Action continuation) => throw new NotSupportedException();
+
+    public void UnsafeOnCompleted(Action continuation)
     {
         if (Process is null)
         {
@@ -200,7 +202,7 @@ public readonly struct ProcessAwaiter : INotifyCompletion
     }
 }
 
-public sealed class WaitHandleAwaiter : INotifyCompletion
+public sealed class WaitHandleAwaiter : ICriticalNotifyCompletion
 {
     private readonly WaitHandle handle;
     private readonly TimeSpan timeout;
@@ -220,7 +222,9 @@ public sealed class WaitHandleAwaiter : INotifyCompletion
 
     public bool GetResult() => result;
 
-    public void OnCompleted(Action continuation)
+    public void OnCompleted(Action continuation) => throw new NotSupportedException();
+
+    public void UnsafeOnCompleted(Action continuation)
     {
         this.continuation = continuation;
 

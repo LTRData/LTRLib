@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
+using System.Security;
 
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Linq;
@@ -72,7 +73,7 @@ namespace System.Runtime.CompilerServices
     // 
     // Summary:
     // Represents an operation that schedules continuations when it completes.
-    public partial interface INotifyCompletion
+    public partial interface ICriticalNotifyCompletion
     {
         // 
         // Summary:
@@ -86,6 +87,20 @@ namespace System.Runtime.CompilerServices
         // T:System.ArgumentNullException:
         // The continuation argument is null (Nothing in Visual Basic).
         void OnCompleted(Action continuation);
+
+        // 
+        // Summary:
+        // Schedules the continuation action that's invoked when the instance completes.
+        // 
+        // Parameters:
+        // continuation:
+        // The action to invoke when the operation completes.
+        // 
+        // Exceptions:
+        // T:System.ArgumentNullException:
+        // The continuation argument is null (Nothing in Visual Basic).
+        [SecurityCritical]
+        void UnsafeOnCompleted(Action continuation);
     }
 
 }

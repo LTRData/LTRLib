@@ -12,6 +12,7 @@ using System.Text;
 using System.Runtime.CompilerServices;
 using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
+using System.Collections;
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Linq;
 #endif
@@ -882,6 +883,7 @@ public static class BufferExtensions
         }
     }
 
+#if !NETCOREAPP
     public static ReadOnlyMemory<char> TrimEnd(this ReadOnlyMemory<char> chars) =>
         chars.Slice(0, chars.Span.TrimEnd().Length);
 
@@ -893,6 +895,50 @@ public static class BufferExtensions
 
     public static ReadOnlyMemory<char> TrimStart(this ReadOnlyMemory<char> chars, char trimChar) =>
         chars.Slice(chars.Length - chars.Span.TrimStart(trimChar).Length);
+
+    public static ReadOnlyMemory<char> Trim(this ReadOnlyMemory<char> chars) =>
+        chars.TrimStart().TrimEnd();
+
+    public static ReadOnlyMemory<char> Trim(this ReadOnlyMemory<char> chars, char trimChar) =>
+        chars.TrimStart(trimChar).TrimEnd(trimChar);
+#endif
+
+#if !NET6_0_OR_GREATER
+    /// <summary>Returns the maximum value in a generic sequence according to a specified key selector function.</summary>
+    /// <typeparam name="TSource">The type of the elements of <paramref name="source" />.</typeparam>
+    /// <typeparam name="TKey">The type of key to compare elements by.</typeparam>
+    /// <param name="source">A sequence of values to determine the maximum value of.</param>
+    /// <param name="keySelector">A function to extract the key for each element.</param>
+    /// <returns>The value with the maximum key in the sequence.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="source" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">No key extracted from <paramref name="source" /> implements the <see cref="IComparable" /> or <see cref="System.IComparable{TKey}" /> interface.</exception>
+    /// <remarks>
+    /// <para>If <typeparamref name="TKey" /> is a reference type and the source sequence is empty or contains only values that are <see langword="null" />, this method returns <see langword="null" />.</para>
+    /// </remarks>
+    public static TSource? MaxBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        => source.OrderByDescending(keySelector).FirstOrDefault();
+
+    /// <summary>Returns the maximum value in a generic sequence according to a specified key selector function.</summary>
+    /// <typeparam name="TSource">The type of the elements of <paramref name="source" />.</typeparam>
+    /// <typeparam name="TKey">The type of key to compare elements by.</typeparam>
+    /// <param name="source">A sequence of values to determine the maximum value of.</param>
+    /// <param name="keySelector">A function to extract the key for each element.</param>
+    /// <param name="comparer">The <see cref="IComparer{TKey}" /> to compare keys.</param>
+    /// <returns>The value with the maximum key in the sequence.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="source" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException">No key extracted from <paramref name="source" /> implements the <see cref="IComparable" /> or <see cref="IComparable{TKey}" /> interface.</exception>
+    /// <remarks>
+    /// <para>If <typeparamref name="TKey" /> is a reference type and the source sequence is empty or contains only values that are <see langword="null" />, this method returns <see langword="null" />.</para>
+    /// </remarks>
+    public static TSource? MaxBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer)
+        => source.OrderByDescending(keySelector, comparer).FirstOrDefault();
+
+    public static TSource? MinBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        => source.OrderBy(keySelector).FirstOrDefault();
+
+    public static TSource? MinBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, IComparer<TKey>? comparer)
+        => source.OrderBy(keySelector, comparer).FirstOrDefault();
+#endif
 
     public static string InitialCapital(this ReadOnlyMemory<char> str, int MinWordLength)
     {

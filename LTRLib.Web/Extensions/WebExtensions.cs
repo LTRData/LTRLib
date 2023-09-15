@@ -40,9 +40,35 @@ public static class WebExtensions
 #endif
 
 #if !NET5_0_OR_GREATER
-    public static Task<Stream> GetStreamAsync(this HttpClient httpClient, string uri, CancellationToken _) => httpClient.GetStreamAsync(uri);
+    public static Task<Stream> GetStreamAsync(this HttpClient httpClient, string uri, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return httpClient.GetStreamAsync(uri);
+    }
 
-    public static Task<Stream> GetStreamAsync(this HttpClient httpClient, Uri uri, CancellationToken _) => httpClient.GetStreamAsync(uri);
+    public static Task<Stream> GetStreamAsync(this HttpClient httpClient, Uri uri, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return httpClient.GetStreamAsync(uri);
+    }
+
+    public static Task<byte[]> ReadAsByteArrayAsync(this HttpContent httpClient, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return httpClient.ReadAsByteArrayAsync();
+    }
+
+    public static Task<Stream> ReadAsStreamAsync(this HttpContent httpClient, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return httpClient.ReadAsStreamAsync();
+    }
+
+    public static Task<string> ReadAsStringAsync(this HttpContent httpClient, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return httpClient.ReadAsStringAsync();
+    }
 #endif
 }
 

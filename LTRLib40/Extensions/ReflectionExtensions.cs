@@ -14,7 +14,7 @@ using System.Linq;
 
 namespace System.Runtime.CompilerServices
 {
-    internal static class IsExternalInit
+    public static class IsExternalInit
     {
     }
 }
@@ -26,7 +26,7 @@ namespace System.Runtime.CompilerServices
 namespace System.Runtime.CompilerServices
 {
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
-    internal sealed class ExtensionAttribute : Attribute
+    public sealed class ExtensionAttribute : Attribute
     {
     }
 }

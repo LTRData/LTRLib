@@ -56,7 +56,35 @@ public static class TaskSupportExtensions
     }
 
 #if !NET5_0_OR_GREATER
-    public static Task<string> ReadLineAsync(this TextReader reader, CancellationToken _) => reader.ReadLineAsync();
+    public static Task<string> ReadLineAsync(this TextReader reader, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return reader.ReadLineAsync();
+    }
+#endif
+
+#if !NET6_0_OR_GREATER
+    public async static Task WaitAsync<T>(this Task task, TimeSpan timeout, CancellationToken cancellationToken)
+    {
+        var timeoutTask = Task.Delay(timeout, cancellationToken);
+        var result = await Task.WhenAny(task, timeoutTask).ConfigureAwait(false);
+        if (result == timeoutTask)
+        {
+            throw new TimeoutException();
+        }
+    }
+
+    public async static Task<T> WaitAsync<T>(this Task<T> task, TimeSpan timeout, CancellationToken cancellationToken)
+    {
+        var timeoutTask = Task.Delay(timeout, cancellationToken);
+        var result = await Task.WhenAny(task, timeoutTask).ConfigureAwait(false);
+        if (result == timeoutTask)
+        {
+            throw new TimeoutException();
+        }
+
+        return task.Result;
+    }
 #endif
 #endif
 

@@ -25,6 +25,7 @@
     <ProjectReference Include="..\LTRLib.Windows\LTRLib.Windows.csproj" Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
     <ProjectReference Include="..\LTRLib.Windows.Shell\LTRLib.Windows.Shell.vbproj" Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
     <ProjectReference Include="..\LTRLib.Xml\LTRLib.Xml.csproj" />
+    <ProjectReference Include="..\LTRLib.NativeIo\LTRLib.NativeIo.csproj" />
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
   </ItemGroup>
 

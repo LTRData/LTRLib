@@ -33,16 +33,23 @@ public static class BufferExtensions
     public static void ReturnArray<T>(T[] _) { }
 #endif
 
-#if NET6_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
     /// <summary>
     /// Returns a string with each byte expressed in two-character hexadecimal notation.
     /// </summary>
+#if NET6_0_OR_GREATER
     [return: NotNullIfNotNull(nameof(bytes))]
+#endif
     public static string? ToHexString(this ICollection<byte>? bytes)
     {
         if (bytes is null)
         {
             return null;
+        }
+
+        if (bytes.Count == 0)
+        {
+            return string.Empty;
         }
 
         var valuestr = string.Create(bytes.Count << 1,
@@ -61,12 +68,53 @@ public static class BufferExtensions
         return valuestr;
     }
 
-#elif NETSTANDARD2_1_OR_GREATER || NETCOREAPP
+    /// <summary>
+    /// Returns a string with each byte expressed in two-character hexadecimal notation.
+    /// </summary>
+#if NET6_0_OR_GREATER
+    [return: NotNullIfNotNull(nameof(bytes))]
+#endif
+    public static string? ToHexString(this ICollection<byte>? bytes, string? delimiter)
+    {
+        if (bytes is null)
+        {
+            return null;
+        }
+
+        if (bytes.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        var valuestr = string.Create((bytes.Count << 1) + (bytes.Count - 1) * (delimiter?.Length ?? 0),
+            (bytes, delimiter),
+            (span, p) =>
+            {
+                var delimiter = p.delimiter.AsSpan();
+
+                foreach (var b in p.bytes)
+                {
+                    if (b.TryFormat(span, out var value, "x2"))
+                    {
+                        span = span[value..];
+                    }
+
+                    if (!span.IsEmpty)
+                    {
+                        delimiter.CopyTo(span);
+                        span = span[delimiter.Length..];
+                    }
+                }
+            });
+
+        return valuestr;
+    }
+
+#elif NET45_OR_GREATER || NETSTANDARD
 
     /// <summary>
     /// Returns a string with each byte expressed in two-character hexadecimal notation.
     /// </summary>
-    [return: NotNullIfNotNull(nameof(bytes))]
     public static string? ToHexString(this ICollection<byte>? bytes)
     {
         if (bytes is null)
@@ -74,13 +122,51 @@ public static class BufferExtensions
             return null;
         }
 
+        if (bytes.Count == 0)
+        {
+            return string.Empty;
+        }
+
         var valuestr = new string('\0', bytes.Count << 1);
         var span = MemoryMarshal.AsMemory(valuestr.AsMemory()).Span;
+
         foreach (var b in bytes)
         {
-            if (b.TryFormat(span, out var value, "x2"))
+            span[0] = (b >> 8) < 10 ? (char)((b >> 8) + '0') : (char)((b >> 8) - 10 + 'a');
+            span[1] = (b & 0xf) < 10 ? (char)((b & 0xf) + '0') : (char)((b & 0xf) - 10 + 'a');
+            span = span.Slice(2);
+        }
+
+        return valuestr;
+    }
+
+    /// <summary>
+    /// Returns a string with each byte expressed in two-character hexadecimal notation.
+    /// </summary>
+    public static string? ToHexString(this ICollection<byte>? bytes, string? delimiter)
+    {
+        if (bytes is null)
+        {
+            return null;
+        }
+
+        if (bytes.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        var valuestr = new string('\0', (bytes.Count << 1) + (bytes.Count - 1) * (delimiter?.Length ?? 0));
+        var span = MemoryMarshal.AsMemory(valuestr.AsMemory()).Span;
+
+        foreach (var b in bytes)
+        {
+            span[0] = (b >> 8) < 10 ? (char)((b >> 8) + '0') : (char)((b >> 8) - 10 + 'a');
+            span[1] = (b & 0xf) < 10 ? (char)((b & 0xf) + '0') : (char)((b & 0xf) - 10 + 'a');
+            span = span.Slice(2);
+            if (delimiter is not null && !span.IsEmpty)
             {
-                span = span[value..];
+                delimiter.AsSpan().CopyTo(span);
+                span = span.Slice(delimiter.Length);
             }
         }
 
@@ -140,6 +226,36 @@ public static class BufferExtensions
     /// </summary>
     public static string ToHexString(this Span<byte> bytes) => ((ReadOnlySpan<byte>)bytes).ToHexString();
 
+#elif NET45_OR_GREATER || NETSTANDARD
+
+    /// <summary>
+    /// Returns a string with each byte expressed in two-character hexadecimal notation.
+    /// </summary>
+    public static string ToHexString(this ReadOnlySpan<byte> bytes)
+    {
+        if (bytes.IsEmpty)
+        {
+            return string.Empty;
+        }
+
+        var valuestr = new string('\0', bytes.Length << 1);
+        var span = MemoryMarshal.AsMemory(valuestr.AsMemory()).Span;
+
+        foreach (var b in bytes)
+        {
+            span[0] = (b >> 8) < 10 ? (char)((b >> 8) + '0') : (char)((b >> 8) - 10 + 'a');
+            span[1] = (b & 0xf) < 10 ? (char)((b & 0xf) + '0') : (char)((b & 0xf) - 10 + 'a');
+            span = span.Slice(2);
+        }
+
+        return valuestr;
+    }
+
+    /// <summary>
+    /// Returns a string with each byte expressed in two-character hexadecimal notation.
+    /// </summary>
+    public static string ToHexString(this Span<byte> bytes) => ((ReadOnlySpan<byte>)bytes).ToHexString();
+
 #endif
 
     /// <summary>
@@ -152,9 +268,43 @@ public static class BufferExtensions
             return null;
         }
 
+        if (bytes is ICollection<byte> collection)
+        {
+            return collection.ToHexString();
+        }
+
         var valuestr = new StringBuilder();
         foreach (var b in bytes)
         {
+            valuestr.Append(b.ToString("x2"));
+        }
+
+        return valuestr.ToString();
+    }
+
+    /// <summary>
+    /// Returns a string with each byte expressed in two-character hexadecimal notation.
+    /// </summary>
+    public static string? ToHexString(this IEnumerable<byte>? bytes, string? delimiter)
+    {
+        if (bytes is null)
+        {
+            return null;
+        }
+
+        if (bytes is ICollection<byte> collection)
+        {
+            return collection.ToHexString(delimiter);
+        }
+
+        var valuestr = new StringBuilder();
+        foreach (var b in bytes)
+        {
+            if (valuestr.Length > 0)
+            {
+                valuestr.Append(delimiter ?? string.Empty);
+            }
+
             valuestr.Append(b.ToString("x2"));
         }
 
@@ -861,7 +1011,7 @@ public static class BufferExtensions
             }
         }
 
-        return target.ToString();
+        return str;
     }
 
 #elif NET45_OR_GREATER || NETSTANDARD
@@ -872,32 +1022,31 @@ public static class BufferExtensions
     public static unsafe Span<T> CreateSpan<T>(ref T source, int length) =>
         new(Unsafe.AsPointer(ref source), length);
 
-    public static string ToHexString(this ReadOnlySpan<byte> data, string? delimiter)
+    public static string ToHexString(this ReadOnlySpan<byte> bytes, ReadOnlySpan<char> delimiter)
     {
-        if (data.IsEmpty)
+        if (bytes.Length == 0)
         {
             return string.Empty;
         }
 
-        var capacity = data.Length << 1;
-        if (delimiter is not null)
-        {
-            capacity += delimiter.Length * (data.Length - 1);
-        }
+        var delimiter_length = delimiter.Length;
+        var str = new string('\0', (bytes.Length << 1) + delimiter_length * (bytes.Length - 1));
 
-        var result = new StringBuilder(capacity);
+        var span = MemoryMarshal.AsMemory(str.AsMemory()).Span;
 
-        foreach (var b in data)
+        foreach (var b in bytes)
         {
-            if (delimiter is not null && result.Length > 0)
+            span[0] = (b >> 8) < 10 ? (char)((b >> 8) + '0') : (char)((b >> 8) - 10 + 'a');
+            span[1] = (b & 0xf) < 10 ? (char)((b & 0xf) + '0') : (char)((b & 0xf) - 10 + 'a');
+            span = span.Slice(2);
+            if (!delimiter.IsEmpty && !span.IsEmpty)
             {
-                result.Append(delimiter);
+                delimiter.CopyTo(span);
+                span = span.Slice(delimiter_length);
             }
-
-            result.Append(b.ToString("x2", NumberFormatInfo.InvariantInfo));
         }
 
-        return result.ToString();
+        return str;
     }
 
 #endif
@@ -935,6 +1084,22 @@ public static class BufferExtensions
         var endpos = buffer.IndexOf(default(T));
         return endpos >= 0 ? endpos : buffer.Length;
     }
+#endif
+
+#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+
+    public static unsafe Span<byte> GetSpan(IntPtr ptr, int length) =>
+        new(ptr.ToPointer(), length);
+
+    public static unsafe ReadOnlySpan<byte> GetReadOnlySpan(IntPtr ptr, int length) =>
+        new(ptr.ToPointer(), length);
+
+    public static unsafe Span<byte> GetSpan(SafeBuffer ptr) =>
+        new(ptr.DangerousGetHandle().ToPointer(), (int)ptr.ByteLength);
+
+    public static unsafe ReadOnlySpan<byte> GetReadOnlySpan(SafeBuffer ptr) =>
+        new(ptr.DangerousGetHandle().ToPointer(), (int)ptr.ByteLength);
+
 #endif
 
 }

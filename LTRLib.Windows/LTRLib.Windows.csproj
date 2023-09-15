@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net20;net30;net35;net40;net46;net48;netcoreapp3.1;net6.0-windows;net7.0-windows</TargetFrameworks>
+    <Guid>00bb958a-7f98-4fcd-b514-c22d8e6741cd</Guid>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -9,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LTRLib.Geodesy\LTRLib.Geodesy.csproj" />
+    <ProjectReference Include="..\LTRLib.NativeIo\LTRLib.NativeIo.csproj" />
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
   </ItemGroup>
 

@@ -13,6 +13,7 @@ using System.Security;
 using System.Security.Permissions;
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable IDE1006 // Naming Styles
 #pragma warning disable SYSLIB0003 // Type or member is obsolete
 
 namespace LTRLib.IO;
@@ -373,7 +374,7 @@ public static class NativeConstants
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal readonly struct DiskExtents
+    public readonly struct DiskExtents
     {
         private readonly int NumberOfExtents;
 

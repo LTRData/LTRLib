@@ -143,7 +143,7 @@ public static class ProcessRoutines
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool IsValidSid(IntPtr pNativeData);
 
-#if NET46_OR_GREATER || NETCOREAPP
+#if NET45_OR_GREATER || NETCOREAPP
 
         [DllImport("ntdll.dll", SetLastError = false)]
         public static extern int NtSuspendProcess(SafeProcessHandle hProcess);
@@ -164,7 +164,7 @@ public static class ProcessRoutines
 #endif
     }
 
-#if NET46_OR_GREATER || NETCOREAPP
+#if NET45_OR_GREATER || NETCOREAPP
 
     [SupportedOSPlatform("windows")]
     public static unsafe ProcessBasicInformation QueryBasicInformation(this Process process)

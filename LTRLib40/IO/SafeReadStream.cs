@@ -5,6 +5,7 @@
  * http://ltr-data.se   https://github.com/LTRData
  */
 
+using LTRLib.Extensions;
 using LTRLib.LTRGeneric;
 using System;
 using System.IO;

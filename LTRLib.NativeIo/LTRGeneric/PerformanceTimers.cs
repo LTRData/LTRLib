@@ -18,6 +18,7 @@ using System.Runtime.Versioning;
 /// <summary>
 /// Static methods and properties for accessing high-performance timer values.
 /// </summary>
+[SupportedOSPlatform("windows")]
 public static class PerformanceTimers
 {
     /// <summary>
@@ -140,9 +141,13 @@ public static class PerformanceTimers
 #endif
 
     #region Internal implementation
+#if NETCOREAPP
+    private static long GetTickCount64() => Environment.TickCount64;
+#else
     [DllImport("kernel32.dll", SetLastError = true)]
     [SupportedOSPlatform("windows")]
     private static extern long GetTickCount64();
+#endif
 
     [DllImport("kernel32.dll", SetLastError = true)]
     [SupportedOSPlatform("windows")]
@@ -167,5 +172,5 @@ public static class PerformanceTimers
         performance_counts_per_ticks_multiplier = PerformanceCountsPerSecond / factor;
         performance_counts_per_ticks_divisor = TimeSpan.FromSeconds(1).Ticks / factor;
     }
-    #endregion
+#endregion
 }

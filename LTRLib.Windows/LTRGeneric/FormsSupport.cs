@@ -12,6 +12,7 @@ using System.Security;
 using System.Security.Permissions;
 using System.Windows.Forms;
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable SYSLIB0003 // Type or member is obsolete
 
 namespace LTRLib.LTRGeneric;

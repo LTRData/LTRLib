@@ -47,7 +47,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LTRLib.Data.Linq", "LTRLib.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LTRLib.Compat.System.Management", "LTRLib.Compat.System.Management\LTRLib.Compat.System.Management.csproj", "{48E25564-AF2C-4FA1-8C54-589620A814BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LTRLib.Net", "LTRLib.Net\LTRLib.Net.csproj", "{61F4F423-0A5C-493D-8C09-DA4D7DDEFBB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LTRLib.Net", "LTRLib.Net\LTRLib.Net.csproj", "{61F4F423-0A5C-493D-8C09-DA4D7DDEFBB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LTRLib.NativeIo", "LTRLib.NativeIo\LTRLib.NativeIo.csproj", "{738BE880-737E-4DA9-8514-5835ED5E268A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -501,6 +503,30 @@ Global
 		{61F4F423-0A5C-493D-8C09-DA4D7DDEFBB5}.Release|Win32.Build.0 = Release|Any CPU
 		{61F4F423-0A5C-493D-8C09-DA4D7DDEFBB5}.Release|x64.ActiveCfg = Release|Any CPU
 		{61F4F423-0A5C-493D-8C09-DA4D7DDEFBB5}.Release|x64.Build.0 = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Debug|ARM.Build.0 = Debug|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Debug|Win32.Build.0 = Debug|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Debug|x64.Build.0 = Debug|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release with doc|Any CPU.ActiveCfg = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release with doc|Any CPU.Build.0 = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release with doc|ARM.ActiveCfg = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release with doc|ARM.Build.0 = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release with doc|Win32.ActiveCfg = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release with doc|Win32.Build.0 = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release with doc|x64.ActiveCfg = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release with doc|x64.Build.0 = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release|ARM.ActiveCfg = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release|ARM.Build.0 = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release|Win32.ActiveCfg = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release|Win32.Build.0 = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release|x64.ActiveCfg = Release|Any CPU
+		{738BE880-737E-4DA9-8514-5835ED5E268A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

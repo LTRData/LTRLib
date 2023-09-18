@@ -6,12 +6,12 @@
 
   <ItemGroup Condition="'$(TargetFramework.CompareTo(`net472`))' &gt;= 0 And ('$(TargetFramework.CompareTo(`net6`))' &lt; 0 Or '$(TargetFramework.CompareTo(`netc`))' &gt;= 0)">
     <PackageReference Include="SixLabors.ImageSharp" Version="2.*" />
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="*-beta*" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.*" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.CompareTo(`net6`))' &gt;= 0 And '$(TargetFramework.CompareTo(`netc`))' &lt; 0">
     <PackageReference Include="SixLabors.ImageSharp" Version="*" />
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="*-beta*" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="*" />
   </ItemGroup>
 
   <ItemGroup>

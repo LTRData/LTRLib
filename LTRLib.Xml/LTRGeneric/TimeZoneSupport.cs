@@ -24,6 +24,9 @@ public static class TimeZoneSupport
         }
     }
 
-#endif
+    public static DateTime ToConfiguredLocalFromUtc(this DateTime dateTime) => TimeZoneInfo.ConvertTimeFromUtc(dateTime, ConfiguredTimeZone);
 
+    public static DateTime ToUtcFromConfiguredLocal(this DateTime dateTime) => TimeZoneInfo.ConvertTimeToUtc(dateTime, ConfiguredTimeZone);
+
+#endif
 }

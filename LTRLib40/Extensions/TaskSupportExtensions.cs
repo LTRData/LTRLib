@@ -56,7 +56,7 @@ public static class TaskSupportExtensions
     }
 
 #if !NET7_0_OR_GREATER
-    public static Task<string> ReadLineAsync(this TextReader reader, CancellationToken cancellationToken)
+    public static Task<string?> ReadLineAsync(this TextReader reader, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         return reader.ReadLineAsync();

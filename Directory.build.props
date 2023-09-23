@@ -7,7 +7,7 @@
     <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <!--<EnableWindowsTargeting>true</EnableWindowsTargeting>-->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1591</NoWarn>
     <OutputPath Condition="'$(MSBuildProjectExtension)' != '.shfbproj'">..\$(Configuration)\</OutputPath>
@@ -41,7 +41,7 @@
     <ProductName>LTRLib</ProductName>
     <Authors>Olof Lagerkvist</Authors>
     <Copyright>2011 - 2023, Olof Lagerkvist, LTR Data</Copyright>
-    <PackageVersion>1.0.23</PackageVersion>
+    <PackageVersion>1.0.24</PackageVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
   </PropertyGroup>

@@ -51,5 +51,9 @@ public class MathExpressions
         var expr10 = math.ParseExpression<Func<double>>("2.5 + 400 / (.1 - .01) * 2");
         var value10 = expr10();
         Assert.Equal(2.5 + 400 / (.1 - .01) * 2, value10);
+
+        var expr11 = math.ParseExpression<Func<double>>("1 << 10");
+        var value11 = expr11();
+        Assert.Equal(1 << 10, value11);
     }
 }

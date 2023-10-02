@@ -37,11 +37,11 @@ public class Surface : IDisposable
         Image.DrawLine(Pen, new PointF(VirtualToScreenX(0d), VirtualToScreenY(Ymin)), new PointF(VirtualToScreenX(0d), VirtualToScreenY(Ymax)));
     }
 
-    public void DrawGraph(IImageProcessingContext Image, Pen Pen) => Image.Draw(Pen, GraphPath);
+    public void DrawGraph(IImageProcessingContext Image, Pen Pen) => Image.Draw(Pen, GraphPath ?? throw new InvalidOperationException("Not initialized"));
 
-    public void DrawDerivative(IImageProcessingContext Image, Pen Pen) => Image.Draw(Pen, DerivPath);
+    public void DrawDerivative(IImageProcessingContext Image, Pen Pen) => Image.Draw(Pen, DerivPath ?? throw new InvalidOperationException("Not initialized"));
 
-    public void DrawIntegral(IImageProcessingContext Image, Pen Pen) => Image.Draw(Pen, IntegPath);
+    public void DrawIntegral(IImageProcessingContext Image, Pen Pen) => Image.Draw(Pen, IntegPath ?? throw new InvalidOperationException("Not initialized"));
 
     public void Refresh(ScriptControl ScriptControl)
     {

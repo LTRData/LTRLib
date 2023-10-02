@@ -5,6 +5,10 @@
  * http://ltr-data.se   https://github.com/LTRData
  */
 
+#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Buffers;
+using LTRData.Extensions.Split;
+#endif
 using LTRLib.Extensions;
 using System;
 using System.Collections.Generic;
@@ -35,7 +39,7 @@ public struct Point : IEquatable<Point>, IPolyGeometry
 
     public override readonly int GetHashCode() => X.GetHashCode() ^ Y.GetHashCode();
 
-    public override bool Equals(object? obj) => obj is Point point && Equals(point);
+    public override readonly bool Equals(object? obj) => obj is Point point && Equals(point);
 
     public readonly bool Equals(Point other) => X.Equals(other.X) && Y.Equals(other.Y);
 
@@ -74,7 +78,7 @@ public struct Point : IEquatable<Point>, IPolyGeometry
     }
 #endif
 
-    bool IPolyGeometry.Contains(Point point) => Equals(point);
+    readonly bool IPolyGeometry.Contains(Point point) => Equals(point);
 
     public static bool operator ==(Point point1, Point point2) => point1.Equals(point2);
 

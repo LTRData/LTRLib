@@ -5,6 +5,9 @@
  * http://ltr-data.se   https://github.com/LTRData
  */
 
+#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Buffers;
+#endif
 using LTRLib.Extensions;
 using Microsoft.Win32.SafeHandles;
 using System;
@@ -264,7 +267,13 @@ internal unsafe struct ShortName
 {
     private fixed char shortName[12];
 
-    public override string ToString() => BufferExtensions.CreateString(shortName[0]);
+    public override string ToString()
+    {
+        fixed (char* ptr = shortName)
+        {
+            return new(ptr);
+        }
+    }
 }
 
 internal readonly struct FILE_BASIC_INFORMATION

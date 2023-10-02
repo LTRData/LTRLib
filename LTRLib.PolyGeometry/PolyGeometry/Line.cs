@@ -4,6 +4,10 @@
  * Copyright (c) Olof Lagerkvist, LTR Data
  * http://ltr-data.se   https://github.com/LTRData
  */
+
+#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Split;
+#endif
 using LTRLib.Extensions;
 using System;
 using System.Collections.Generic;
@@ -69,21 +73,21 @@ public struct Line : IPolyGeometry, IEquatable<Line>
     }
 #endif
 
-    public override string ToString() => $"{X0Y0}, {X1Y1}";
+    public override readonly string ToString() => $"{X0Y0}, {X1Y1}";
 
-    public double MinX => Math.Min(X0Y0.X, X1Y1.X);
+    public readonly double MinX => Math.Min(X0Y0.X, X1Y1.X);
 
-    public double MinY => Math.Min(X0Y0.Y, X1Y1.Y);
+    public readonly double MinY => Math.Min(X0Y0.Y, X1Y1.Y);
 
-    public double MaxX => Math.Max(X0Y0.X, X1Y1.X);
+    public readonly double MaxX => Math.Max(X0Y0.X, X1Y1.X);
 
-    public double MaxY => Math.Max(X0Y0.Y, X1Y1.Y);
+    public readonly double MaxY => Math.Max(X0Y0.Y, X1Y1.Y);
 
     public readonly double GetXForY(double y) => (y - Base) / Gradient;
 
     public readonly double GetYForX(double x) => Gradient * x + Base;
 
-    public bool Contains(Point point)
+    public readonly bool Contains(Point point)
     {
         if (!this.MBRContains(point))
         {
@@ -107,23 +111,23 @@ public struct Line : IPolyGeometry, IEquatable<Line>
         return false;
     }
 
-    public double Length => Math.Sqrt(Math.Pow(X1Y1.Y - X0Y0.Y, 2) + Math.Pow(X1Y1.X - X0Y0.X, 2));
+    public readonly double Length => Math.Sqrt(Math.Pow(X1Y1.Y - X0Y0.Y, 2) + Math.Pow(X1Y1.X - X0Y0.X, 2));
 
     public static bool operator ==(Line line1, Line line2) => line1.Equals(line2);
 
     public static bool operator !=(Line line1, Line line2) => !line1.Equals(line2);
 
-    public override int GetHashCode() => X0Y0.GetHashCode() ^ X1Y1.GetHashCode();
+    public override readonly int GetHashCode() => X0Y0.GetHashCode() ^ X1Y1.GetHashCode();
 
-    public override bool Equals(object? obj) => obj is Line line && Equals(line);
+    public override readonly bool Equals(object? obj) => obj is Line line && Equals(line);
 
-    public bool Equals(Line other) => X0Y0.Equals(other.X0Y0) && X1Y1.Equals(other.X1Y1);
+    public readonly bool Equals(Line other) => X0Y0.Equals(other.X0Y0) && X1Y1.Equals(other.X1Y1);
 
     readonly double IPolyGeometry.Area => 0;
 
     public static implicit operator Path(Line line) => new(line.X0Y0, line.X1Y1);
 
-    IEnumerable<Point> IPolyGeometry.Corners
+    readonly IEnumerable<Point> IPolyGeometry.Corners
     {
         get
         {

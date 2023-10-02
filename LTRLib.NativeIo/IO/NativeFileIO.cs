@@ -19,6 +19,9 @@ using static LTRLib.IO.NativeConstants;
 using System.Diagnostics;
 using static LTRLib.IO.Win32API;
 using System.Runtime.Versioning;
+#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Formatting;
+#endif
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Linq;
 #endif
@@ -641,7 +644,7 @@ public static class NativeFileIO
         return str.ToString();
     }
 
-#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
+#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
     public static IEnumerable<string> GetDiskVolumesMountPoints(uint DiskNumber) => GetDiskVolumes(DiskNumber).SelectMany(GetVolumeMountPoints);
 
     public static string GetVolumeNameForVolumeMountPoint(string MountPoint)
@@ -730,6 +733,7 @@ public static class NativeFileIO
         }
     }
 
+#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
     public static IEnumerable<string> GetDiskVolumes(uint DiskNumber)
     {
         return new VolumeEnumerator()
@@ -778,6 +782,7 @@ public static class NativeFileIO
                 }
             });
     }
+#endif
 
     public static bool VolumeUsesDisk(string VolumeGuid, uint DiskNumber)
     {

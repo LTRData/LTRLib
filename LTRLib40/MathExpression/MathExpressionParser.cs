@@ -269,7 +269,7 @@ public class MathExpressionParser : IMathExpressionParser
                     operands.Insert(0, key);
                 }
 
-                if (!subExpr.ContainsKey(operands[2]))
+                if (!subExpr.ContainsKey(operands[1]))
                 {
                     key = ParseExpression(operands.Skip(2).ToList(), subExpr);
                     if (key is null)
@@ -349,6 +349,7 @@ public class MathExpressionParser : IMathExpressionParser
         }
 
         var paramList = Enumerable.Repeat(typeof(Expression), paramCount).ToArray();
+
         return typeof(Expression).GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase, null, paramList, null);
     }
 

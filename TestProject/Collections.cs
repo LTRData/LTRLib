@@ -1,4 +1,4 @@
-﻿using LTRLib.Extensions;
+﻿using LTRData.Extensions.Formatting;
 using LTRLib.LTRGeneric;
 using System;
 using System.Linq;

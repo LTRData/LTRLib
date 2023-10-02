@@ -5,6 +5,9 @@
 // http://ltr-data.se   https://github.com/LTRData
 // 
 
+#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Buffers;
+#endif
 using LTRLib.Extensions;
 using System;
 using System.IO;
@@ -512,7 +515,13 @@ public static class NativeConstants
     {
         private unsafe fixed char version[128];
 
-        public override unsafe string ToString() => BufferExtensions.CreateString(version[0]);
+        public override unsafe string ToString()
+        {
+            fixed (char* ptr = version)
+            {
+                return new(ptr);
+            }
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]

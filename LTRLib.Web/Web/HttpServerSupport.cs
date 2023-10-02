@@ -22,6 +22,9 @@ using System.Web;
 using System.Xml.Serialization;
 using static LTRLib.Web.HttpShared;
 using static LTRLib.Extensions.NetExtensions;
+#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Formatting;
+#endif
 
 namespace LTRLib.Web;
 
@@ -239,6 +242,7 @@ public static class HttpServerSupport
 
     }
 
+#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
     /// <summary>
     /// Adds dyndoc features and /reloadapp
     /// feature to a web server request.
@@ -453,6 +457,7 @@ public static class HttpServerSupport
         }
 
     }
+#endif
 
     public static bool IsWapBrowser(this HttpRequest Request)
     {

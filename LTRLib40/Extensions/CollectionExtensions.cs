@@ -1,4 +1,7 @@
-﻿using LTRLib.LTRGeneric;
+﻿#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Formatting;
+#endif
+using LTRLib.LTRGeneric;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -547,75 +550,7 @@ public static class CollectionExtensions
         }
     }
 
-    public static IEnumerable<string> EnumerateMessages(this Exception? ex)
-    {
-        while (ex is not null)
-        {
-            if (ex is TargetInvocationException)
-            {
-                ex = ex.InnerException;
-            }
-#if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
-            else if (ex is AggregateException agex)
-            {
-                foreach (var msg in agex.InnerExceptions.SelectMany(EnumerateMessages))
-                {
-                    yield return msg;
-                }
-
-                yield break;
-            }
-#endif
-#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
-            else if (ex is ReflectionTypeLoadException tlex)
-            {
-                yield return ex.Message;
-
-                foreach (var msg in tlex.LoaderExceptions.SelectMany(EnumerateMessages))
-                {
-                    yield return msg;
-                }
-
-                ex = ex.InnerException;
-            }
-#endif
-            else if (ex is Win32Exception win32ex)
-            {
-                yield return $"{win32ex.Message} ({win32ex.NativeErrorCode})";
-
-                ex = ex.InnerException;
-            }
-            else
-            {
-                yield return ex.Message;
-
-                ex = ex.InnerException;
-            }
-        }
-    }
-
-    public static string JoinMessages(this Exception exception) =>
-        exception.JoinMessages(Environment.NewLine + Environment.NewLine);
-
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-    public static string JoinMessages(this Exception exception, char separator) =>
-        string.Join(separator, exception.EnumerateMessages());
-#else
-    public static string JoinMessages(this Exception exception, char separator) =>
-        exception.JoinMessages(separator.ToString());
-#endif
-
-#if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
-    public static string JoinMessages(this Exception exception, string separator) =>
-        string.Join(separator, exception.EnumerateMessages());
-#elif NET35_OR_GREATER
-    public static string JoinMessages(this Exception exception, string separator) =>
-        string.Join(separator, exception.EnumerateMessages().ToArray());
-#else
-    public static string JoinMessages(this Exception exception, string separator) =>
-        string.Join(separator, new List<string>(exception.EnumerateMessages()).ToArray());
-#endif
-
+#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
     public static string? FormatLogMessages(this Exception exception) =>
 #if DEBUG
         Debugger.IsAttached
@@ -623,6 +558,7 @@ public static class CollectionExtensions
         : exception?.ToString();
 #else
         exception.JoinMessages();
+#endif
 #endif
 
 }

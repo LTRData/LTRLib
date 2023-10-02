@@ -35,7 +35,7 @@ public readonly struct SingleValueEnumerable<T> : IEnumerable<T?>
 
         public readonly T? Current => Started ? Value : default;
 
-        object? IEnumerator.Current => Current;
+        readonly object? IEnumerator.Current => Current;
 
         readonly void IDisposable.Dispose() { }
 

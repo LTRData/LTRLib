@@ -7,6 +7,7 @@
 
 #if NET47_OR_GREATER || NETSTANDARD2_0_OR_GREATER || NETCOREAPP
 
+using LTRData.Extensions.Split;
 using LTRGeneric;
 using LTRLib.Extensions;
 using LTRLib.LTRGeneric;

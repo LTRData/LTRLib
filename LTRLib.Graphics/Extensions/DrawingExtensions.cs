@@ -1,5 +1,7 @@
 ﻿#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
-
+#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Formatting;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Drawing;

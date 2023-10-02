@@ -9,8 +9,12 @@
     <NoWarn>$(NoWarn);0618</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup Condition="('$(TargetFramework.CompareTo(`net5`))' &lt;= 0 And '$(TargetFramework.CompareTo(`net461`))' &gt;= 0) Or '$(TargetFramework)' == 'netstandard2.0'">
+  <ItemGroup Condition="('$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net461`))' &gt;= 0) Or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net46`))' &gt;= 0">
+    <PackageReference Include="LTRData.Extensions" Version="*" />
   </ItemGroup>
 
   <ItemGroup>

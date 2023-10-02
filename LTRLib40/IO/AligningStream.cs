@@ -4,16 +4,18 @@
  * Copyright (c) Olof Lagerkvist, LTR Data
  * http://ltr-data.se   https://github.com/LTRData
  */
+
+#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
+
 using LTRLib.Extensions;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using LTRLib.LTRGeneric;
-#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Buffers;
 using System.Buffers;
 using System.Threading.Tasks;
-#endif
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CA1835 // Prefer the 'Memory'-based overloads for 'ReadAsync' and 'WriteAsync'
@@ -685,3 +687,5 @@ public class AligningStream : Stream
 
     public long GrowInterval { get; set; } = (32L << 20) - 1;
 }
+
+#endif

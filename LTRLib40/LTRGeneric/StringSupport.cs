@@ -578,7 +578,7 @@ public static class StringSupport
                 if (valuepos >= 0)
                 {
                     name = arg.Substring(namestart, valuepos - namestart);
-                    value = Enumerable.Repeat(arg.Substring(valuepos + 1), 1);
+                    value = SingleValueEnumerable.Get(arg.Substring(valuepos + 1));
                 }
                 else
                 {
@@ -597,7 +597,7 @@ public static class StringSupport
 
                     if (i + 1 < arg.Length && (arg[i + 1] == '=' || arg[i + 1] == ':'))
                     {
-                        value = Enumerable.Repeat(arg.Substring(i + 2), 1);
+                        value = SingleValueEnumerable.Get(arg.Substring(i + 2));
                         yield return new KeyValuePair<string, IEnumerable<string>>(name, value);
                         break;
                     }
@@ -613,7 +613,7 @@ public static class StringSupport
 
             if (switches_finished)
             {
-                yield return new KeyValuePair<string, IEnumerable<string>>(string.Empty, Enumerable.Repeat(arg, 1));
+                yield return new KeyValuePair<string, IEnumerable<string>>(string.Empty, SingleValueEnumerable.Get(arg));
             }
         }
     }

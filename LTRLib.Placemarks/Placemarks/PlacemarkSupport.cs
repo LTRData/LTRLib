@@ -30,6 +30,8 @@ using NetTopologySuite.IO.KML;
 using System.IO;
 using NetTopologySuite.Operation.OverlayNG;
 using NetTopologySuite.Operation.Distance;
+using LTRData.Extensions.Buffers;
+using LTRData.Extensions.Split;
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable IDE0057 // Use range operator

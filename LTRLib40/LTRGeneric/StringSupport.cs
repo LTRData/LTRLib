@@ -5,6 +5,9 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Buffers;
+#endif
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Linq;
 #endif
@@ -175,199 +178,18 @@ public static class StringSupport
         }
     }
 
-    private static readonly Dictionary<ulong, string> multipliers = new()
-    {
-        { 1UL << 60, " EB" },
-        { 1UL << 50, " PB" },
-        { 1UL << 40, " TB" },
-        { 1UL << 30, " GB" },
-        { 1UL << 20, " MB" },
-        { 1UL << 10, " KB" },
-        { 2UL, " bytes" }
-    };
-
-    public static string FormatBytes(ulong size)
-    {
-        foreach (var m in multipliers)
-        {
-            if (size >= m.Key)
-            {
-                return $"{size / (double)m.Key:0.0}{m.Value}";
-            }
-        }
-
-        return $"{size} byte";
-    }
-
-    public static string FormatBytes(ulong size, int precision)
-    {
-        foreach (var m in multipliers)
-        {
-            if (size >= m.Key)
-            {
-                return $"{(size / (double)m.Key).ToString($"0.{new string('0', precision - 1)}")}{m.Value}";
-            }
-        }
-
-        return $"{size} byte";
-    }
-
-    public static string FormatBytes(long size)
-    {
-        foreach (var m in multipliers)
-        {
-            if (Math.Abs(size) >= (long)m.Key)
-            {
-                return $"{size / (double)m.Key:0.0}{m.Value}";
-            }
-        }
-
-        return $"{size} byte";
-
-    }
-
-    public static string FormatBytes(long size, int precision)
-    {
-
-        foreach (var m in multipliers)
-        {
-            if (size >= (long)m.Key)
-            {
-                return $"{(size / (double)m.Key).ToString($"0.{new string('0', precision - 1)}")}{m.Value}";
-            }
-        }
-
-        return $"{size} byte";
-
-    }
-
-    public static long? ParseSuffixedSize(string Str)
-        => TryParseSuffixedSize(Str, out var result) ? result : null;
-
-    public static bool TryParseSuffixedSize(string Str, out long ParseSuffixedSizeRet)
-    {
-        ParseSuffixedSizeRet = 0;
-
-        if (string.IsNullOrEmpty(Str))
-        {
-            return false;
-        }
-
-        if (Str.StartsWith("0x", StringComparison.Ordinal) || Str.StartsWith("&H", StringComparison.Ordinal))
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-            return long.TryParse(Str.AsSpan(2), NumberStyles.AllowHexSpecifier, provider: null, out ParseSuffixedSizeRet);
-#else
-            return long.TryParse(Str.Substring(2), NumberStyles.AllowHexSpecifier, provider: null, out ParseSuffixedSizeRet);
-#endif
-        }
-
-        var Suffix = Str[Str.Length - 1];
-
-        if (char.IsLetter(Suffix))
-        {
-            var factor = char.ToUpper(Suffix) switch
-            {
-                'E' => 1L << 60,
-                'P' => 1L << 50,
-                'T' => 1L << 40,
-                'G' => 1L << 30,
-                'M' => 1L << 20,
-                'K' => 1L << 10,
-                _ => throw new FormatException($"Bad suffix: {Suffix}"),
-            };
-
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-            if (long.TryParse(Str.AsSpan(0, Str.Length - 1), NumberStyles.Any, provider: null, out ParseSuffixedSizeRet))
-            {
-                ParseSuffixedSizeRet *= factor;
-                return true;
-            }
-#else
-            if (long.TryParse(Str.Substring(0, Str.Length - 1), NumberStyles.Any, provider: null, out ParseSuffixedSizeRet))
-            {
-                ParseSuffixedSizeRet *= factor;
-                return true;
-            }
-#endif
-
-            return false;
-        }
-        else
-        {
-            return long.TryParse(Str, NumberStyles.Any, provider: null, out ParseSuffixedSizeRet);
-        }
-    }
-
-    public static byte[] ParseHexString(string str)
-    {
-        var bytes = new byte[(str.Length >> 1)];
-
-        for (int i = 0, loopTo = bytes.Length - 1; i <= loopTo; i++)
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-            bytes[i] = byte.Parse(str.AsSpan(i << 1, 2), NumberStyles.HexNumber);
-#else
-            bytes[i] = byte.Parse(str.Substring(i << 1, 2), NumberStyles.HexNumber);
-#endif
-        }
-
-        return bytes;
-    }
-
-    public static IEnumerable<byte> ParseHexString(IEnumerable<char> str)
-    {
-        var buffer = new char[2];
-
-        foreach (var c in str)
-        {
-            if (buffer[0] == default(char))
-            {
-                buffer[0] = c;
-            }
-            else
-            {
-                buffer[1] = c;
-
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-                yield return byte.Parse(buffer, NumberStyles.HexNumber);
-#else
-                yield return byte.Parse(new string(buffer), NumberStyles.HexNumber);
-#endif
-
-                Array.Clear(buffer, 0, 2);
-            }
-        }
-    }
-
-    public static byte[] ParseHexString(string str, int offset, int count)
-    {
-        var bytes = new byte[(count >> 1)];
-
-        for (int i = 0, loopTo = count - 1; i <= loopTo; i++)
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-            bytes[i] = byte.Parse(str.AsSpan(i + offset << 1, 2), NumberStyles.HexNumber);
-#else
-            bytes[i] = byte.Parse(str.Substring(i + offset << 1, 2), NumberStyles.HexNumber);
-#endif
-        }
-
-        return bytes;
-    }
-
     /// <summary>
     /// Translates character spans to a string containing all characters in spans. The string AFPR will
     /// for example return ABCDEFPQR.
     /// </summary>
-    /// <param name="CharSpan">String of character pairs describing first and last characters of each
+    /// <param name="charSpan">String of character pairs describing first and last characters of each
     /// span.</param>
-    public static string TranslateCharSpanToCharList(string CharSpan)
+    public static string TranslateCharSpanToCharList(string charSpan)
     {
         var CharList = new StringBuilder();
-        for (int i = 0, loopTo = CharSpan.Length - 2; i <= loopTo; i += 2)
+        for (int i = 0, loopTo = charSpan.Length - 2; i <= loopTo; i += 2)
         {
-            for (short j = (short)CharSpan[i], loopTo1 = (short)CharSpan[i + 1]; j <= loopTo1; j++)
+            for (short j = (short)charSpan[i], loopTo1 = (short)charSpan[i + 1]; j <= loopTo1; j++)
             {
                 CharList.Append(Convert.ToChar(j));
             }
@@ -379,17 +201,17 @@ public static class StringSupport
     /// <summary>
     /// Returns characters up to excluding first found NULL character.
     /// </summary>
-    /// <param name="Str">NULL terminated string</param>
-    public static string TrimNullString(string Str)
+    /// <param name="str">NULL terminated string</param>
+    public static string TrimNullString(string str)
     {
-        var ToPos = Str.IndexOf(new char());
-        if (ToPos == -1)
+        var toPos = str.IndexOf(new char());
+        if (toPos == -1)
         {
-            return Str;
+            return str;
         }
         else
         {
-            return Str.Remove(ToPos);
+            return str.Remove(toPos);
         }
     }
 
@@ -529,95 +351,6 @@ public static class StringSupport
             return null;
         }
     }
-#endif
-
-#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
-
-    public static Dictionary<string, string[]> ParseCommandLine(IEnumerable<string> args, StringComparer comparer)
-    {
-        var dict = ParseCommandLineParameter(args).GroupBy(item => item.Key, item => item.Value, comparer).ToDictionary(item => item.Key, item => item.SelectMany(i => i).ToArray(), comparer);
-
-        return dict;
-    }
-
-    public static IEnumerable<KeyValuePair<string, IEnumerable<string>>> ParseCommandLineParameter(IEnumerable<string> args)
-    {
-        var switches_finished = false;
-
-        foreach (var arg in args)
-        {
-            if (switches_finished)
-            {
-            }
-            else if (arg.Length == 0 || arg == "-")
-            {
-                switches_finished = true;
-            }
-            else if (arg == "--")
-            {
-                switches_finished = true;
-                continue;
-            }
-            else if (arg.StartsWith("--", StringComparison.Ordinal) || IsOSWindows && arg.StartsWith("/", StringComparison.Ordinal))
-            {
-                var namestart = 1;
-                if (arg[0] == '-')
-                {
-                    namestart = 2;
-                }
-
-                var valuepos = arg.IndexOf('=');
-                if (valuepos < 0)
-                {
-                    valuepos = arg.IndexOf(':');
-                }
-
-                string name;
-                IEnumerable<string> value;
-
-                if (valuepos >= 0)
-                {
-                    name = arg.Substring(namestart, valuepos - namestart);
-                    value = SingleValueEnumerable.Get(arg.Substring(valuepos + 1));
-                }
-                else
-                {
-                    name = arg.Substring(namestart);
-                    value = Enumerable.Empty<string>();
-                }
-
-                yield return new KeyValuePair<string, IEnumerable<string>>(name, value);
-            }
-            else if (arg.StartsWith("-", StringComparison.Ordinal))
-            {
-                for (int i = 1, loopTo = arg.Length - 1; i <= loopTo; i++)
-                {
-                    var name = arg.Substring(i, 1);
-                    IEnumerable<string> value;
-
-                    if (i + 1 < arg.Length && (arg[i + 1] == '=' || arg[i + 1] == ':'))
-                    {
-                        value = SingleValueEnumerable.Get(arg.Substring(i + 2));
-                        yield return new KeyValuePair<string, IEnumerable<string>>(name, value);
-                        break;
-                    }
-
-                    value = Enumerable.Empty<string>();
-                    yield return new KeyValuePair<string, IEnumerable<string>>(name, value);
-                }
-            }
-            else
-            {
-                switches_finished = true;
-            }
-
-            if (switches_finished)
-            {
-                yield return new KeyValuePair<string, IEnumerable<string>>(string.Empty, SingleValueEnumerable.Get(arg));
-            }
-        }
-    }
-
 #endif
 
 }

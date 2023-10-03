@@ -16,14 +16,6 @@ namespace LTRLib.Extensions;
 
 public static class CollectionExtensions
 {
-#if NET35_OR_GREATER && !NET471_OR_GREATER
-
-    public static IEnumerable<T> Append<T>(this IEnumerable<T> values, T nextValue) => values.Concat(SingleValueEnumerable.Get(nextValue));
-
-    public static IEnumerable<T> Prepend<T>(this IEnumerable<T> values, T previousValue) => SingleValueEnumerable.Get(previousValue).Concat(values);
-
-#endif
-
     /// <summary>
     /// Adds or replaces a dictionary entry.
     /// </summary>

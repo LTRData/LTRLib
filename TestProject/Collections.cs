@@ -1,4 +1,5 @@
-﻿using LTRData.Extensions.Formatting;
+﻿using LTRData.Extensions.Buffers;
+using LTRData.Extensions.Formatting;
 using LTRLib.LTRGeneric;
 using System;
 using System.Linq;

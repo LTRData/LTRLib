@@ -5,7 +5,7 @@
  * http://ltr-data.se   https://github.com/LTRData
  */
 using LTRLib.Extensions;
-using LTRLib.LTRGeneric;
+using LTRData.Extensions.Buffers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

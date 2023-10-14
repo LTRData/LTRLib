@@ -6,7 +6,8 @@
  */
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 
-using LTRLib.Extensions;
+using LTRData.Extensions.Formatting;
+using LTRData.Extensions.Buffers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,6 +23,7 @@ public class MathExpressionParser : IMathExpressionParser
     {
         { "pow", "Power" },
         { "^", "Power" },
+        { "**", "Power" },
         { "+", "AddChecked" },
         { "-", "SubtractChecked" },
         { "*", "MultiplyChecked" },
@@ -30,7 +32,19 @@ public class MathExpressionParser : IMathExpressionParser
         { "%", "Modulo" },
         { "&", "And" },
         { "|", "Or" },
-        { ",", "," }
+        { "xor", "ExclusiveOr" },
+        { ",", "," },
+        { "<<", "LeftShift" },
+        { ">>", "RightShift" },
+    };
+
+    private static readonly Dictionary<string, Type> OperatorOperandTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "And", typeof(int) },
+        { "Or", typeof(int) },
+        { "ExclusiveOr", typeof(int) },
+        { "LeftShift", typeof(int) },
+        { "RightShift", typeof(int) },
     };
 
     private static readonly Dictionary<string, string> UnaryPrefixOperators = new(StringComparer.OrdinalIgnoreCase)
@@ -269,7 +283,7 @@ public class MathExpressionParser : IMathExpressionParser
                     operands.Insert(0, key);
                 }
 
-                if (!subExpr.ContainsKey(operands[1]))
+                if (!subExpr.ContainsKey(operands[2]))
                 {
                     key = ParseExpression(operands.Skip(2).ToList(), subExpr);
                     if (key is null)
@@ -337,7 +351,7 @@ public class MathExpressionParser : IMathExpressionParser
         }
     }
 
-    private static MethodInfo? GetExpressionFactoryMethod(string method, int paramCount)
+    private static MethodInfo? GetExpressionFactoryMethod(string method, int paramCount, out Type? operandType)
     {
         if (paramCount == 1 && UnaryPrefixOperators.TryGetValue(method, out var operatorname))
         {
@@ -348,21 +362,32 @@ public class MathExpressionParser : IMathExpressionParser
             method = operatorname;
         }
 
+        if (!OperatorOperandTypes.TryGetValue(method, out operandType))
+        {
+            operandType = null;
+        }
+
         var paramList = Enumerable.Repeat(typeof(Expression), paramCount).ToArray();
 
-        return typeof(Expression).GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase, null, paramList, null);
+        return typeof(Expression)
+            .GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase, null, paramList, null);
     }
 
-    private MethodInfo? GetMathMethod(string method, int paramCount) => ProviderTypes
-            .Select(type => type.GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase, null, Enumerable.Repeat(typeof(double), paramCount).ToArray(), null))
-            .FirstOrDefault(m => m is not null && m.ReturnType == typeof(double));
+    private MethodInfo? GetMathDoubleMethod(string method, int paramCount) => ProviderTypes
+        .Select(type => type.GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase, null, Enumerable.Repeat(typeof(double), paramCount).ToArray(), null))
+        .FirstOrDefault(m => m is not null && m.ReturnType == typeof(double));
+
+    private MethodInfo? GetMathIntMethod(string method, int paramCount) => ProviderTypes
+        .Select(type => type.GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase, null, Enumerable.Repeat(typeof(long), paramCount).ToArray(), null))
+        .FirstOrDefault(m => m is not null && m.ReturnType == typeof(long));
 
     private FieldInfo? GetMathConstant(string constant) => ProviderTypes
-            .Select(type => type.GetField(constant, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase))
-            .FirstOrDefault(f => (f is not null) && f.FieldType == typeof(double));
+        .Select(type => type.GetField(constant, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase))
+        .FirstOrDefault(f => (f is not null) && f.FieldType == typeof(double));
 
-    private bool IsKnownOperator(string method, int argumentCount) => GetExpressionFactoryMethod(method, argumentCount) is not null ||
-            GetMathMethod(method, argumentCount) is not null;
+    private bool IsKnownOperator(string method, int argumentCount) => GetExpressionFactoryMethod(method, argumentCount, out _) is not null ||
+        GetMathDoubleMethod(method, argumentCount) is not null ||
+        GetMathIntMethod(method, argumentCount) is not null;
 
     private string? ParseOperation(string method, Dictionary<string, Expression> subExpr, params Expression[] operands)
     {
@@ -386,21 +411,40 @@ public class MathExpressionParser : IMathExpressionParser
                 }
             }
         }
-        else
+        else if (GetExpressionFactoryMethod(method, operands.Length, out var operandType)
+            is { } methodInfo)
         {
-            var methodInfo = GetExpressionFactoryMethod(method, operands.Length);
-            if (methodInfo is not null)
+            var methodOperands = operands;
+
+            if (operandType is not null)
             {
-                expr = methodInfo.Invoke(null, operands) as Expression;
+                methodOperands = operands
+                    .Select(op => Expression.ConvertChecked(op, operandType))
+                    .ToArray();
             }
-            else
+
+            expr = methodInfo.Invoke(null, methodOperands) as Expression;
+
+            if (operandType is not null)
             {
-                methodInfo = GetMathMethod(method, operands.Length);
-                if (methodInfo is not null)
-                {
-                    expr = Expression.Call(methodInfo, operands);
-                }
+                expr = Expression.ConvertChecked(expr, typeof(double));
             }
+        }
+        else if (GetMathDoubleMethod(method, operands.Length)
+            is { } methodInfoMathDouble)
+        {
+            expr = Expression.Call(methodInfoMathDouble, operands);
+        }
+        else if (GetMathIntMethod(method, operands.Length)
+            is { } methodInfoMathInt)
+        {
+            var methodOperands = operands
+                .Select(op => Expression.ConvertChecked(op, typeof(long)))
+                .ToArray();
+
+            expr = Expression.Call(methodInfoMathInt, operands);
+
+            expr = Expression.ConvertChecked(expr, typeof(double));
         }
 
         if (expr is null)
@@ -412,7 +456,7 @@ public class MathExpressionParser : IMathExpressionParser
             ? $"#{BitConverter.DoubleToInt64Bits((double)((ConstantExpression)expr!).Value!):X8}"
             : $"$({expr})";
 
-        subExpr.AddOrReplace(key, expr);
+        subExpr[key] = expr;
 
         return key;
     }

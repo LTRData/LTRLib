@@ -8,6 +8,16 @@ namespace LTRLib;
 public class MathExpressions
 {
     [Fact]
+    public void Test2()
+    {
+        var math = new MathExpressionParser(CultureInfo.InvariantCulture);
+
+        var expr2 = math.ParseExpression<Func<double>>("sin(0.4) * 2");
+        var value2 = expr2();
+        Assert.Equal(Math.Sin(0.4) * 2, value2);
+    }
+
+    [Fact]
     public void Test1()
     {
         var math = new MathExpressionParser(CultureInfo.InvariantCulture);
@@ -15,10 +25,6 @@ public class MathExpressions
         var expr1 = math.ParseExpression<Func<double>>("atan2(312,2)");
         var value1 = expr1();
         Assert.Equal(Math.Atan2(312, 2), value1);
-
-        var expr2 = math.ParseExpression<Func<double>>("sin(0.4) * 2");
-        var value2 = expr2();
-        Assert.Equal(Math.Sin(0.4) * 2, value2);
 
         var expr3 = math.ParseExpression<Func<double>>("e ** 2");
         var value3 = expr3();
@@ -51,6 +57,12 @@ public class MathExpressions
         var expr10 = math.ParseExpression<Func<double>>("2.5 + 400 / (.1 - .01) * 2");
         var value10 = expr10();
         Assert.Equal(2.5 + 400 / (.1 - .01) * 2, value10);
+    }
+
+    [Fact]
+    public void Test3()
+    {
+        var math = new MathExpressionParser(CultureInfo.InvariantCulture);
 
         var expr11 = math.ParseExpression<Func<double>>("1 << 10");
         var value11 = expr11();

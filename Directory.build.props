@@ -3,7 +3,7 @@
   <PropertyGroup>
 
     <RootNamespace>LTRLib</RootNamespace>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>

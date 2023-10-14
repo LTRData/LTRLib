@@ -39,6 +39,7 @@ using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using LTRData.Extensions.Split;
 using LTRData.Extensions.Formatting;
+using LTRData.Extensions.Buffers;
 
 namespace LTRLib.WebCore;
 

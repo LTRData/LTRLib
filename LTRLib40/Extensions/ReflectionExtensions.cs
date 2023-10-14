@@ -109,7 +109,6 @@ namespace System.Runtime.CompilerServices
 
 namespace LTRLib.Extensions
 {
-
     public static class ReflectionExtensions
     {
 #if NETFRAMEWORK && !NET46_OR_GREATER

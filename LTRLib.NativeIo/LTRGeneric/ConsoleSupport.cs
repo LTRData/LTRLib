@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using System.Security;
 using System.Security.Permissions;
 using System.Text;
+using LTRData.Extensions.Formatting;
 using LTRLib.Extensions;
 using LTRLib.IO;
 
@@ -178,7 +179,7 @@ public static class ConsoleSupport
 
 #if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
 
-            Console.WriteLine(msg.LineFormat());
+            Console.WriteLine(StringFormatting.LineFormat(msg.AsSpan()));
 
 #else
 

@@ -1,4 +1,4 @@
-﻿using LTRLib.Extensions;
+﻿using LTRData.Extensions.Buffers;
 using System;
 
 namespace LTRLib.Geodesy.Positions;

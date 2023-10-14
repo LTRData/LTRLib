@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="*" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net46`))' &gt;= 0">
+  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0">
     <PackageReference Include="LTRData.Extensions" Version="*" />
   </ItemGroup>
 

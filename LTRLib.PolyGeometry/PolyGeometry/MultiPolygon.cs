@@ -4,7 +4,8 @@
  * Copyright (c) Olof Lagerkvist, LTR Data
  * http://ltr-data.se   https://github.com/LTRData
  */
-using LTRLib.Extensions;
+using LTRData.Extensions.Buffers;
+using LTRData.Extensions.Formatting;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

@@ -12,6 +12,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 #if NET45_OR_GREATER || NETCOREAPP || NETSTANDARD
+using LTRData.Extensions.Async;
 using System.Threading.Tasks;
 #endif
 

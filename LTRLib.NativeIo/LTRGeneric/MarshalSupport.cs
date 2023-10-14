@@ -15,9 +15,10 @@ using static System.Runtime.InteropServices.Marshal;
 using System.Security;
 using System.Security.Permissions;
 using System.Text;
-using LTRLib.Extensions;
+using LTRData.Extensions.Buffers;
 using static LTRLib.IO.Win32API;
 using System.Runtime.Versioning;
+using LTRData.Extensions.Formatting;
 
 namespace LTRLib.LTRGeneric;
 
@@ -110,7 +111,6 @@ public static class MarshalSupport
     /// existing of specified paths first if True, or add new paths after existing path list if False.</param>
     public static void AddProcessPaths(bool BeforeExisting, string AddPaths)
     {
-
         if (string.IsNullOrEmpty(AddPaths))
         {
             return;
@@ -119,7 +119,6 @@ public static class MarshalSupport
         var AddPathsArray = AddPaths.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
         AddProcessPaths(BeforeExisting, AddPathsArray);
-
     }
 
     /// <summary>
@@ -131,7 +130,6 @@ public static class MarshalSupport
     /// existing of specified paths first if True, or add new paths after existing path list if False.</param>
     public static void AddProcessPaths(bool BeforeExisting, params string[] AddPathsArray)
     {
-
         if (AddPathsArray is null || AddPathsArray.Length == 0)
         {
             return;

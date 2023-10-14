@@ -412,26 +412,6 @@ public static class CollectionExtensions
 
     #endif
 
-    public static IEnumerable<string> EnumerateLines(this TextReader tr)
-    {
-
-        do
-        {
-
-            var line = tr.ReadLine();
-
-            if (line is null)
-            {
-                yield break;
-            }
-
-            yield return line;
-        }
-
-        while (true);
-
-    }
-
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 
     public static T Second<T>(this IEnumerable<T> seq) => seq.ElementAt(1);
@@ -500,47 +480,6 @@ public static class CollectionExtensions
 #endif
 
 #endif
-
-    public static IEnumerable<Exception> Enumerate(this Exception? ex)
-    {
-        while (ex is not null)
-        {
-            if (ex is TargetInvocationException)
-            {
-                ex = ex.InnerException;
-            }
-#if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
-            else if (ex is AggregateException aex)
-            {
-                foreach (var iex in aex.InnerExceptions.SelectMany(Enumerate))
-                {
-                    yield return iex;
-                }
-
-                yield break;
-            }
-#endif
-#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
-            else if (ex is ReflectionTypeLoadException rtlex)
-            {
-                yield return ex;
-
-                foreach (var iex in rtlex.LoaderExceptions.SelectMany(Enumerate))
-                {
-                    yield return iex;
-                }
-
-                ex = ex.InnerException;
-            }
-#endif
-            else
-            {
-                yield return ex;
-
-                ex = ex.InnerException;
-            }
-        }
-    }
 
 #if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
     public static string? FormatLogMessages(this Exception exception) =>

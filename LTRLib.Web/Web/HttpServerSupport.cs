@@ -5,9 +5,9 @@
 // http://ltr-data.se   https://github.com/LTRData
 // 
 
-#if NET40_OR_GREATER
+#if NET46_OR_GREATER
 
-using LTRLib.Extensions;
+using LTRData.Extensions.Buffers;
 using LTRLib.LTRGeneric;
 using System;
 using System.IO;
@@ -22,12 +22,11 @@ using System.Web;
 using System.Xml.Serialization;
 using static LTRLib.Web.HttpShared;
 using static LTRLib.Extensions.NetExtensions;
-#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
 using LTRData.Extensions.Formatting;
-#endif
 
 namespace LTRLib.Web;
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 
 [XmlType("WebHttpServerSupport")]
 public static class HttpServerSupport
@@ -36,7 +35,6 @@ public static class HttpServerSupport
 
     public static string GetRequestCompressionEncoding(this HttpRequest Request)
     {
-
         var acceptEncoding = Request.Headers.Get("Accept-Encoding") ?? Request.Headers.Get("Transfer-Encoding") ?? Request.Headers.Get("TE");
 
         if (!string.IsNullOrWhiteSpace(acceptEncoding))
@@ -52,7 +50,6 @@ public static class HttpServerSupport
         }
 
         return "none";
-
     }
 
     /// <summary>
@@ -122,7 +119,9 @@ public static class HttpServerSupport
             }
 
             var lastModified = File.GetLastWriteTimeUtc(filepath);
+#pragma warning disable SYSLIB0021 // Type or member is obsolete
             var etag = Convert.ToBase64String(Cryptography.GetHash<MD5CryptoServiceProvider>(filepath));
+#pragma warning restore SYSLIB0021 // Type or member is obsolete
 
             Response.AddFileDependency(filepath);
             Response.ContentType = GetMimeType(requestExt);
@@ -133,7 +132,7 @@ public static class HttpServerSupport
 
             if (!string.IsNullOrWhiteSpace(ifModifiedSince))
             {
-                if (ifModifiedSince.IndexOf(';') >= 0)
+                if (ifModifiedSince.Contains(';'))
                 {
                     ifModifiedSince = ifModifiedSince.Remove(ifModifiedSince.IndexOf(';'));
                 }

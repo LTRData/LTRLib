@@ -11,7 +11,7 @@
  * Modified and extended by Olof Lagerkvist 2011. http://www.ltr-data.se
  */
 
-using LTRLib.Extensions;
+using LTRData.Extensions.Buffers;
 using System;
 using System.Globalization;
 using System.Runtime.InteropServices;

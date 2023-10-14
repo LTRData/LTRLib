@@ -6,9 +6,9 @@
  */
 
 #if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
-using LTRData.Extensions.Buffers;
 using LTRData.Extensions.Split;
 #endif
+using LTRData.Extensions.Buffers;
 using LTRLib.Extensions;
 using System;
 using System.Collections.Generic;

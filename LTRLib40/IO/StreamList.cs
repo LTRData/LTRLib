@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 #if NET40_OR_GREATER || NETCOREAPP || NETSTANDARD
 using System.Threading.Tasks;
+using LTRData.Extensions.Async;
 using LTRLib.Extensions;
 #endif
 using LTRLib.LTRGeneric;

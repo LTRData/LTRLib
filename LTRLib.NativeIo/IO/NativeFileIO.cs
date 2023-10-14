@@ -19,10 +19,9 @@ using static LTRLib.IO.NativeConstants;
 using System.Diagnostics;
 using static LTRLib.IO.Win32API;
 using System.Runtime.Versioning;
-#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
-using LTRData.Extensions.Formatting;
-#endif
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Formatting;
+using LTRData.Extensions.Buffers;
 using System.Linq;
 #endif
 

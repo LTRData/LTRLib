@@ -12,6 +12,8 @@ using System.Xml;
 using System.Xml.Serialization;
 using LTRLib.Extensions;
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Buffers;
+using LTRData.Extensions.Formatting;
 using System.Linq;
 using System.Xml.Linq;
 #endif

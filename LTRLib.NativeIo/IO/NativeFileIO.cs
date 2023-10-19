@@ -643,18 +643,18 @@ public static class NativeFileIO
         return str.ToString();
     }
 
-#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
-    public static IEnumerable<string> GetDiskVolumesMountPoints(uint DiskNumber) => GetDiskVolumes(DiskNumber).SelectMany(GetVolumeMountPoints);
+#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
+    public static IEnumerable<string> GetDiskVolumesMountPoints(uint DiskNumber)
+        => GetDiskVolumes(DiskNumber)
+        .SelectMany(GetVolumeMountPoints);
 
     public static string GetVolumeNameForVolumeMountPoint(string MountPoint)
     {
-
         var str = new StringBuilder(65536);
 
         Win32Try(Win32API.GetVolumeNameForVolumeMountPoint(MountPoint, str, str.Capacity));
 
         return str.ToString();
-
     }
 
     private static readonly int _GetDevicesScsiAddresses_SizeOfScsiAddress = MarshalSupport<SCSI_ADDRESS>.Size;
@@ -670,7 +670,7 @@ public static class NativeFileIO
                 var errcode = GetLastWin32Error();
                 if (rc)
                 {
-                    return (SCSI_ADDRESS?)ScsiAddress;
+                    return ScsiAddress;
                 }
                 else
                 {
@@ -732,7 +732,7 @@ public static class NativeFileIO
         }
     }
 
-#if NET46_OR_GREATER || NETSTANDARD || NETCOREAPP
+#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
     public static IEnumerable<string> GetDiskVolumes(uint DiskNumber)
     {
         return new VolumeEnumerator()

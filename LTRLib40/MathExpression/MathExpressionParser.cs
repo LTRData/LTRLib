@@ -423,7 +423,7 @@ public class MathExpressionParser : IMathExpressionParser
                     .ToArray();
             }
 
-            expr = methodInfo.Invoke(null, methodOperands) as Expression;
+            expr = (Expression)methodInfo.Invoke(null, methodOperands)!;
 
             if (operandType is not null)
             {

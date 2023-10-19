@@ -16,23 +16,15 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="3.1.*" />
     <PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.*" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="*" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="*" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="6.0.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="*" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="*" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="*" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="7.0.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="*" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="7.0.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="*" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>

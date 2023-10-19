@@ -1,14 +1,9 @@
 ﻿#if NET461_OR_GREATER || NETSTANDARD || NETCOREAPP
 
-using LTRLib.Web;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.FileProviders;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,19 +11,6 @@ namespace LTRLib.Extensions;
 
 public static class WebExtensions
 {
-    public static IApplicationBuilder UseApplicationFeatures(this IApplicationBuilder app, IFileProvider FileProvider, HttpShared.DynDocFeatures Features)
-    {
-        return app.Use(async (context, next) =>
-        {
-            if (await WebCore.HttpServerSupport.ApplicationAddFeatures(context, context.Request, context.Response, FileProvider, Features).ConfigureAwait(continueOnCapturedContext: false))
-            {
-                return;
-            }
-
-            await next().ConfigureAwait(continueOnCapturedContext: false);
-        });
-    }
-
 #if NETFRAMEWORK
 
     public static string Get(this NameValueCollection dict, string key) => dict[key];

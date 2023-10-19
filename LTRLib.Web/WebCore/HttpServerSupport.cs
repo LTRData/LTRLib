@@ -40,6 +40,7 @@ using System.Security.Cryptography;
 using LTRData.Extensions.Split;
 using LTRData.Extensions.Formatting;
 using LTRData.Extensions.Buffers;
+using Microsoft.AspNetCore.Builder;
 
 namespace LTRLib.WebCore;
 
@@ -73,6 +74,19 @@ public static class HttpServerSupport
         }
 
         return "none";
+    }
+
+    public static IApplicationBuilder UseApplicationFeatures(this IApplicationBuilder app, IFileProvider FileProvider, DynDocFeatures Features)
+    {
+        return app.Use(async (context, next) =>
+        {
+            if (await ApplicationAddFeatures(context, context.Request, context.Response, FileProvider, Features).ConfigureAwait(continueOnCapturedContext: false))
+            {
+                return;
+            }
+
+            await next().ConfigureAwait(continueOnCapturedContext: false);
+        });
     }
 
     /// <summary>

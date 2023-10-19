@@ -138,7 +138,7 @@ public static class FormsExtensions
         return new PointF(Rectangle.Left + Rectangle.Width / 2f, Rectangle.Top + Rectangle.Height / 2f);
     }
 
-    #if NETFRAMEWORK && !NET45_OR_GREATER
+#if NETFRAMEWORK && !NET45_OR_GREATER
     /// <summary>
     /// Adjusts a string to a display with specified width by wrapping complete words.
     /// </summary>

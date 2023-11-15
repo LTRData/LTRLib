@@ -21,8 +21,8 @@ Public Class PropertyDialog
             Return PropertyGrid.SelectedObject
         End Get
         <SecuritySafeCritical>
-        Set(value As Object)
-            PropertyGrid.SelectedObject = value
+        Set
+            PropertyGrid.SelectedObject = Value
         End Set
     End Property
 
@@ -32,15 +32,15 @@ Public Class PropertyDialog
             Return PropertyGrid.SelectedObjects
         End Get
         <SecuritySafeCritical>
-        Set(value As Object())
-            PropertyGrid.SelectedObjects = value
+        Set
+            PropertyGrid.SelectedObjects = Value
         End Set
     End Property
 
 #Disable Warning IDE1006 ' Naming Styles
 
     Private Sub btnOK_Click(sender As Object, e As EventArgs) Handles btnOK.Click
-        DialogResult = Windows.Forms.DialogResult.OK
+        DialogResult = System.Windows.Forms.DialogResult.OK
     End Sub
 
     <SecuritySafeCritical>

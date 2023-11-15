@@ -36,8 +36,8 @@ Public Class GridDialog
         Get
             Return mBindingSource.DataMember
         End Get
-        Set(value As String)
-            mBindingSource.DataMember = value
+        Set
+            mBindingSource.DataMember = Value
         End Set
     End Property
 

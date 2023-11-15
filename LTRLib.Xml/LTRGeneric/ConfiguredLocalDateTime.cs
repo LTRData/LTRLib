@@ -15,9 +15,9 @@ namespace LTRLib.LTRGeneric;
 #if NET462_OR_GREATER || NETSTANDARD || NETCOREAPP
 [JsonConverter(typeof(ConfiguredLocalDateTimeConverter))]
 #endif
-public struct ConfiguredLocalDateTime : IXmlSerializable, IComparable<DateTime>, IComparable<ConfiguredLocalDateTime>, IEquatable<DateTime>, IEquatable<ConfiguredLocalDateTime>, IConvertible, IFormattable, ISerializable
+public struct ConfiguredLocalDateTime(DateTime DateTime) : IXmlSerializable, IComparable<DateTime>, IComparable<ConfiguredLocalDateTime>, IEquatable<DateTime>, IEquatable<ConfiguredLocalDateTime>, IConvertible, IFormattable, ISerializable
 {
-    public DateTime DateTime { get; private set; }
+    public DateTime DateTime { get; private set; } = DateTime;
 
     public readonly DateTime Date => DateTime.Date;
 
@@ -26,11 +26,6 @@ public struct ConfiguredLocalDateTime : IXmlSerializable, IComparable<DateTime>,
     public static DateTime Now => TimeZoneSupport.CurrentConfiguredTimeZoneLocalTime;
 
     public static DateTime UtcNow => DateTime.UtcNow;
-
-    public ConfiguredLocalDateTime(DateTime DateTime)
-    {
-        this.DateTime = DateTime;
-    }
 
     public void ReadXml(XmlReader reader)
     {
@@ -139,6 +134,9 @@ public struct ConfiguredLocalDateTime : IXmlSerializable, IComparable<DateTime>,
 
     public readonly string ToString(string? format, IFormatProvider? formatProvider) => DateTime.ToString(format, formatProvider);
 
+#if NET8_0_OR_GREATER
+    [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.", DiagnosticId = "SYSLIB0051", UrlFormat = "https://aka.ms/dotnet-warnings/{0}")]
+#endif
     public readonly void GetObjectData(SerializationInfo info, StreamingContext context) => ((ISerializable)DateTime).GetObjectData(info, context);
 }
 #endif

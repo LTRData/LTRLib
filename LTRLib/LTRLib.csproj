@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net20;net30;net35;net40;net46;net48;net6.0;net6.0-windows;net7.0;net7.0-windows</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net20;net30;net35;net40;net46;net48;net6.0;net6.0-windows;net7.0;net8.0;net7.0-windows;net8.0-windows</TargetFrameworks>
     <AssemblyName>LTRLib</AssemblyName>
     <OutputPath>..\$(Configuration)\</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>

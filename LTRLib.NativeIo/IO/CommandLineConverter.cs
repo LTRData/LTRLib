@@ -29,35 +29,28 @@ namespace LTRLib.IO;
 /// Class that simplifies use of command line conversion tools. This class, along with all
 /// static and instance members, are completely thread safe.
 /// </summary>
+/// <remarks>
+/// Initiates a new instance of CommandLineConverter.
+/// </remarks>
+/// <param name="Converter">Full path to conversion tool executable.</param>
+/// <param name="ConverterArgs">Command line arguments passed to conversion tool. {0} is replaced by source
+/// filename and {1} by target filename. Example: {0} {1}</param>
+/// <param name="ConverterStartDir">Directory where application should start.</param>
 [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.AllFlags)]
-public partial class CommandLineConverter : MarshalByRefObject
+public partial class CommandLineConverter(string Converter, string ConverterArgs, string ConverterStartDir) : MarshalByRefObject
 {
 
     /// <summary>
     /// Full path to conversion tool executable.
     /// </summary>
-    private readonly string Converter;
+    private readonly string Converter = Converter;
 
     /// <summary>Command line arguments passed to conversion tool. {0} is replaced by source
     /// filename and {1} by target filename.</summary>
-    private readonly string ConverterArgs;
+    private readonly string ConverterArgs = ConverterArgs;
 
     /// <summary>Directory where application should start.</summary>
-    private readonly string ConverterStartDir;
-
-    /// <summary>
-    /// Initiates a new instance of CommandLineConverter.
-    /// </summary>
-    /// <param name="Converter">Full path to conversion tool executable.</param>
-    /// <param name="ConverterArgs">Command line arguments passed to conversion tool. {0} is replaced by source
-    /// filename and {1} by target filename. Example: {0} {1}</param>
-    /// <param name="ConverterStartDir">Directory where application should start.</param>
-    public CommandLineConverter(string Converter, string ConverterArgs, string ConverterStartDir)
-    {
-        this.Converter = Converter;
-        this.ConverterArgs = ConverterArgs;
-        this.ConverterStartDir = ConverterStartDir;
-    }
+    private readonly string ConverterStartDir = ConverterStartDir;
 
     /// <summary>
     /// Executes conversion tool with source and target filenames inserted in predefined command line.
@@ -247,8 +240,14 @@ Result:
 
         // <SecurityPermission(SecurityAction.Demand, flags:=SecurityPermissionFlag.SerializationFormatter)>
         [SecurityCritical]
+#if NET8_0_OR_GREATER
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.", DiagnosticId = "SYSLIB0051", UrlFormat = "https://aka.ms/dotnet-warnings/{0}")]
+#endif
         public override void GetObjectData(SerializationInfo info, StreamingContext context) => base.GetObjectData(info, context);
 
+#if NET8_0_OR_GREATER
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.", DiagnosticId = "SYSLIB0051", UrlFormat = "https://aka.ms/dotnet-warnings/{0}")]
+#endif
         protected ExternalToolException(SerializationInfo si, StreamingContext context) : base(si, context)
         {
         }

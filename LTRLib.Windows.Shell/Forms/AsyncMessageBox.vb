@@ -18,16 +18,16 @@ Public Class AsyncMessageBox
     Private m_TextRectangle As RectangleF
 
     Private WriteOnly Property ForegroundBrush As Brush
-        Set(value As Brush)
+        Set
             m_ForegroundBrush?.Dispose()
-            m_ForegroundBrush = value
+            m_ForegroundBrush = Value
         End Set
     End Property
 
     Private WriteOnly Property BackgroundBrush As Brush
-        Set(value As Brush)
+        Set
             m_BackgroundBrush?.Dispose()
-            m_BackgroundBrush = value
+            m_BackgroundBrush = Value
         End Set
     End Property
 
@@ -54,8 +54,8 @@ Public Class AsyncMessageBox
         Get
             Return m_Text
         End Get
-        Set(value As String)
-            m_Text = value
+        Set
+            m_Text = Value
             CurrentFont = Nothing
             OnResize(EventArgs.Empty)
         End Set
@@ -66,9 +66,9 @@ Public Class AsyncMessageBox
     Private m_Sized As Boolean
 
     Private WriteOnly Property CurrentFont As Font
-        Set(value As Font)
+        Set
             m_CurrentFont?.Dispose()
-            m_CurrentFont = value
+            m_CurrentFont = Value
         End Set
     End Property
 
@@ -109,9 +109,9 @@ Public Class AsyncMessageBox
 
     Private m_ImageBuffer As Image
     Private WriteOnly Property ImageBuffer As Image
-        Set(value As Image)
+        Set
             m_ImageBuffer?.Dispose()
-            m_ImageBuffer = value
+            m_ImageBuffer = Value
         End Set
     End Property
 
@@ -180,9 +180,9 @@ Public Class AsyncMessageBox
         Get
             Return MyBase.ForeColor
         End Get
-        Set(value As Color)
-            MyBase.ForeColor = value
-            ForegroundBrush = New SolidBrush(value)
+        Set
+            MyBase.ForeColor = Value
+            ForegroundBrush = New SolidBrush(Value)
         End Set
     End Property
 
@@ -190,9 +190,9 @@ Public Class AsyncMessageBox
         Get
             Return MyBase.BackColor
         End Get
-        Set(value As Color)
-            MyBase.BackColor = value
-            BackgroundBrush = New SolidBrush(value)
+        Set
+            MyBase.BackColor = Value
+            BackgroundBrush = New SolidBrush(Value)
         End Set
     End Property
 

@@ -705,7 +705,7 @@ public static class NativeFileIO
 
         if (length <= 2L)
         {
-            return ReflectionExtensions.Empty<string>();
+            return [];
         }
 
         var Target = new string(TargetPath, 0, (int)(length - 2L));

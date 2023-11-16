@@ -21,6 +21,8 @@ using System.Runtime.InteropServices;
 
 namespace LTRLib.Net;
 
+#pragma warning disable CS9191 // The 'ref' modifier for an argument corresponding to 'in' parameter is equivalent to 'in'. Consider using 'in' instead.
+
 /// <summary>
 /// Collection of ranges of IPv4 addresses
 /// </summary>

@@ -50,10 +50,10 @@ namespace LTRLib.WebCore;
 public static class HttpServerSupport
 {
     private static readonly string[] _compressionHeaderIndicators =
-    {
+    [
         "gzip",
         "deflate"
-    };
+    ];
 
     public static string GetRequestCompressionEncoding(this HttpRequest Request)
     {

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Security;
 using System.Security.Permissions;
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable SYSLIB0003 // Type or member is obsolete
 #pragma warning disable IDE0057 // Use range operator
 
@@ -38,33 +39,36 @@ public static class CodeCompiler
         Cpp
     }
 
-    private static string[] GetDefaultLibrariesList(CompilerVersion CompilerVersion)
+    private static string[] GetDefaultLibrariesList(CompilerVersion compilerVersion)
     {
-        var References = new List<string>() { "System.dll", "System.Xml.dll", "System.Drawing.dll", "System.Management.dll", "System.Windows.Forms.dll" };
-        if (CompilerVersion >= CompilerVersion.v3_5)
+        var references = new List<string>() { "System.dll", "System.Xml.dll", "System.Drawing.dll", "System.Management.dll", "System.Windows.Forms.dll" };
+        if (compilerVersion >= CompilerVersion.v3_5)
         {
-            References.Add("System.Core.dll");
-            References.Add("System.Xml.Linq.dll");
+            references.Add("System.Core.dll");
+            references.Add("System.Xml.Linq.dll");
         }
 
-        return References.ToArray();
+        return references.ToArray();
     }
 
-    private static readonly Dictionary<CompilerLanguage, Dictionary<CompilerVersion, CodeDomProvider>> CodeProviders = new();
+    private static readonly Dictionary<CompilerLanguage, Dictionary<CompilerVersion, CodeDomProvider>> CodeProviders = [];
 
-    private static readonly string[] lineBreaks = { "\r\n", "\r", "\n" };
+    private static readonly string[] lineBreaks = ["\r\n", "\r", "\n"];
 
     [SecurityCritical]
     [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.AllFlags)]
     public static CompilerResults CompileSourceCodeToMemory(string[] SourceCodes, CompilerLanguage CompilerLanguage, CompilerVersion CompilerVersion, string AdditionalCompilerParameters)
     {
         // ' Compiler command line options
-        var Parameters = new CompilerParameters();
-        Parameters.ReferencedAssemblies.AddRange(GetDefaultLibrariesList(CompilerVersion));
-        Parameters.GenerateExecutable = false;
-        Parameters.GenerateInMemory = true;
-        Parameters.TreatWarningsAsErrors = true;
-        Parameters.IncludeDebugInformation = true;
+        var parameters = new CompilerParameters
+        {
+            GenerateExecutable = false,
+            GenerateInMemory = true,
+            TreatWarningsAsErrors = true,
+            IncludeDebugInformation = true
+        };
+
+        parameters.ReferencedAssemblies.AddRange(GetDefaultLibrariesList(CompilerVersion));
 
         // ' Analyze source code for any reference tags
         foreach (var SourceCode in SourceCodes)
@@ -74,11 +78,11 @@ public static class CodeCompiler
             {
                 if (Row.StartsWith("'Reference ", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    Parameters.ReferencedAssemblies.Add(Row.Substring("'Reference ".Length));
+                    parameters.ReferencedAssemblies.Add(Row.Substring("'Reference ".Length));
                 }
                 else if (Row.StartsWith("//#using ", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    Parameters.ReferencedAssemblies.Add(Row.Substring("//#using ".Length));
+                    parameters.ReferencedAssemblies.Add(Row.Substring("//#using ".Length));
                 }
                 else
                 {
@@ -93,7 +97,7 @@ public static class CodeCompiler
         {
             if (!CodeProviders.TryGetValue(CompilerLanguage, out var LanguageCodeProviders))
             {
-                LanguageCodeProviders = new Dictionary<CompilerVersion, CodeDomProvider>();
+                LanguageCodeProviders = [];
                 CodeProviders.Add(CompilerLanguage, LanguageCodeProviders);
             }
 
@@ -107,16 +111,16 @@ public static class CodeCompiler
                     case CompilerLanguage.CSharp:
                         {
                             CodeProvider = new Microsoft.CSharp.CSharpCodeProvider(CompilerOptions);
-                            Parameters.CompilerOptions = "/warnaserror- /optimize+";
+                            parameters.CompilerOptions = "/warnaserror- /optimize+";
                             break;
                         }
                     case CompilerLanguage.VB:
                         {
                             CodeProvider = new Microsoft.VisualBasic.VBCodeProvider(CompilerOptions);
-                            Parameters.CompilerOptions = "/warnaserror- /optionexplicit+";
+                            parameters.CompilerOptions = "/warnaserror- /optionexplicit+";
                             if (CompilerVersion >= CompilerVersion.v3_5)
                             {
-                                Parameters.CompilerOptions += " /optioninfer+";
+                                parameters.CompilerOptions += " /optioninfer+";
                             }
 
                             break;
@@ -135,11 +139,11 @@ public static class CodeCompiler
 
         if (!string.IsNullOrEmpty(AdditionalCompilerParameters))
         {
-            Parameters.CompilerOptions += " " + AdditionalCompilerParameters;
+            parameters.CompilerOptions += " " + AdditionalCompilerParameters;
         }
 
         // ' Compile. Results stored in CompilerResult variable
-        return CodeProvider.CompileAssemblyFromSource(Parameters, SourceCodes);
+        return CodeProvider.CompileAssemblyFromSource(parameters, SourceCodes);
 
     }
 

@@ -92,7 +92,7 @@ internal static class UnsafeNativeMethods
 {
     [DllImport("Advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool ConvertSidToStringSid([In] byte[] sid, out IntPtr stringSid);
+    internal static extern bool ConvertSidToStringSid([In] byte[] sid, out nint stringSid);
 
     [DllImport("WTSAPI32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -112,7 +112,7 @@ internal static class UnsafeNativeMethods
 
     [DllImport("WTSAPI32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool WTSEnumerateListeners(IntPtr Server, IntPtr pReserved, int Reserved, IntPtr buffer, ref int count);
+    internal static extern bool WTSEnumerateListeners(nint Server, nint pReserved, int Reserved, nint buffer, ref int count);
 
     [DllImport("WTSAPI32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -135,11 +135,11 @@ internal static class UnsafeNativeMethods
     internal static extern bool WTSDisconnectSession(this SafeWTSHandle Server, int sessionId, [MarshalAs(UnmanagedType.Bool)] bool wait);
 
     [DllImport("WTSAPI32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static extern void WTSFreeMemory(IntPtr buffer);
+    internal static extern void WTSFreeMemory(nint buffer);
 
     [DllImport("WTSAPI32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    internal static extern bool WTSFreeMemoryEx(WTSTypeClass typeClass, IntPtr buffer, int count);
+    internal static extern bool WTSFreeMemoryEx(WTSTypeClass typeClass, nint buffer, int count);
 
     [DllImport("WTSAPI32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -153,10 +153,10 @@ internal static class UnsafeNativeMethods
     internal static extern SafeWTSHandle WTSOpenServer(string serverName);
 
     [DllImport("WTSAPI32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static extern void WTSCloseServer(IntPtr buffer);
+    internal static extern void WTSCloseServer(nint buffer);
 
     [DllImport("WTSAPI32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static extern bool WTSQueryListenerConfig(IntPtr hServer, IntPtr pReserved, int Reserved, string listener, [MarshalAs(UnmanagedType.LPStruct), Out] WTSListenerConfig info);
+    internal static extern bool WTSQueryListenerConfig(nint hServer, nint pReserved, int Reserved, string listener, [MarshalAs(UnmanagedType.LPStruct), Out] WTSListenerConfig info);
 }
 
 [SecurityCritical]
@@ -164,7 +164,7 @@ internal static class UnsafeNativeMethods
 public class SafeWTSHandle : SafeHandleMinusOneIsInvalid
 {
     [SecurityCritical]
-    public SafeWTSHandle(IntPtr serverHandle, bool ownsHandle) : base(ownsHandle) => handle = serverHandle;
+    public SafeWTSHandle(nint serverHandle, bool ownsHandle) : base(ownsHandle) => handle = serverHandle;
 
     [SecurityCritical]
     protected SafeWTSHandle() : base(ownsHandle: true)
@@ -247,7 +247,7 @@ public class WTS : IDisposable
 
     private bool disposedValue;
 
-    public static SafeWTSHandle LocalServerHandle { get; } = new(IntPtr.Zero, ownsHandle: false);
+    public static SafeWTSHandle LocalServerHandle { get; } = new(0, ownsHandle: false);
 
     public static WTS LocalServer { get; } = new();
 
@@ -291,12 +291,12 @@ public class WTS : IDisposable
         get
         {
             var count = 0;
-            WTSEnumerateListeners(IntPtr.Zero, IntPtr.Zero, 0, IntPtr.Zero, ref count);
+            WTSEnumerateListeners(0, 0, 0, 0, ref count);
 
             var buffer = stackalloc byte[count * _sizeOfListener];
-            var ptr = new IntPtr(buffer);
+            var ptr = (nint)buffer;
 
-            if (!WTSEnumerateListeners(IntPtr.Zero, IntPtr.Zero, 0, ptr, ref count))
+            if (!WTSEnumerateListeners(0, 0, 0, ptr, ref count))
             {
                 throw new Exception("Listener enumeration failed", new Win32Exception());
             }
@@ -335,7 +335,7 @@ public class WTS : IDisposable
     {
         var info = new WTSListenerConfig();
 
-        if (!WTSQueryListenerConfig(IntPtr.Zero, IntPtr.Zero, 0, listener, info))
+        if (!WTSQueryListenerConfig(0, 0, 0, listener, info))
         {
             throw new Exception("Query listener configuration failed", new Win32Exception());
         }
@@ -664,9 +664,9 @@ public sealed class WTSProcessItem
 
         public int ProcessId { get; }
 
-        public IntPtr ProcessName { get; }
+        public nint ProcessName { get; }
 
-        public IntPtr Sid { get; }
+        public nint Sid { get; }
     }
 
     public int SessionId { get; }
@@ -704,8 +704,8 @@ public sealed class WTSProcessItemEx
     {
         public int SessionId { get; }
         public int ProcessId { get; }
-        public IntPtr ProcessName { get; }
-        public IntPtr UserSid { get; }
+        public nint ProcessName { get; }
+        public nint UserSid { get; }
         public int NumberOfThreads { get; }
         public int HandleCount { get; }
         public int PagefileUsage { get; }

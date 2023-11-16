@@ -61,7 +61,7 @@ public class MathExpressionParser : IMathExpressionParser
 
     public CultureInfo FormatInfo { get; } = CultureInfo.CurrentCulture;
 
-    public Type[] ProviderTypes = { typeof(Math), typeof(MathFunctions) };
+    public Type[] ProviderTypes = [typeof(Math), typeof(MathFunctions)];
 
     public MathExpressionParser()
     {
@@ -100,7 +100,7 @@ public class MathExpressionParser : IMathExpressionParser
         .Join(" ")
         .ToLowerInvariant();
 
-    private static readonly string[] prioOperators = { "^", "*", "/", "%", "Power", "pow", "MultiplyChecked", "Multiply", "Divide", "Modulo", "mod" };
+    private static readonly string[] prioOperators = ["^", "*", "/", "%", "Power", "pow", "MultiplyChecked", "Multiply", "Divide", "Modulo", "mod"];
 
     private string ParseExpression(string line, Dictionary<string, Expression> subExpr)
     {

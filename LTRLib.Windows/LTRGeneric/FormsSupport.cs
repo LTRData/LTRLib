@@ -58,7 +58,7 @@ public static class FormsSupport
     [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.UnmanagedCode)]
     public static int SetForegroundLockTimeout(uint ms)
     {
-        if (IO.Win32API.SetSystemParametersDWORD(SPI_SETFOREGROUNDLOCKTIMEOUT, 0U, (IntPtr)ms, SPIF_SENDWININICHANGE | SPIF_UPDATEINIFILE) != 0)
+        if (IO.Win32API.SetSystemParametersDWORD(SPI_SETFOREGROUNDLOCKTIMEOUT, 0U, (nint)ms, SPIF_SENDWININICHANGE | SPIF_UPDATEINIFILE) != 0)
         {
             return 0;
         }

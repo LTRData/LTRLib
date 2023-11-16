@@ -36,7 +36,7 @@ public struct Rectangle : IPolyGeometry
 
     public static implicit operator Polygon(Rectangle rect) => rect.AsPolygon();
 
-    public readonly Polygon AsPolygon() => new(new[] { X0Y0, X1Y0, X1Y1, X0Y1, X0Y0 });
+    public readonly Polygon AsPolygon() => new([X0Y0, X1Y0, X1Y1, X0Y1, X0Y0]);
 
     public readonly IEnumerable<Point> Corners
     {

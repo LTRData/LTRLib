@@ -24,37 +24,31 @@ public class DiskStream : FileStream
 #if NETFRAMEWORK && !NET462_OR_GREATER
     public DiskStream(string path, FileAccess access) : base(NativeFileIO.OpenFileHandle(path, FileMode.Open, access, FileShare.ReadWrite | FileShare.Delete, 0), access: NativeFileIO.GetFileStreamLegalAccessValue(access), bufferSize: 512)
     {
-
         DevicePath = path;
-        if (!Win32API.DeviceIoControl(SafeFileHandle, NativeConstants.FSCTL_ALLOW_EXTENDED_DASD_IO, IntPtr.Zero, 0U, IntPtr.Zero, 0U, out _, IntPtr.Zero))
+        if (!Win32API.DeviceIoControl(SafeFileHandle, NativeConstants.FSCTL_ALLOW_EXTENDED_DASD_IO, 0, 0U, 0, 0U, out _, 0))
         {
             var errcode = Marshal.GetLastWin32Error();
             if (errcode != NativeConstants.ERROR_INVALID_PARAMETER)
             {
                 Trace.WriteLine($"FSCTL_ALLOW_EXTENDED_DASD_IO failed for '{path}': {errcode}");
             }
-
         }
-
     }
 
 #else
 
     public DiskStream(string path, FileAccess access) : base(path, FileMode.Open, access, FileShare.ReadWrite | FileShare.Delete, 512)
     {
-
         DevicePath = path;
 
-        if (!Win32API.DeviceIoControl(SafeFileHandle, NativeConstants.FSCTL_ALLOW_EXTENDED_DASD_IO, IntPtr.Zero, 0U, IntPtr.Zero, 0U, out _, IntPtr.Zero))
+        if (!Win32API.DeviceIoControl(SafeFileHandle, NativeConstants.FSCTL_ALLOW_EXTENDED_DASD_IO, 0, 0U, 0, 0U, out _, 0))
         {
             var errcode = Marshal.GetLastWin32Error();
             if (errcode != NativeConstants.ERROR_INVALID_PARAMETER)
             {
                 Trace.WriteLine($"FSCTL_ALLOW_EXTENDED_DASD_IO failed for '{path}': {errcode}");
             }
-
         }
-
     }
 
 #endif

@@ -111,7 +111,7 @@ public static class ExpressionSupport
         return Expression.Lambda(callExpr, Instance).Compile();
     }
 
-    private static readonly Dictionary<string, MethodInfo?> _GetCompatibleMethod_methodCache = new();
+    private static readonly Dictionary<string, MethodInfo?> _GetCompatibleMethod_methodCache = [];
 
     public static MethodInfo? GetCompatibleMethod(Type TypeToSearch, bool FindStaticMethod, string MethodName, Type[] GenericArguments, Type ReturnType, Type[] AlternateArgsTypes)
     {
@@ -151,7 +151,7 @@ public static class ExpressionSupport
         return newMethod;
     }
 
-    private static readonly Dictionary<Type, Type[]> _GetListItemsType_listItemsTypes = new();
+    private static readonly Dictionary<Type, Type[]> _GetListItemsType_listItemsTypes = [];
 
     public static Type GetListItemsType(Type Type)
     {
@@ -205,7 +205,7 @@ public static class ExpressionSupport
     public static Dictionary<IEnumerable<MemberInfo>, string> CreateMemberToFieldDictionary()
         => new(new SequenceEqualityComparer<MemberInfo>(new ExpressionMemberEqualityComparer()));
 
-    private static readonly Dictionary<Type, Dictionary<IEnumerable<MemberInfo>, string>> _GetDataFieldMappings_dataMappings = new();
+    private static readonly Dictionary<Type, Dictionary<IEnumerable<MemberInfo>, string>> _GetDataFieldMappings_dataMappings = [];
 
     public static Dictionary<IEnumerable<MemberInfo>, string> GetDataFieldMappings(Type ElementType)
     {
@@ -254,7 +254,7 @@ public static class ExpressionSupport
     public static ReadOnlyCollection<string> GetPropertiesWithAttributes<TAttribute>(Type type) where TAttribute : Attribute
         => AttributedMemberFinder<TAttribute>.GetPropertiesWithAttributes(type);
 
-    private static readonly Dictionary<Type, ReadOnlyCollection<string>> _GetPropertiesWithAttributes_cache = new();
+    private static readonly Dictionary<Type, ReadOnlyCollection<string>> _GetPropertiesWithAttributes_cache = [];
 
     private class AttributedMemberFinder<TAttribute> where TAttribute : Attribute
     {
@@ -284,7 +284,7 @@ public static class ExpressionSupport
 
     public static string GetDataTableName<TContext>(Type entityType) => DataContextPropertyFinder<TContext>.GetDataTableName(entityType);
 
-    private static readonly Dictionary<Type, string> _GetDataTableName_properties = new();
+    private static readonly Dictionary<Type, string> _GetDataTableName_properties = [];
 
     private class DataContextPropertyFinder<TContext>
     {

@@ -85,8 +85,14 @@ public partial class DisposableDictionary<TKey, TValue> : Dictionary<TKey, TValu
     }
 
     [SecurityCritical]
+#if NET8_0_OR_GREATER
+    [Obsolete("Old serialization API")]
+#endif
     public override void GetObjectData(SerializationInfo info, StreamingContext context) => base.GetObjectData(info, context);
 
+#if NET8_0_OR_GREATER
+    [Obsolete("Old serialization API")]
+#endif
     protected DisposableDictionary(SerializationInfo si, StreamingContext context) : base(si, context)
     {
     }

@@ -21,9 +21,9 @@ using System.Threading.Tasks;
 
 namespace LTRLib.IO;
 
-public class SafeReadStream : Stream
+public class SafeReadStream(Stream baseStream) : Stream
 {
-    public Stream BaseStream { get; }
+    public Stream BaseStream { get; } = baseStream ?? throw new ArgumentNullException(nameof(baseStream));
 
     public override bool CanRead => BaseStream.CanRead;
 
@@ -52,11 +52,6 @@ public class SafeReadStream : Stream
     }
 
     public override bool CanTimeout => BaseStream.CanTimeout;
-
-    public SafeReadStream(Stream baseStream)
-    {
-        BaseStream = baseStream ?? throw new ArgumentNullException(nameof(baseStream));
-    }
 
     public override int Read(byte[] buffer, int offset, int count)
     {

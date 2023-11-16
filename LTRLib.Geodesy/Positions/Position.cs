@@ -83,7 +83,7 @@ public abstract class Position
         return ParseValueFromDmString(negativechar, direction, degrees, minutes);
     }
 
-    private static readonly char[] DegreeChars = { 'º', '°' };
+    private static readonly char[] DegreeChars = ['º', '°'];
 
     protected static double ParseValueFromDmsString(string value, char negativechar)
     {

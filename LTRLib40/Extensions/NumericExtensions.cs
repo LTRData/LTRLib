@@ -163,7 +163,7 @@ public static class NumericExtensions
     }
 
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
-    private static readonly List<long> _primetable = new() { 2, 3 };
+    private static readonly List<long> _primetable = [2, 3];
 
     /// <summary>
     /// Calculates a sequence of prime numbers as long as the sequence is

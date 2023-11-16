@@ -46,14 +46,14 @@ public static class MarshalSupport
         }
 
         [SecuritySafeCritical]
-        public void CleanUpNativeData(IntPtr pNativeData) => FreeBSTR(pNativeData);
+        public void CleanUpNativeData(nint pNativeData) => FreeBSTR(pNativeData);
 
         [SecuritySafeCritical]
         public int GetNativeDataSize() => IntPtr.Size;
 
         [SecuritySafeCritical]
         [SupportedOSPlatform("windows")]
-        public IntPtr MarshalManagedToNative(object ManagedObj)
+        public nint MarshalManagedToNative(object ManagedObj)
         {
             if (ManagedObj is string str)
             {
@@ -62,15 +62,15 @@ public static class MarshalSupport
             }
             else
             {
-                return IntPtr.Zero;
+                return 0;
             }
         }
 
         [SecuritySafeCritical]
         [SupportedOSPlatform("windows")]
-        public object MarshalNativeToManaged(IntPtr PtrBSTR)
+        public object MarshalNativeToManaged(nint PtrBSTR)
         {
-            if (PtrBSTR == IntPtr.Zero)
+            if (PtrBSTR == 0)
             {
                 return string.Empty;
             }
@@ -88,9 +88,9 @@ public static class MarshalSupport
     /// </summary>
     /// <param name="PtrBSTR">Pointer to an AnsiBSTR in unmanaged memory.</param>
     [SupportedOSPlatform("windows")]
-    public static string CharsFromAnsiBSTR(IntPtr PtrBSTR)
+    public static string CharsFromAnsiBSTR(nint PtrBSTR)
     {
-        if (PtrBSTR == IntPtr.Zero)
+        if (PtrBSTR == 0)
         {
             return string.Empty;
         }
@@ -219,17 +219,13 @@ public static class MarshalSupport
 
             if (param_values[i] is not null && !param_type.IsAssignableFrom(param_values[i].GetType()))
             {
-
-                if (ReferenceEquals(param_type, typeof(IntPtr)) && param_values[i] is SafeHandle handle)
+                if (ReferenceEquals(param_type, typeof(nint)) && param_values[i] is SafeHandle handle)
                 {
-
                     param_values[i] = handle.DangerousGetHandle();
                 }
-
-                else if (ReferenceEquals(param_type, typeof(IntPtr)) && param_values[i].GetType().IsPrimitive)
+                else if (ReferenceEquals(param_type, typeof(nint)) && param_values[i].GetType().IsPrimitive)
                 {
-
-                    param_values[i] = IntPtr.Size < 8 ? (IntPtr)(int)param_values[i] : (object)(IntPtr)(long)param_values[i];
+                    param_values[i] = IntPtr.Size < 8 ? (int)param_values[i] : (nint)(long)param_values[i];
                 }
                 else
                 {

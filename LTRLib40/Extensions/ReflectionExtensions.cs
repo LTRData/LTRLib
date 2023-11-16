@@ -51,15 +51,9 @@ namespace System.Runtime.Versioning
     // Multiple attributes can be applied to indicate support on multiple operating
     // systems.
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Module | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
-    public sealed class SupportedOSPlatformAttribute : Attribute
+    public sealed class SupportedOSPlatformAttribute(string platformName) : Attribute
     {
-
-        public string PlatformName { get; set; }
-
-        public SupportedOSPlatformAttribute(string platformName)
-        {
-            PlatformName = platformName;
-        }
+        public string PlatformName { get; set; } = platformName;
     }
 }
 
@@ -111,21 +105,6 @@ namespace LTRLib.Extensions
 {
     public static class ReflectionExtensions
     {
-#if NETFRAMEWORK && !NET46_OR_GREATER
-
-    private sealed class EmptyArray<T>
-    {
-        public static readonly T[] Value = new T[0];
-    }
-
-    public static T[] Empty<T>() => EmptyArray<T>.Value;
-
-#else
-
-        public static T[] Empty<T>() => Array.Empty<T>();
-
-#endif
-
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 
         /// <summary>
@@ -233,7 +212,7 @@ namespace LTRLib.Extensions
         /// </summary>
         /// <typeparam name="T">Type of elements in array</typeparam>
         /// <param name="o">Array reference variable to check for Null reference</param>
-        public static T[] Nz<T>(this T[]? o) => o ?? Empty<T>();
+        public static T[] Nz<T>(this T[]? o) => o ?? [];
 
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 
@@ -289,31 +268,31 @@ namespace LTRLib.Extensions
 
 #endif
 
-        public static void Invoke<T>(this ISynchronizeInvoke target, Action<T> method, T param) => target.Invoke(method, new object?[] { param });
+        public static void Invoke<T>(this ISynchronizeInvoke target, Action<T> method, T param) => target.Invoke(method, [param]);
 
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP3_0_OR_GREATER
 
-        public static IAsyncResult BeginInvoke<T1, T2>(this ISynchronizeInvoke target, Action<T1, T2> method, T1 param1, T2 param2) => target.BeginInvoke(method, new object?[] { param1, param2 });
+        public static IAsyncResult BeginInvoke<T1, T2>(this ISynchronizeInvoke target, Action<T1, T2> method, T1 param1, T2 param2) => target.BeginInvoke(method, [param1, param2]);
 
         public static void QueueInvoke<T1, T2>(this ISynchronizeInvoke target, Action<T1, T2> method, T1 param1, T2 param2) => RuntimeSupport.QueueInvoke(target.Invoke, method, param1, param2);
 
-        public static void Invoke<T1, T2>(this ISynchronizeInvoke target, Action<T1, T2> method, T1 param1, T2 param2) => target.Invoke(method, new object?[] { param1, param2 });
+        public static void Invoke<T1, T2>(this ISynchronizeInvoke target, Action<T1, T2> method, T1 param1, T2 param2) => target.Invoke(method, [param1, param2]);
 
-        public static IAsyncResult BeginInvoke<T1, T2, T3>(this ISynchronizeInvoke target, Action<T1, T2, T3> method, T1 param1, T2 param2, T3 param3) => target.BeginInvoke(method, new object?[] { param1, param2, param3 });
+        public static IAsyncResult BeginInvoke<T1, T2, T3>(this ISynchronizeInvoke target, Action<T1, T2, T3> method, T1 param1, T2 param2, T3 param3) => target.BeginInvoke(method, [param1, param2, param3]);
 
         public static void QueueInvoke<T1, T2, T3>(this ISynchronizeInvoke target, Action<T1, T2, T3> method, T1 param1, T2 param2, T3 param3) => RuntimeSupport.QueueInvoke(target.Invoke, method, param1, param2, param3);
 
-        public static void Invoke<T1, T2, T3>(this ISynchronizeInvoke target, Action<T1, T2, T3> method, T1 param1, T2 param2, T3 param3) => target.Invoke(method, new object?[] { param1, param2, param3 });
+        public static void Invoke<T1, T2, T3>(this ISynchronizeInvoke target, Action<T1, T2, T3> method, T1 param1, T2 param2, T3 param3) => target.Invoke(method, [param1, param2, param3]);
 
-        public static IAsyncResult BeginInvoke<T1, T2, T3, T4>(this ISynchronizeInvoke target, Action<T1, T2, T3, T4> method, T1 param1, T2 param2, T3 param3, T4 param4) => target.BeginInvoke(method, new object?[] { param1, param2, param3, param4 });
+        public static IAsyncResult BeginInvoke<T1, T2, T3, T4>(this ISynchronizeInvoke target, Action<T1, T2, T3, T4> method, T1 param1, T2 param2, T3 param3, T4 param4) => target.BeginInvoke(method, [param1, param2, param3, param4]);
 
-        public static void Invoke<T1, T2, T3, T4>(this ISynchronizeInvoke target, Action<T1, T2, T3, T4> method, T1 param1, T2 param2, T3 param3, T4 param4) => target.Invoke(method, new object?[] { param1, param2, param3, param4 });
+        public static void Invoke<T1, T2, T3, T4>(this ISynchronizeInvoke target, Action<T1, T2, T3, T4> method, T1 param1, T2 param2, T3 param3, T4 param4) => target.Invoke(method, [param1, param2, param3, param4]);
 
 #if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP3_0_OR_GREATER
 
         public static void QueueInvoke<T1, T2, T3, T4>(this ISynchronizeInvoke target, Action<T1, T2, T3, T4> method, T1 param1, T2 param2, T3 param3, T4 param4) => RuntimeSupport.QueueInvoke(target.Invoke, method, param1, param2, param3, param4);
 
-        public static void Invoke<T1, T2, T3, T4, T5>(this ISynchronizeInvoke target, Action<T1, T2, T3, T4, T5> method, T1 param1, T2 param2, T3 param3, T4 param4, T5 param5) => target.Invoke(method, new object?[] { param1, param2, param3, param4, param5 });
+        public static void Invoke<T1, T2, T3, T4, T5>(this ISynchronizeInvoke target, Action<T1, T2, T3, T4, T5> method, T1 param1, T2 param2, T3 param3, T4 param4, T5 param5) => target.Invoke(method, [param1, param2, param3, param4, param5]);
 
 #endif
 
@@ -322,27 +301,27 @@ namespace LTRLib.Extensions
 
         public static TResult? Invoke<TResult>(this ISynchronizeInvoke target, Func<TResult> method) => (TResult?)target.Invoke(method, default);
 
-        public static IAsyncResult BeginInvoke<T, TResult>(this ISynchronizeInvoke target, Func<T, TResult> method, T param) => target.BeginInvoke(method, new object?[] { param });
+        public static IAsyncResult BeginInvoke<T, TResult>(this ISynchronizeInvoke target, Func<T, TResult> method, T param) => target.BeginInvoke(method, [param]);
 
-        public static TResult? Invoke<T, TResult>(this ISynchronizeInvoke target, Func<T, TResult> method, T param) => (TResult?)target.Invoke(method, new object?[] { param });
+        public static TResult? Invoke<T, TResult>(this ISynchronizeInvoke target, Func<T, TResult> method, T param) => (TResult?)target.Invoke(method, [param]);
 
-        public static IAsyncResult BeginInvoke<T1, T2, TResult>(this ISynchronizeInvoke target, Func<T1, T2, TResult> method, T1 param1, T2 param2) => target.BeginInvoke(method, new object?[] { param1, param2 });
+        public static IAsyncResult BeginInvoke<T1, T2, TResult>(this ISynchronizeInvoke target, Func<T1, T2, TResult> method, T1 param1, T2 param2) => target.BeginInvoke(method, [param1, param2]);
 
-        public static TResult? Invoke<T1, T2, TResult>(this ISynchronizeInvoke target, Func<T1, T2, TResult> method, T1 param1, T2 param2) => (TResult?)target.Invoke(method, new object?[] { param1, param2 });
+        public static TResult? Invoke<T1, T2, TResult>(this ISynchronizeInvoke target, Func<T1, T2, TResult> method, T1 param1, T2 param2) => (TResult?)target.Invoke(method, [param1, param2]);
 
-        public static IAsyncResult BeginInvoke<T1, T2, T3, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, TResult> method, T1 param1, T2 param2, T3 param3) => target.BeginInvoke(method, new object?[] { param1, param2, param3 });
+        public static IAsyncResult BeginInvoke<T1, T2, T3, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, TResult> method, T1 param1, T2 param2, T3 param3) => target.BeginInvoke(method, [param1, param2, param3]);
 
-        public static TResult? Invoke<T1, T2, T3, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, TResult> method, T1 param1, T2 param2, T3 param3) => (TResult?)target.Invoke(method, new object?[] { param1, param2, param3 });
+        public static TResult? Invoke<T1, T2, T3, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, TResult> method, T1 param1, T2 param2, T3 param3) => (TResult?)target.Invoke(method, [param1, param2, param3]);
 
-        public static IAsyncResult BeginInvoke<T1, T2, T3, T4, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, T4, TResult> method, T1 param1, T2 param2, T3 param3, T4 param4) => target.BeginInvoke(method, new object?[] { param1, param2, param3, param4 });
+        public static IAsyncResult BeginInvoke<T1, T2, T3, T4, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, T4, TResult> method, T1 param1, T2 param2, T3 param3, T4 param4) => target.BeginInvoke(method, [param1, param2, param3, param4]);
 
-        public static TResult? Invoke<T1, T2, T3, T4, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, T4, TResult> method, T1 param1, T2 param2, T3 param3, T4 param4) => (TResult?)target.Invoke(method, new object?[] { param1, param2, param3, param4 });
+        public static TResult? Invoke<T1, T2, T3, T4, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, T4, TResult> method, T1 param1, T2 param2, T3 param3, T4 param4) => (TResult?)target.Invoke(method, [param1, param2, param3, param4]);
 
 #if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP3_0_OR_GREATER
 
-        public static IAsyncResult BeginInvoke<T1, T2, T3, T4, T5, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, T4, T5, TResult> method, T1 param1, T2 param2, T3 param3, T4 param4, T5 param5) => target.BeginInvoke(method, new object?[] { param1, param2, param3, param4, param5 });
+        public static IAsyncResult BeginInvoke<T1, T2, T3, T4, T5, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, T4, T5, TResult> method, T1 param1, T2 param2, T3 param3, T4 param4, T5 param5) => target.BeginInvoke(method, [param1, param2, param3, param4, param5]);
 
-        public static TResult? Invoke<T1, T2, T3, T4, T5, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, T4, T5, TResult> method, T1 param1, T2 param2, T3 param3, T4 param4, T5 param5) => (TResult?)target.Invoke(method, new object?[] { param1, param2, param3, param4, param5 });
+        public static TResult? Invoke<T1, T2, T3, T4, T5, TResult>(this ISynchronizeInvoke target, Func<T1, T2, T3, T4, T5, TResult> method, T1 param1, T2 param2, T3 param3, T4 param4, T5 param5) => (TResult?)target.Invoke(method, [param1, param2, param3, param4, param5]);
 
 #endif
 

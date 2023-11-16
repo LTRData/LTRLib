@@ -11,6 +11,9 @@ using System.Text;
 
 namespace LTRLib.IO.Printing;
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable IDE0057 // Use range operator
+
 public static class EpsonPrinter
 {
     public static string TagToEscape(string Text)
@@ -37,11 +40,11 @@ public static class EpsonPrinter
 
     }
 
-    public static string GetPrintFlashBitmapControl(byte ImageId, byte Scale) => Encoding.Default.GetString(new[] { (byte)0x1C, (byte)0x70, ImageId, Scale });
+    public static string GetPrintFlashBitmapControl(byte ImageId, byte Scale) => Encoding.Default.GetString([(byte)0x1C, (byte)0x70, ImageId, Scale]);
 
-    public static string GetPrintFlashBitmapControl(byte ImageId) => Encoding.Default.GetString(new[] { (byte)0x1C, (byte)0x70, ImageId, (byte)0 });
+    public static string GetPrintFlashBitmapControl(byte ImageId) => Encoding.Default.GetString([(byte)0x1C, (byte)0x70, ImageId, (byte)0]);
 
-    public static string GetPrintFlashBitmapControl() => Encoding.Default.GetString(new[] { (byte)0x1C, (byte)0x70, (byte)1, (byte)0 });
+    public static string GetPrintFlashBitmapControl() => Encoding.Default.GetString([(byte)0x1C, (byte)0x70, (byte)1, (byte)0]);
 
     public enum InternationalCharacterSet : byte
     {
@@ -223,21 +226,21 @@ public static class EpsonPrinter
 
     }
 
-    public static readonly string NormalFont = Encoding.Default.GetString(new[] { (byte)0x1B, (byte)0x21, (byte)0x0 });
-    public static readonly string HighFont = Encoding.Default.GetString(new[] { (byte)0x1B, (byte)0x21, (byte)0x10 });
-    public static readonly string WideFont = Encoding.Default.GetString(new[] { (byte)0x1B, (byte)0x21, (byte)0x20 });
-    public static readonly string LargeFont = Encoding.Default.GetString(new[] { (byte)0x1B, (byte)0x21, (byte)0x30 });
+    public static readonly string NormalFont = Encoding.Default.GetString([(byte)0x1B, (byte)0x21, (byte)0x0]);
+    public static readonly string HighFont = Encoding.Default.GetString([(byte)0x1B, (byte)0x21, (byte)0x10]);
+    public static readonly string WideFont = Encoding.Default.GetString([(byte)0x1B, (byte)0x21, (byte)0x20]);
+    public static readonly string LargeFont = Encoding.Default.GetString([(byte)0x1B, (byte)0x21, (byte)0x30]);
 
-    public static readonly string PrimaryColor = Encoding.Default.GetString(new[] { (byte)0x1B, (byte)0x72, (byte)0x0 });
-    public static readonly string SecondaryColor = Encoding.Default.GetString(new[] { (byte)0x1B, (byte)0x72, (byte)0x1 });
+    public static readonly string PrimaryColor = Encoding.Default.GetString([(byte)0x1B, (byte)0x72, (byte)0x0]);
+    public static readonly string SecondaryColor = Encoding.Default.GetString([(byte)0x1B, (byte)0x72, (byte)0x1]);
 
-    public static readonly byte[] SelectPrinter = { 0x1B, 0x3D, 0x1 };
-    public static readonly byte[] SelectDisplay = { 0x1B, 0x3D, 0x2 };
+    public static readonly byte[] SelectPrinter = [0x1B, 0x3D, 0x1];
+    public static readonly byte[] SelectDisplay = [0x1B, 0x3D, 0x2];
 
-    public static readonly byte[] DisplayGoToStart = { 0xD, 0xD };
+    public static readonly byte[] DisplayGoToStart = [0xD, 0xD];
 
-    public static readonly byte[] PageFeed = { 0xC };
+    public static readonly byte[] PageFeed = [0xC];
 
-    public static readonly byte[] PaperCut = { 0x1B, 0x6D };
+    public static readonly byte[] PaperCut = [0x1B, 0x6D];
 
 }

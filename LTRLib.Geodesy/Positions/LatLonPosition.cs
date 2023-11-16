@@ -53,9 +53,9 @@ public abstract class LatLonPosition
         Longitude = lon;
     }
 
-    private static readonly char[] _AA00aa00 = { 'A', 'A', '0', '0', 'a', 'a', '0', '0' };
-    private static readonly char[] _LL44ll44 = { 'L', 'L', '4', '4', 'l', 'l', '4', '4' };
-    private static readonly char[] _XX99xx99 = { 'X', 'X', '9', '9', 'x', 'x', '9', '9' };
+    private static readonly char[] _AA00aa00 = ['A', 'A', '0', '0', 'a', 'a', '0', '0'];
+    private static readonly char[] _LL44ll44 = ['L', 'L', '4', '4', 'l', 'l', '4', '4'];
+    private static readonly char[] _XX99xx99 = ['X', 'X', '9', '9', 'x', 'x', '9', '9'];
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
     protected LatLonPosition(ReadOnlySpan<char> lat_str, ReadOnlySpan<char> long_str, GeoFormat format)
@@ -242,7 +242,7 @@ public abstract class LatLonPosition
     }
 
     public void SetMaidenhead(string maidenhead, GridSquarePosition squarerelativepos) =>
-        SetMaidenhead(maidenhead, squarerelativepos);
+        SetMaidenhead(maidenhead.AsSpan(), squarerelativepos);
 
     /// <summary>
     /// Set the latitude value from a string. The string is

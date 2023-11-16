@@ -32,7 +32,7 @@ public abstract class NullSafeDictionary<TKey, TValue> : IDictionary<TKey, TValu
     /// </summary>
     public NullSafeDictionary()
     {
-        m_Dictionary = new Dictionary<TKey, TValue>();
+        m_Dictionary = [];
     }
 
     /// <summary>

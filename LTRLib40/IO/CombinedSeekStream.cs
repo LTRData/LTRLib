@@ -50,7 +50,7 @@ public class CombinedSeekStream : Stream, IHasPhysicalPosition
     {
         if (inputStreams is null || inputStreams.Length == 0)
         {
-            _streams = new DisposableDictionary<long, Stream>();
+            _streams = [];
 
             Extendable = true;
         }

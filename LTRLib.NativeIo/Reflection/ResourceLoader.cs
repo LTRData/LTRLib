@@ -61,7 +61,7 @@ public class ResourceLoader
         AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolver;
     }
 
-    private static readonly List<ResourceLoader> SearchAssemblies = new();
+    private static readonly List<ResourceLoader> SearchAssemblies = [];
 
     private ResourceLoader(Type Type)
     {
@@ -213,7 +213,7 @@ public class ResourceLoader
         var filename = ExtractResourceAsFile(resourcename, name, TemporaryDirectory);
         if (filename is not null && loadModule)
         {
-            if (LoadLibrary(filename) == IntPtr.Zero)
+            if (LoadLibrary(filename) == 0)
             {
                 Trace.WriteLine($"Unable to load '{filename}': {new Win32Exception().Message}");
             }

@@ -48,7 +48,7 @@ public static class HttpShared
     }
 
     public static readonly string[] PublicCacheableExtensions =
-    {
+    [
         ".html",
         ".txt",
         ".css",
@@ -70,10 +70,10 @@ public static class HttpShared
         ".jpg",
         ".gif",
         ".png"
-    };
+    ];
 
     public static readonly string[] EncodableExtensions =
-    {
+    [
         ".html",
         ".txt",
         ".css",
@@ -86,7 +86,7 @@ public static class HttpShared
         ".cpl",
         ".dll",
         ".pdb"
-    };
+    ];
 
     #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
     public static readonly Dictionary<string, Func<HashAlgorithm>> CheckSums = new(StringComparer.OrdinalIgnoreCase)

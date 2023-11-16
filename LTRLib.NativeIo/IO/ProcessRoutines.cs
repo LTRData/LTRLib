@@ -15,8 +15,11 @@ using System.Security.Principal;
 
 namespace LTRLib.IO;
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
+
 [SecurityCritical]
-public static class ProcessRoutines
+public static partial class ProcessRoutines
 {
     [Flags]
     public enum TokenAccess
@@ -118,16 +121,16 @@ public static class ProcessRoutines
 
     public readonly struct ProcessBasicInformation
     {
-        public IntPtr Reserved1 { get; }
-        public IntPtr PebBaseAddress { get; }
-        public IntPtr Reserved2 { get; }
-        public IntPtr Reserved3 { get; }
-        public IntPtr UniqueProcessId { get; }
-        public IntPtr ParentProcessId { get; }
+        public nint Reserved1 { get; }
+        public nint PebBaseAddress { get; }
+        public nint Reserved2 { get; }
+        public nint Reserved3 { get; }
+        public nint UniqueProcessId { get; }
+        public nint ParentProcessId { get; }
     }
 
     [SupportedOSPlatform("windows")]
-    private static class UnsafeNativeMethods
+    private static partial class UnsafeNativeMethods
     {
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern int GetLengthSid([In] byte[] pNativeData);
@@ -137,11 +140,11 @@ public static class ProcessRoutines
         public static extern bool IsValidSid([In] byte[] pNativeData);
 
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern int GetLengthSid(IntPtr pNativeData);
+        public static extern int GetLengthSid(nint pNativeData);
 
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool IsValidSid(IntPtr pNativeData);
+        public static extern bool IsValidSid(nint pNativeData);
 
 #if NET45_OR_GREATER || NETCOREAPP
 
@@ -157,10 +160,10 @@ public static class ProcessRoutines
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetTokenInformation(SafeAccessTokenHandle token, TokenInformationClass InformationClass, IntPtr Information, int InformationLength, out int ReturnLength);
+        public static extern bool GetTokenInformation(SafeAccessTokenHandle token, TokenInformationClass InformationClass, nint Information, int InformationLength, out int ReturnLength);
 
         [DllImport("ntdll.dll", SetLastError = false)]
-        public static extern int NtQueryInformationProcess(SafeProcessHandle hProcess, ProcessInfoClass ProcessInformationClass, IntPtr pProcessInformation, int uProcessInformationLength, out int puReturnLength);
+        public static extern int NtQueryInformationProcess(SafeProcessHandle hProcess, ProcessInfoClass ProcessInformationClass, nint pProcessInformation, int uProcessInformationLength, out int puReturnLength);
 #endif
     }
 
@@ -169,8 +172,8 @@ public static class ProcessRoutines
     [SupportedOSPlatform("windows")]
     public static unsafe ProcessBasicInformation QueryBasicInformation(this Process process)
     {
-        ProcessBasicInformation info;
-        Win32API.ThrowOnNtStatusFailed(UnsafeNativeMethods.NtQueryInformationProcess(process.SafeHandle, ProcessInfoClass.ProcessBasicInformation, new IntPtr(&info), sizeof(ProcessBasicInformation), out _));
+        ProcessBasicInformation info = default;
+        Win32API.ThrowOnNtStatusFailed(UnsafeNativeMethods.NtQueryInformationProcess(process.SafeHandle, ProcessInfoClass.ProcessBasicInformation, (nint)(&info), sizeof(ProcessBasicInformation), out _));
         return info;
     }
 
@@ -196,7 +199,7 @@ public static class ProcessRoutines
 #endif
 
     [SupportedOSPlatform("windows")]
-    public static int GetNativeSidLength(IntPtr psid) =>
+    public static int GetNativeSidLength(nint psid) =>
         UnsafeNativeMethods.IsValidSid(psid) ? UnsafeNativeMethods.GetLengthSid(psid) : 0;
 
     [SupportedOSPlatform("windows")]

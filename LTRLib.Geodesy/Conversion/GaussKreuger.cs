@@ -11,6 +11,8 @@
 using System;
 using System.Runtime.InteropServices;
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable IDE0057 // Use range operator
 #pragma warning disable IDE1006 // Naming Styles
 #pragma warning disable CS0618 // Type or member is obsolete
 

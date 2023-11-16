@@ -27,11 +27,11 @@ public static class XmlSupport
 
     public static readonly XmlWriterSettings XmlWriterSettings = new() { IndentChars = "  ", Indent = true, OmitXmlDeclaration = true };
 
-    public static readonly Dictionary<Type, XmlSerializer> XmlSerializers = new();
+    public static readonly Dictionary<Type, XmlSerializer> XmlSerializers = [];
 
-    public static readonly Dictionary<Type, XmlSerializerNamespaces> XmlNamespaces = new();
+    public static readonly Dictionary<Type, XmlSerializerNamespaces> XmlNamespaces = [];
 
-    public static readonly XmlSerializerNamespaces XmlSerializerEmptyNamespaces = new(new[] { new XmlQualifiedName("", "") });
+    public static readonly XmlSerializerNamespaces XmlSerializerEmptyNamespaces = new([new XmlQualifiedName("", "")]);
 
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 

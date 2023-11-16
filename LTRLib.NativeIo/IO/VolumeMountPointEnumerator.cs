@@ -10,6 +10,7 @@ using System.Text;
 using static LTRLib.IO.NativeConstants;
 using static LTRLib.IO.Win32API;
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable SYSLIB0003 // Type or member is obsolete
 
 namespace LTRLib.IO;
@@ -17,10 +18,9 @@ namespace LTRLib.IO;
 [SecurityCritical]
 [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.AllFlags)]
 [SupportedOSPlatform("windows")]
-public class VolumeMountPointEnumerator : IEnumerable<string>
+public class VolumeMountPointEnumerator(string VolumePath) : IEnumerable<string>
 {
-
-    public string VolumePath { get; set; }
+    public string VolumePath { get; set; } = VolumePath;
 
     [SecuritySafeCritical]
     public IEnumerator<string> GetEnumerator() => new Enumerator(VolumePath);
@@ -31,22 +31,10 @@ public class VolumeMountPointEnumerator : IEnumerable<string>
     [SecuritySafeCritical]
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
 
-    public VolumeMountPointEnumerator(string VolumePath)
+    public sealed class Enumerator(string volumePath) : IEnumerator<string>
     {
-        this.VolumePath = VolumePath;
-    }
-
-    public sealed class Enumerator : IEnumerator<string>
-    {
-
-        private readonly string _volumePath;
         private SafeFindVolumeMountPointHandle? _handle;
         private StringBuilder _sb = new(32767);
-
-        public Enumerator(string VolumePath)
-        {
-            _volumePath = VolumePath;
-        }
 
         public string Current
         {
@@ -85,7 +73,7 @@ public class VolumeMountPointEnumerator : IEnumerable<string>
 
             if (_handle is null)
             {
-                _handle = FindFirstVolumeMountPoint(_volumePath, _sb, _sb.Capacity);
+                _handle = FindFirstVolumeMountPoint(volumePath, _sb, _sb.Capacity);
                 if (!_handle.IsInvalid)
                 {
                     return true;

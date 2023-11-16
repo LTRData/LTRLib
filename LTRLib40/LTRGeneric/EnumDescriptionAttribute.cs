@@ -10,14 +10,7 @@ using System;
 namespace LTRLib.LTRGeneric;
 
 [AttributeUsage(AttributeTargets.Field)]
-public class EnumDescriptionAttribute : Attribute
+public class EnumDescriptionAttribute(string Description) : Attribute()
 {
-
-    public string Description;
-
-    public EnumDescriptionAttribute(string Description) : base()
-    {
-
-        this.Description = Description;
-    }
+    public string Description { get; set; } = Description;
 }

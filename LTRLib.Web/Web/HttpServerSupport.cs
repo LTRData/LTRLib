@@ -31,7 +31,7 @@ namespace LTRLib.Web;
 [XmlType("WebHttpServerSupport")]
 public static class HttpServerSupport
 {
-    private static readonly string[] _compressionHeaderIndicators = { "gzip", "deflate" };
+    private static readonly string[] _compressionHeaderIndicators = ["gzip", "deflate"];
 
     public static string GetRequestCompressionEncoding(this HttpRequest Request)
     {
@@ -196,7 +196,7 @@ public static class HttpServerSupport
 
     }
 
-    private static readonly string[] aspExtensions = { ".aspx", ".asp" };
+    private static readonly string[] aspExtensions = [".aspx", ".asp"];
 
     /// <summary>
     /// Adds automatic gzip and deflate compression support for dynamic content.

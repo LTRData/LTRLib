@@ -16,6 +16,8 @@ using System.Runtime.InteropServices;
 
 namespace LTRLib.Extensions;
 
+#pragma warning disable CS9191 // The 'ref' modifier for an argument corresponding to 'in' parameter is equivalent to 'in'. Consider using 'in' instead.
+
 public static class MathExtensions
 {
     public static int GetNumberOfDecimalsSafe(this decimal dec) => (decimal.GetBits(dec)[3] & 0xFF0000) >> 16;

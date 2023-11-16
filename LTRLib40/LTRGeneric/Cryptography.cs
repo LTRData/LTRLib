@@ -81,7 +81,7 @@ public static class Cryptography
     /// <param name="Encoding"></param>
     public static byte[] GetHash<T>(string str, Encoding Encoding) where T : HashAlgorithm, new()
     {
-        var bytes = str is null ? ReflectionExtensions.Empty<byte>() : Encoding.GetBytes(str);
+        var bytes = str is null ? [] : Encoding.GetBytes(str);
         return HashProviderCache<T>.Instance.ComputeHash(bytes);
     }
 

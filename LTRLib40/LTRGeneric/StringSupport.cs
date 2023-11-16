@@ -26,9 +26,9 @@ public static class StringSupport
     public static bool IsOSWindows { get; } = true;
 #endif
 
-    private static readonly string[] lineBreaks = new[] { "\r\n", "\r", "\n" };
-    private static readonly Type[] typesString = new[] { typeof(string) };
-    private static readonly Type[] typesStringAndFormatProvider = new[] { typeof(string), typeof(IFormatProvider) };
+    private static readonly string[] lineBreaks = ["\r\n", "\r", "\n"];
+    private static readonly Type[] typesString = [typeof(string)];
+    private static readonly Type[] typesStringAndFormatProvider = [typeof(string), typeof(IFormatProvider)];
 
     /// <summary>
     /// Parses a string and returns value as specified type
@@ -327,7 +327,7 @@ public static class StringSupport
         }
     }
 
-    private static readonly string[] _ValidSwedishPersonalIdNumber_Formats = { "yyyyMMdd", "yyMMdd" };
+    private static readonly string[] _ValidSwedishPersonalIdNumber_Formats = ["yyyyMMdd", "yyMMdd"];
 
     /// <summary>
     /// Ensures that a character sequence contains a valid personal Swedish Id number.

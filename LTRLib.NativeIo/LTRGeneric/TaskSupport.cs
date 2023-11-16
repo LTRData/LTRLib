@@ -21,7 +21,7 @@ using System.Linq;
 
 namespace LTRLib.LTRGeneric;
 
-public static class TaskSupport
+public static partial class TaskSupport
 {
 #if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
 
@@ -43,21 +43,36 @@ public static class TaskSupport
         NativeWaitHandle.DuplicateExisting(process.Handle, inheritable);
 #endif
 
-    private sealed class NativeWaitHandle : WaitHandle
+    private sealed partial class NativeWaitHandle : WaitHandle
     {
+#if NET7_0_OR_GREATER
+        [LibraryImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool DuplicateHandle(nint hSourceProcessHandle,
+                                                    nint hSourceHandle,
+                                                    nint hTargetProcessHandle,
+                                                    out SafeWaitHandle lpTargetHandle,
+                                                    uint dwDesiredAccess,
+                                                    [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle,
+                                                    uint dwOptions);
+
+        [LibraryImport("kernel32.dll", SetLastError = true)]
+        private static partial nint GetCurrentProcess();
+#else
         [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool DuplicateHandle(IntPtr hSourceProcessHandle,
-                                                   IntPtr hSourceHandle,
-                                                   IntPtr hTargetProcessHandle,
+        private static extern bool DuplicateHandle(nint hSourceProcessHandle,
+                                                   nint hSourceHandle,
+                                                   nint hTargetProcessHandle,
                                                    out SafeWaitHandle lpTargetHandle,
                                                    uint dwDesiredAccess,
                                                    bool bInheritHandle,
                                                    uint dwOptions);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr GetCurrentProcess();
+        private static extern nint GetCurrentProcess();
+#endif
 
-        public static NativeWaitHandle DuplicateExisting(IntPtr handle, bool inheritable)
+        public static NativeWaitHandle DuplicateExisting(nint handle, bool inheritable)
         {
             if (!DuplicateHandle(GetCurrentProcess(), handle, GetCurrentProcess(), out var new_handle, 0, inheritable, 0x2))
             {
@@ -84,7 +99,7 @@ public readonly struct ProcessAwaiter : ICriticalNotifyCompletion
     {
         try
         {
-            if (process is null || process.Handle == IntPtr.Zero)
+            if (process is null || process.Handle == default)
             {
                 Process = null;
                 return;
@@ -135,19 +150,11 @@ public readonly struct ProcessAwaiter : ICriticalNotifyCompletion
     }
 }
 
-public sealed class WaitHandleAwaiter : ICriticalNotifyCompletion
+public sealed class WaitHandleAwaiter(WaitHandle handle, TimeSpan timeout) : ICriticalNotifyCompletion
 {
-    private readonly WaitHandle handle;
-    private readonly TimeSpan timeout;
     private RegisteredWaitHandle? callbackHandle;
     private Action? continuation;
     private bool result = true;
-
-    public WaitHandleAwaiter(WaitHandle handle, TimeSpan timeout)
-    {
-        this.handle = handle;
-        this.timeout = timeout;
-    }
 
     public WaitHandleAwaiter GetAwaiter() => this;
 

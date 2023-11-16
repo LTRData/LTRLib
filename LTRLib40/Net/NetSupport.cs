@@ -90,7 +90,7 @@ public static class NetSupport
 
     }
 
-    private static readonly Dictionary<string, byte[]> _DownloadAndCacheData_cache = new();
+    private static readonly Dictionary<string, byte[]> _DownloadAndCacheData_cache = [];
 
     [Obsolete("Use DownloadAndCacheDataAsync instead.")]
     public static byte[]? DownloadAndCacheData(string str)

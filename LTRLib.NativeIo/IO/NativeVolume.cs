@@ -20,12 +20,13 @@ using System.Runtime.Versioning;
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable IDE0056 // Use index operator
-#pragma warning disable CS0649
+#pragma warning disable IDE0057 // Use range operator
+#pragma warning disable IDE0290 // Use primary constructor
 
 namespace LTRLib.IO;
 
 [SupportedOSPlatform("windows")]
-public static class NativeVolume
+public static partial class NativeVolume
 {
 
     public static IEnumerable<FileExtent> EnumerateFileExtents(string path) => EnumerateFileExtents(path, 0);
@@ -39,6 +40,18 @@ public static class NativeVolume
         }
     }
 
+#if NET7_0_OR_GREATER
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static unsafe partial bool DeviceIoControl(SafeFileHandle hDevice,
+                                                        uint dwIoControlCode,
+                                                        void* lpInBuffer,
+                                                        int nInBufferSize,
+                                                        void* lpOutBuffer,
+                                                        int nOutBufferSize,
+                                                        uint* lpBytesReturned,
+                                                        NativeOverlapped* lpOverlapped);
+#else
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     internal static extern unsafe bool DeviceIoControl(SafeFileHandle hDevice,
                                                        uint dwIoControlCode,
@@ -48,6 +61,7 @@ public static class NativeVolume
                                                        int nOutBufferSize,
                                                        uint* lpBytesReturned,
                                                        NativeOverlapped* lpOverlapped);
+#endif
 
     internal static unsafe FileExtent? GetNextFileExtent(SafeFileHandle file, long start_vcn)
     {
@@ -263,7 +277,7 @@ public static class NativeVolume
             NumberOfClusters = buffer->BitmapSize;
             Bitmap = new byte[byte_size - 16];
 
-            Marshal.Copy(new IntPtr(&buffer->Buffer), Bitmap, 0, Bitmap.Length);
+            Marshal.Copy((nint)(&buffer->Buffer), Bitmap, 0, Bitmap.Length);
         }
     }
 

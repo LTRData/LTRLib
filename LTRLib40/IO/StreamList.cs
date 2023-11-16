@@ -46,7 +46,7 @@ public class StreamList : Stream, IList<Stream>
 
     public StreamList()
     {
-        List = new DisposableList<Stream>();
+        List = [];
     }
 
     public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();

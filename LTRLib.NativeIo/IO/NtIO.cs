@@ -13,7 +13,9 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using static LTRLib.IO.NativeConstants;
 
-#pragma warning disable CS0649
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable IDE0057 // Use range operator
+#pragma warning disable IDE0290 // Use primary constructor
 
 namespace LTRLib.IO;
 
@@ -104,8 +106,49 @@ public enum CreateOptions : uint
 }
 
 [SupportedOSPlatform("windows")]
-public static class NtIO
+public static partial class NtIO
 {
+#if NET7_0_OR_GREATER
+    [LibraryImport("ntdll.dll")]
+    internal static unsafe partial int NtQueryDirectoryFile(SafeFileHandle FileHandle,
+                                                           void* Event,
+                                                           delegate*<void*, IoStatusBlock*, uint, void> ApcRoutine,
+                                                           void* ApcContext,
+                                                           out IoStatusBlock IoStatusBlock,
+                                                           void* FileInformation,
+                                                           uint Length,
+                                                           FILE_INFORMATION_CLASS FileInformationClass,
+                                                           byte ReturnSingleEntry,
+                                                           UNICODE_STRING* FileName,
+                                                           byte RestartScan);
+
+    [LibraryImport("ntdll.dll")]
+    internal static unsafe partial int NtQueryInformationFile(SafeFileHandle FileHandle,
+                                                             out IoStatusBlock IoStatusBlock,
+                                                             void* FileInformation,
+                                                             uint Length,
+                                                             FILE_INFORMATION_CLASS FileInformationClass);
+
+    [LibraryImport("ntdll.dll")]
+    internal static unsafe partial int NtCreateFile(out SafeFileHandle FileHandle,
+                                                    uint DesiredAccess,
+                                                    in ObjectAttributes ObjectAttributes,
+                                                    out IoStatusBlock IoStatusBlock,
+                                                    long* AllocationSize,
+                                                    FileAttributes FileAttributes,
+                                                    FileShare ShareAccess,
+                                                    CreateDisposition CreateDisposition,
+                                                    CreateOptions CreateOptions,
+                                                    void* EaBuffer,
+                                                    uint EaLength);
+
+    [LibraryImport("ntdll.dll")]
+    internal static unsafe partial int NtQueryVolumeInformationFile(SafeFileHandle FileHandle,
+                                                                   out IoStatusBlock IoStatusBlock,
+                                                                   void* FsInformation,
+                                                                   uint Length,
+                                                                   FSINFOCLASS FsInformationClass);
+#else
     [DllImport("ntdll.dll")]
     internal static extern unsafe int NtQueryDirectoryFile(SafeFileHandle FileHandle,
                                                            void* Event,
@@ -125,6 +168,27 @@ public static class NtIO
                                                              void* FileInformation,
                                                              uint Length,
                                                              FILE_INFORMATION_CLASS FileInformationClass);
+
+    [DllImport("ntdll.dll")]
+    internal static extern unsafe int NtCreateFile(out SafeFileHandle FileHandle,
+                                                   uint DesiredAccess,
+                                                   in ObjectAttributes ObjectAttributes,
+                                                   out IoStatusBlock IoStatusBlock,
+                                                   long* AllocationSize,
+                                                   FileAttributes FileAttributes,
+                                                   FileShare ShareAccess,
+                                                   CreateDisposition CreateDisposition,
+                                                   CreateOptions CreateOptions,
+                                                   void* EaBuffer,
+                                                   uint EaLength);
+
+    [DllImport("ntdll.dll")]
+    internal static extern unsafe int NtQueryVolumeInformationFile(SafeFileHandle FileHandle,
+                                                                   out IoStatusBlock IoStatusBlock,
+                                                                   void* FsInformation,
+                                                                   uint Length,
+                                                                   FSINFOCLASS FsInformationClass);
+#endif
 
     public static FileStream OpenFileStream(string base_path,
                                             string relative_path,
@@ -172,7 +236,7 @@ public static class NtIO
     {
         fixed (char* path_ptr = relative_path)
         {
-            var us_path = new UNICODE_STRING(new IntPtr(path_ptr), checked((ushort)(relative_path.Length * 2)));
+            var us_path = new UNICODE_STRING((nint)path_ptr, checked((ushort)(relative_path.Length * 2)));
 
             var ref_success = false;
 
@@ -202,19 +266,6 @@ public static class NtIO
         }
     }
 
-    [DllImport("ntdll.dll")]
-    internal static extern unsafe int NtCreateFile(out SafeFileHandle FileHandle,
-                                                   uint DesiredAccess,
-                                                   in ObjectAttributes ObjectAttributes,
-                                                   out IoStatusBlock IoStatusBlock,
-                                                   [In] long* AllocationSize,
-                                                   FileAttributes FileAttributes,
-                                                   FileShare ShareAccess,
-                                                   CreateDisposition CreateDisposition,
-                                                   CreateOptions CreateOptions,
-                                                   void* EaBuffer,
-                                                   uint EaLength);
-
     public static unsafe SafeFileHandle OpenFileHandle(string nt_path,
                                                        FileAccess file_access,
                                                        FileAttributes file_attributes,
@@ -224,7 +275,7 @@ public static class NtIO
     {
         fixed (char* path_ptr = nt_path)
         {
-            var us_path = new UNICODE_STRING(new IntPtr(path_ptr), checked((ushort)(nt_path.Length * 2)));
+            var us_path = new UNICODE_STRING((nint)path_ptr, checked((ushort)(nt_path.Length * 2)));
 
             var objattr = new ObjectAttributes(&us_path, ObjectAccess.CaseInsensitive | ObjectAccess.OpenIf);
 
@@ -277,13 +328,6 @@ public static class NtIO
 
         return fs_size_info;
     }
-
-    [DllImport("ntdll.dll")]
-    internal static extern unsafe int NtQueryVolumeInformationFile(SafeFileHandle FileHandle,
-                                                                   out IoStatusBlock IoStatusBlock,
-                                                                   void* FsInformation,
-                                                                   uint Length,
-                                                                   FSINFOCLASS FsInformationClass);
 }
 
 public enum FSINFOCLASS
@@ -302,11 +346,11 @@ public enum FSINFOCLASS
 [Serializable]
 public readonly struct IoStatusBlock
 {
-    public IntPtr Pointer { get; }
+    public nint Pointer { get; }
 
     public UIntPtr Information { get; }
 
-    public int Status => Pointer.ToInt32();
+    public int Status => (int)Pointer;
 }
 
 public class FileExtent

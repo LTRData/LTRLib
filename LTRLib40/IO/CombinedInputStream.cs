@@ -14,18 +14,13 @@ using System.Threading.Tasks;
 
 namespace LTRLib.IO;
 
-public class CombinedInputStream : Stream, IHasPhysicalPosition
+public class CombinedInputStream(IEnumerable<Stream> inputStreams) : Stream, IHasPhysicalPosition
 {
-    private IEnumerator<Stream>? _enum;
+    private IEnumerator<Stream>? _enum = inputStreams?.GetEnumerator();
 
     public CombinedInputStream(params Stream[] inputStreams)
         : this(inputStreams as IEnumerable<Stream>)
     {
-    }
-
-    public CombinedInputStream(IEnumerable<Stream> inputStreams)
-    {
-        _enum = inputStreams?.GetEnumerator();
     }
 
     public override int Read(byte[] buffer, int index, int count)

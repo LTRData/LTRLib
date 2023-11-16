@@ -254,7 +254,7 @@ public class WGS84Position
         var maxLon = Longitude + AngleFactor * rad / EarthRadius / Math.Cos(Latitude / AngleFactor);
         var minLon = Longitude - AngleFactor * rad / EarthRadius / Math.Cos(Latitude / AngleFactor);
 
-        return new[] {
+        return [
                 new WGS84Position {
                     Latitude = minLat,
                     Longitude = minLon
@@ -271,7 +271,7 @@ public class WGS84Position
                     Latitude = minLat,
                     Longitude = maxLon
                 }
-            };
+            ];
     }
 
 }

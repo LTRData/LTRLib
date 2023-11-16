@@ -47,7 +47,7 @@ public static class Verhoeff
     };
 
     // The inverse table
-    private static readonly int[] inv = { 0, 4, 3, 2, 1, 5, 6, 7, 8, 9 };
+    private static readonly int[] inv = [0, 4, 3, 2, 1, 5, 6, 7, 8, 9];
 
     /// <summary>
     /// Validates that an entered number is Verhoeff compliant.

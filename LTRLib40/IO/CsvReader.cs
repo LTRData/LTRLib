@@ -24,9 +24,9 @@ namespace LTRLib.IO;
 
 public abstract partial class CsvReader : MarshalByRefObject, IEnumerable, IEnumerator, IDisposable
 {
-    protected readonly char[] _Delimiters = { ',' };
+    protected readonly char[] _Delimiters = [','];
 
-    protected readonly char[] _Textquotes = { '"' };
+    protected readonly char[] _Textquotes = ['"'];
 
     public TextReader BaseReader { get; }
 
@@ -126,7 +126,7 @@ public partial class CsvReader<T> : CsvReader, IEnumerable<T>, IEnumerator<T> wh
     protected readonly Action<T, string>?[] _Properties;
 
     private static readonly MethodInfo _EnumParse
-        = typeof(Enum).GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(Type), typeof(string) }, null)!;
+        = typeof(Enum).GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, [typeof(Type), typeof(string)], null)!;
 
     /// <summary>Generate a specific member setter for a specific reference type</summary>
     /// <param name="member_name">The member's name as defined in <typeparamref name="T"/></param>
@@ -175,7 +175,7 @@ public partial class CsvReader<T> : CsvReader, IEnumerable<T>, IEnumerator<T> wh
         }
         else
         {
-            var method = member.Type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(string) }, null);
+            var method = member.Type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, [typeof(string)], null);
 
             if (method is not null)
             {

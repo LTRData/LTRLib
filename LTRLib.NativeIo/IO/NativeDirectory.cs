@@ -149,8 +149,8 @@ public class NativeFileInfo
         }
 
         using var handle = Win32API.CreateFile(path, 0,
-            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, IntPtr.Zero,
-            OPEN_EXISTING, (int)FILE_FLAG_BACKUP_SEMANTICS, IntPtr.Zero);
+            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0,
+            OPEN_EXISTING, (int)FILE_FLAG_BACKUP_SEMANTICS, 0);
 
         if (handle.IsInvalid)
         {
@@ -317,7 +317,7 @@ internal readonly struct FILE_MODE_INFORMATION
 internal readonly unsafe struct FILE_RENAME_INFORMATION
 {
     public byte ReplaceIfExists { get; }
-    public IntPtr RootDirectory { get; }
+    public nint RootDirectory { get; }
     public uint FileNameLength { get; }
     internal readonly char FileName;
 }
@@ -325,7 +325,7 @@ internal readonly unsafe struct FILE_RENAME_INFORMATION
 internal readonly unsafe struct FILE_LINK_INFORMATION
 {
     public byte ReplaceIfExists { get; }
-    public IntPtr RootDirectory { get; }
+    public nint RootDirectory { get; }
     public uint FileNameLength { get; }
     internal readonly char FileName;
 }
@@ -355,7 +355,7 @@ internal unsafe struct FILE_COMPRESSION_INFORMATION
 
 internal readonly struct FILE_COMPLETION_INFORMATION
 {
-    public IntPtr Port { get; }
+    public nint Port { get; }
     public uint Key { get; }
 }
 
@@ -460,7 +460,7 @@ public static class NativeDirectory
     {
         if (returnHardLinkedOnce && linkList is null)
         {
-            linkList = new List<long>();
+            linkList = [];
         }
 
         foreach (var entry in new NativeFileFinder(path, pattern))
@@ -581,7 +581,7 @@ internal class NativeFileIterator : IDisposable, IEnumerator<NativeDirectoryEntr
     }
 
     public NativeFileIterator(string directory, string? pattern)
-        : this(directory, pattern, Win32API.CreateFile(directory, 1u, 7u, IntPtr.Zero, 3u, 33554432, IntPtr.Zero), ownsHandle: true)
+        : this(directory, pattern, Win32API.CreateFile(directory, 1u, 7u, 0, 3u, 33554432, 0), ownsHandle: true)
     {
         try
         {
@@ -616,8 +616,6 @@ internal class NativeFileIterator : IDisposable, IEnumerator<NativeDirectoryEntr
 
     public virtual unsafe bool MoveNext()
     {
-        UNICODE_STRING name = default;
-
         fixed (byte* ptr = finder)
         {
             int status;
@@ -631,7 +629,7 @@ internal class NativeFileIterator : IDisposable, IEnumerator<NativeDirectoryEntr
                 fixed (char* namechars = pattern)
                 {
                     var num = checked((ushort)(pattern.Length << 1));
-                    name = new(new IntPtr(namechars), num);
+                    var name = new UNICODE_STRING((nint)namechars, num);
                     status = NtIO.NtQueryDirectoryFile(handle, null, null, null, out _, ptr, (uint)finder.Length, FILE_INFORMATION_CLASS.FileIdBothDirectoryInformation, 1, &name, 1);
                 }
             }

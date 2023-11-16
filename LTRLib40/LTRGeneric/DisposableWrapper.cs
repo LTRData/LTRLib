@@ -36,18 +36,9 @@ public abstract class DisposableWrapper : IDisposable
 
 }
 
-public sealed class DisposableWrapper<T> : DisposableWrapper where T : IDisposable
+public sealed class DisposableWrapper<T>(IEnumerable<T> objects) : DisposableWrapper where T : IDisposable
 {
-
-    private IEnumerable<T> objects;
-
     private bool disposedValue; // To detect redundant calls
-
-    public DisposableWrapper(IEnumerable<T> objects)
-    {
-        this.objects = objects;
-
-    }
 
     // IDisposable
     protected override void Dispose(bool disposing)

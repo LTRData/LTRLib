@@ -3,6 +3,9 @@ using System;
 
 namespace LTRLib.Geodesy.Positions;
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable IDE0057 // Use range operator
+
 public static class GenericParser
 {
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
@@ -39,7 +42,7 @@ public static class GenericParser
     public static Position Parse(string value)
     {
         if (value.Length >= 7 &&
-            value.IndexOf(',') >= 0 &&
+            value.Contains(',') &&
             value.TrimStart().Substring(0, 2).Equals("x=", StringComparison.OrdinalIgnoreCase) &&
             value.Substring(value.IndexOf(',') + 1).TrimStart().Substring(0, 2).Equals("y=", StringComparison.OrdinalIgnoreCase))
         {

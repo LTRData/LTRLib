@@ -24,8 +24,55 @@ public enum CompressionFormatAndEngine : ushort
 }
 
 [SupportedOSPlatform("windows")]
-public static unsafe class NativeCompression
+public static unsafe partial class NativeCompression
 {
+#if NET7_0_OR_GREATER
+    [LibraryImport("ntdll.dll", SetLastError = false)]
+    private static partial int RtlCompressBuffer(
+        CompressionFormatAndEngine CompressionFormatAndEngine,
+        byte* UncompressedBuffer,
+        int UncompressedBufferSize,
+        byte* CompressedBuffer,
+        int CompressedBufferSize,
+        int UncompressedChunkSize,
+        out int FinalCompressedSize,
+        byte* WorkSpace);
+
+    [LibraryImport("ntdll.dll", SetLastError = false)]
+    private static partial int RtlDecompressBuffer(
+        CompressionFormatAndEngine CompressionFormatAndEngine,
+        byte* UncompressedBuffer,
+        int UncompressedBufferSize,
+        byte* CompressedBuffer,
+        int CompressedBufferSize,
+        out int FinalUncompressedSize);
+
+    [LibraryImport("ntdll.dll", SetLastError = false)]
+    private static partial int RtlDecompressBufferEx(
+        CompressionFormatAndEngine CompressionFormatAndEngine,
+        byte* UncompressedBuffer,
+        int UncompressedBufferSize,
+        byte* CompressedBuffer,
+        int CompressedBufferSize,
+        out int FinalUncompressedSize,
+        byte* WorkSpace);
+
+    [LibraryImport("ntdll.dll", SetLastError = false)]
+    private static partial int RtlDecompressBufferEx2(
+        CompressionFormatAndEngine CompressionFormatAndEngine,
+        byte* UncompressedBuffer,
+        int UncompressedBufferSize,
+        byte* CompressedBuffer,
+        int CompressedBufferSize,
+        out int FinalUncompressedSize,
+        byte* WorkSpace);
+
+    [LibraryImport("ntdll.dll", SetLastError = false)]
+    private static partial int RtlGetCompressionWorkSpaceSize(
+      CompressionFormatAndEngine CompressionFormatAndEngine,
+      out int CompressBufferWorkSpaceSize,
+      out int CompressFragmentWorkSpaceSize);
+#else
     [DllImport("ntdll.dll", SetLastError = false)]
     private static extern int RtlCompressBuffer(
         CompressionFormatAndEngine CompressionFormatAndEngine,
@@ -71,6 +118,7 @@ public static unsafe class NativeCompression
       CompressionFormatAndEngine CompressionFormatAndEngine,
       out int CompressBufferWorkSpaceSize,
       out int CompressFragmentWorkSpaceSize);
+#endif
 
     public static int GetCompressBufferWorkSpaceSize(CompressionFormatAndEngine CompressionFormatAndEngine)
     {

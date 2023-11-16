@@ -18,6 +18,7 @@ using System.Security.Permissions;
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable IDE1006 // Naming Styles
 #pragma warning disable SYSLIB0003 // Type or member is obsolete
+#pragma warning disable IDE0290 // Use primary constructor
 
 namespace LTRLib.IO;
 
@@ -146,16 +147,16 @@ public static class NativeConstants
 
         public ushort MaximumLength { get; }
 
-        private readonly IntPtr Buffer;
+        private readonly nint Buffer;
 
-        public UNICODE_STRING(IntPtr buffer, ushort length, ushort maximumLength)
+        public UNICODE_STRING(nint buffer, ushort length, ushort maximumLength)
         {
             Buffer = buffer;
             Length = length;
             MaximumLength = maximumLength;
         }
 
-        public UNICODE_STRING(IntPtr buffer, ushort length)
+        public UNICODE_STRING(nint buffer, ushort length)
         {
             Buffer = buffer;
             Length = length;
@@ -168,8 +169,8 @@ public static class NativeConstants
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct MEMORY_BASIC_INFORMATION
     {
-        public IntPtr BaseAddress { get; }
-        public IntPtr AllocationBase { get; }
+        public nint BaseAddress { get; }
+        public nint AllocationBase { get; }
         public uint AllocationProtect { get; }
         public UIntPtr RegionSize { get; }
         public uint State { get; }
@@ -426,13 +427,13 @@ public static class NativeConstants
     {
         public int Length { get; }
 
-        public IntPtr SecurityDescriptor { get; }
+        public nint SecurityDescriptor { get; }
 
         [field: MarshalAs(UnmanagedType.Bool)]
         public readonly bool InheritHandle { get; }
 
         [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.AllFlags)]
-        public SECURITY_ATTRIBUTES(IntPtr SecurityDescriptor, bool InheritHandle)
+        public SECURITY_ATTRIBUTES(nint SecurityDescriptor, bool InheritHandle)
             : this()
         {
             this.SecurityDescriptor = SecurityDescriptor;

@@ -57,18 +57,11 @@ public class ManagementPath
     public string NamespacePath { get; set; } = @"root\cimv2";
 }
 
-public class ManagementClass
+public class ManagementClass(ManagementScope scope, ManagementPath path, ObjectGetOptions options)
 {
-    public ManagementClass(ManagementScope scope, ManagementPath path, ObjectGetOptions options)
-    {
-        Scope = scope ?? new();
-        Path = path;
-        Options = options;
-    }
-
-    public ManagementScope Scope { get; }
-    public ManagementPath Path { get; }
-    public ObjectGetOptions Options { get; }
+    public ManagementScope Scope { get; } = scope ?? new();
+    public ManagementPath Path { get; } = path;
+    public ObjectGetOptions Options { get; } = options;
 
     public ManagementObject CreateInstance() => new(Scope, Path, Options);
 
@@ -308,17 +301,11 @@ public class ManagementObjectCollection : IReadOnlyCollection<ManagementObject>
 
 }
 
-public class ManagementObjectSearcher
+public class ManagementObjectSearcher(ManagementScope mgmtScope, SelectQuery selectQuery)
 {
-    public ManagementObjectSearcher(ManagementScope mgmtScope, SelectQuery selectQuery)
-    {
-        Scope = mgmtScope;
-        SelectQuery = selectQuery;
-    }
-
     public EnumerationOptions? Options { get; set; }
-    public ManagementScope Scope { get; }
-    public SelectQuery SelectQuery { get; }
+    public ManagementScope Scope { get; } = mgmtScope;
+    public SelectQuery SelectQuery { get; } = selectQuery;
 
     public ManagementObjectCollection Get()
     {

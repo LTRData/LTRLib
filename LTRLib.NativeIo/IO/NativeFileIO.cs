@@ -45,7 +45,7 @@ public static class NativeFileIO
     public static bool TestFileOpen(string path)
     {
 
-        using var handle = CreateFile(path, FILE_READ_ATTRIBUTES, 0U, IntPtr.Zero, OPEN_EXISTING, 0, IntPtr.Zero);
+        using var handle = CreateFile(path, FILE_READ_ATTRIBUTES, 0U, 0, OPEN_EXISTING, 0, 0);
 
         return !handle.IsInvalid;
 
@@ -53,7 +53,7 @@ public static class NativeFileIO
 
     public static long GetVolumeSize(SafeFileHandle volume)
     {
-        if (!DeviceIoControl(volume, IOCTL_DISK_GET_LENGTH_INFO, IntPtr.Zero, 0U, out long length, 8U, out _, IntPtr.Zero))
+        if (!DeviceIoControl(volume, IOCTL_DISK_GET_LENGTH_INFO, 0, 0U, out long length, 8U, out _, 0))
         {
             throw new Win32Exception();
         }
@@ -164,7 +164,7 @@ public static class NativeFileIO
 
         NativeFlagsAndAttributes += (int)Options;
 
-        var Handle = CreateFile(FileName, NativeDesiredAccess, NativeShareMode, IntPtr.Zero, NativeCreationDisposition, NativeFlagsAndAttributes, IntPtr.Zero);
+        var Handle = CreateFile(FileName, NativeDesiredAccess, NativeShareMode, 0, NativeCreationDisposition, NativeFlagsAndAttributes, 0);
         if (Handle.IsInvalid)
         {
             throw new Win32Exception();
@@ -286,12 +286,12 @@ public static class NativeFileIO
     }
 
     private static void SetFileCompressionState(SafeFileHandle SafeFileHandle, ushort State)
-        => Win32Try(DeviceIoControl(SafeFileHandle, FSCTL_SET_COMPRESSION, State, 2U, IntPtr.Zero, 0U, out _, IntPtr.Zero));
+        => Win32Try(DeviceIoControl(SafeFileHandle, FSCTL_SET_COMPRESSION, State, 2U, 0, 0U, out _, 0));
 
     public static void CreateDirectory(string path) =>
 
 #if NETFRAMEWORK && !NET462_OR_GREATER
-        Win32Try(Win32API.CreateDirectory(path, IntPtr.Zero));
+        Win32Try(Win32API.CreateDirectory(path, 0));
 #else
         Directory.CreateDirectory(path);
 #endif
@@ -322,7 +322,7 @@ public static class NativeFileIO
     {
 
         var hModule = Load ? LoadLibrary(ModuleName) : GetModuleHandle(ModuleName);
-        if (hModule == IntPtr.Zero)
+        if (hModule == 0)
         {
             throw new Win32Exception();
         }
@@ -412,7 +412,7 @@ public static class NativeFileIO
 
     [Obsolete]
     [SecuritySafeCritical]
-    public static Delegate GetProcAddress(IntPtr hModule, string procedureName, Type delegateType)
+    public static Delegate GetProcAddress(nint hModule, string procedureName, Type delegateType)
     {
 
         return GetDelegateForFunctionPointer(Win32Try(Win32API.GetProcAddress(hModule, procedureName)), delegateType);
@@ -430,7 +430,7 @@ public static class NativeFileIO
     }
 
     [SecuritySafeCritical]
-    public static T GetProcAddress<T>(IntPtr hModule, string procedureName)
+    public static T GetProcAddress<T>(nint hModule, string procedureName)
     {
 
         return GetDelegateForFunctionPointer<T>(Win32Try(Win32API.GetProcAddress(hModule, procedureName)));
@@ -448,7 +448,7 @@ public static class NativeFileIO
 
 #else
     [SecuritySafeCritical]
-    public static Delegate GetProcAddress(IntPtr hModule, string procedureName, Type delegateType) =>
+    public static Delegate GetProcAddress(nint hModule, string procedureName, Type delegateType) =>
         GetDelegateForFunctionPointer(Win32Try(Win32API.GetProcAddress(hModule, procedureName)), delegateType);
 
     [SecuritySafeCritical]
@@ -468,7 +468,7 @@ public static class NativeFileIO
     /// <param name="hDevice">Handle to device.</param>
     public static DISK_GEOMETRY? GetDiskGeometry(SafeFileHandle hDevice)
     {
-        if (DeviceIoControl(hDevice, IOCTL_DISK_GET_DRIVE_GEOMETRY, IntPtr.Zero, 0U, out var DiskGeometry, MarshalSupport<DISK_GEOMETRY>.Size, out _, default))
+        if (DeviceIoControl(hDevice, IOCTL_DISK_GET_DRIVE_GEOMETRY, 0, 0U, out var DiskGeometry, MarshalSupport<DISK_GEOMETRY>.Size, out _, default))
         {
 
             return DiskGeometry;
@@ -546,7 +546,7 @@ public static class NativeFileIO
     {
         fixed (T* pinptr = values)
         {
-            Win32Try(RtlGenRandom(new IntPtr(pinptr), Buffer.ByteLength(values)));
+            Win32Try(RtlGenRandom((nint)pinptr, Buffer.ByteLength(values)));
         }
     }
 
@@ -559,7 +559,7 @@ public static class NativeFileIO
 
         fixed (T* ptr = values)
         {
-            Win32Try(RtlGenRandom(new IntPtr(ptr + startIndex), count * sizeof(T)));
+            Win32Try(RtlGenRandom((nint)(ptr + startIndex), count * sizeof(T)));
         }
     }
 
@@ -619,7 +619,7 @@ public static class NativeFileIO
         var struct_size = SizeOf(typeof(DiskExtents));
 #endif
 
-        var rc = DeviceIoControl(volume, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, default, 0, out extents, struct_size, out var arglpBytesReturned, IntPtr.Zero);
+        var rc = DeviceIoControl(volume, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, default, 0, out extents, struct_size, out var arglpBytesReturned, 0);
 
         if (!rc)
         {
@@ -630,7 +630,7 @@ public static class NativeFileIO
 
     }
 
-    public static string GetModuleFullPath(IntPtr hModule)
+    public static string GetModuleFullPath(nint hModule)
     {
         var str = new StringBuilder(32768);
 
@@ -666,7 +666,7 @@ public static class NativeFileIO
             try
             {
                 using var disk = OpenFileHandle(drv, FileMode.Open, 0, FileShare.ReadWrite, 0);
-                var rc = DeviceIoControl(disk, IOCTL_SCSI_GET_ADDRESS, IntPtr.Zero, 0, out SCSI_ADDRESS ScsiAddress, _GetDevicesScsiAddresses_SizeOfScsiAddress, out _, default);
+                var rc = DeviceIoControl(disk, IOCTL_SCSI_GET_ADDRESS, 0, 0, out SCSI_ADDRESS ScsiAddress, _GetDevicesScsiAddresses_SizeOfScsiAddress, out _, default);
                 var errcode = GetLastWin32Error();
                 if (rc)
                 {
@@ -810,12 +810,12 @@ public static class NativeFileIO
     {
         if (DeviceIoControl(disk,
                             IOCTL_DISK_GET_PARTITION_INFO_EX,
-                            IntPtr.Zero,
+                            0,
                             0U,
                             out PARTITION_INFORMATION partition_info,
                             (uint)MarshalSupport<PARTITION_INFORMATION>.Size,
                             out _,
-                            IntPtr.Zero))
+                            0))
         {
             return partition_info;
         }
@@ -829,12 +829,12 @@ public static class NativeFileIO
     {
         if (DeviceIoControl(disk,
                             IOCTL_DISK_GET_PARTITION_INFO_EX,
-                            IntPtr.Zero,
+                            0,
                             0U,
                             out PARTITION_INFORMATION_EX partition_info,
                             (uint)MarshalSupport<PARTITION_INFORMATION_EX>.Size,
                             out _,
-                            IntPtr.Zero))
+                            0))
         {
             return partition_info;
         }
@@ -850,12 +850,12 @@ public static class NativeFileIO
         var attribs = new byte[attribs_size];
         if (DeviceIoControl(disk,
                             IOCTL_DISK_GET_DISK_ATTRIBUTES,
-                            IntPtr.Zero,
+                            0,
                             0U,
                             attribs,
                             attribs_size,
                             out _,
-                            IntPtr.Zero))
+                            0))
         {
             return (attribs[8] & 1) != 0;
         }
@@ -876,7 +876,7 @@ public static class NativeFileIO
             attribs[8] = 1;
         }
 
-        Win32Try(DeviceIoControl(disk, IOCTL_DISK_SET_DISK_ATTRIBUTES, attribs, attribs_size, IntPtr.Zero, 0U, out _, IntPtr.Zero));
+        Win32Try(DeviceIoControl(disk, IOCTL_DISK_SET_DISK_ATTRIBUTES, attribs, attribs_size, 0, 0U, out _, 0));
     }
 
     public static bool? GetDiskReadOnly(SafeFileHandle disk)
@@ -885,12 +885,12 @@ public static class NativeFileIO
         var attribs = new byte[attribs_size];
         if (DeviceIoControl(disk,
                             IOCTL_DISK_GET_DISK_ATTRIBUTES,
-                            IntPtr.Zero,
+                            0,
                             0U,
                             attribs,
                             attribs_size,
                             out _,
-                            IntPtr.Zero))
+                            0))
         {
             return (attribs[8] & 2) != 0;
         }
@@ -911,18 +911,18 @@ public static class NativeFileIO
             attribs[8] = 2;
         }
 
-        Win32Try(DeviceIoControl(disk, IOCTL_DISK_SET_DISK_ATTRIBUTES, attribs, attribs_size, IntPtr.Zero, 0U, out _, IntPtr.Zero));
+        Win32Try(DeviceIoControl(disk, IOCTL_DISK_SET_DISK_ATTRIBUTES, attribs, attribs_size, 0, 0U, out _, 0));
     }
 
     public static void SetVolumeOffline(SafeFileHandle disk, bool offline)
         => Win32Try(DeviceIoControl(disk,
                                     offline ? IOCTL_VOLUME_OFFLINE : IOCTL_VOLUME_ONLINE,
-                                    IntPtr.Zero,
+                                    0,
                                     0U,
-                                    IntPtr.Zero,
+                                    0,
                                     0U,
                                     out _,
-                                    IntPtr.Zero));
+                                    0));
 
     private static class MarshalSupport<T>
     {
@@ -954,7 +954,7 @@ public static class NativeFileIO
 #endif
 
     public static void SetFileSparseFlag(SafeFileHandle file, bool flag)
-        => Win32Try(DeviceIoControl(file, FSCTL_SET_SPARSE, flag, 1U, default, 0U, out _, IntPtr.Zero));
+        => Win32Try(DeviceIoControl(file, FSCTL_SET_SPARSE, flag, 1U, default, 0U, out _, 0));
 
 #if NETCOREAPP3_0_OR_GREATER || !NETCOREAPP
     /// <summary>

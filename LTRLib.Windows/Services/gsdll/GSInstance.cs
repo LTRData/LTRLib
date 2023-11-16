@@ -32,9 +32,9 @@ public class GSInstance : IDisposable
     private static class NativeMethods
     {
         [DllImport("gsdll32.dll", CharSet = CharSet.Ansi)]
-        public static extern void gsapi_delete_instance(IntPtr pinstance);
+        public static extern void gsapi_delete_instance(nint pinstance);
         [DllImport("gsdll32.dll", CharSet = CharSet.Ansi)]
-        public static extern int gsapi_new_instance(out SafeGSHandle pinstance, IntPtr handle);
+        public static extern int gsapi_new_instance(out SafeGSHandle pinstance, nint handle);
         [DllImport("gsdll32.dll", CharSet = CharSet.Ansi)]
         public static extern int gsapi_init_with_args(SafeGSHandle pinstance, int argc, string[] argv);
         [DllImport("gsdll32.dll", CharSet = CharSet.Ansi)]
@@ -77,7 +77,7 @@ public class GSInstance : IDisposable
         /// <param name="open_handle">Existing open handle.</param>
         /// <param name="owns_handle">Indicates whether handle should be closed when this
         /// instance is released.</param>
-        public SafeGSHandle(IntPtr open_handle, bool owns_handle) : base(owns_handle)
+        public SafeGSHandle(nint open_handle, bool owns_handle) : base(owns_handle)
         {
             SetHandle(open_handle);
         }
@@ -96,12 +96,12 @@ public class GSInstance : IDisposable
     #endif
 
     [SecurityCritical]
-    public GSInstance() : this(IntPtr.Zero)
+    public GSInstance() : this(0)
     {
     }
 
     [SecurityCritical]
-    public GSInstance(IntPtr ownerWindow)
+    public GSInstance(nint ownerWindow)
     {
         var rc = NativeMethods.gsapi_new_instance(out var safeHandle, ownerWindow);
         
@@ -140,7 +140,6 @@ public class GSInstance : IDisposable
     [SecurityCritical]
     public void ConvertToPDF(string[] sourcefiles, string targetfile)
     {
-
         var parameters = new List<string>() { "ps2pdf", "-dNOPAUSE", "-dBATCH", "-dSAFER", "-sDEVICE=pdfwrite", $"-sOutputFile={targetfile}", "-c", ".setpdfwrite", "-f" };
 
         parameters.AddRange(sourcefiles);
@@ -149,13 +148,10 @@ public class GSInstance : IDisposable
         {
             InitWithArgs(parameters.ToArray());
         }
-
         finally
         {
             Exit();
-
         }
-
     }
 
     #region IDisposable Support

@@ -34,19 +34,11 @@ public class GenericAsyncQueryable<TElement> : GenericQueryable<TElement>, IAsyn
         return new GenericAsyncEnumerator(Expression, asyncAggregationQueryProvider, cancellationToken);
     }
 
-    private sealed class GenericAsyncEnumerator : IAsyncEnumerator<TElement?>
+    private sealed class GenericAsyncEnumerator(Expression expression,
+                                                IAsyncAggregationQueryProvider provider,
+                                                CancellationToken cancellationToken) : IAsyncEnumerator<TElement?>
     {
-        private readonly Expression expression;
-        private readonly IAsyncAggregationQueryProvider provider;
-        private readonly CancellationToken cancellationToken;
         private IEnumerator<TElement>? elements;
-
-        public GenericAsyncEnumerator(Expression expression, IAsyncAggregationQueryProvider provider, CancellationToken cancellationToken)
-        {
-            this.expression = expression;
-            this.provider = provider;
-            this.cancellationToken = cancellationToken;
-        }
 
         public TElement? Current => elements is null ? default : elements.Current;
 

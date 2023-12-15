@@ -41,6 +41,10 @@ using LTRData.Extensions.Split;
 using LTRData.Extensions.Formatting;
 using LTRData.Extensions.Buffers;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Primitives;
+using System.Threading;
+using LTRData.Extensions.IO;
+using LTRData.Extensions.Async;
 
 namespace LTRLib.WebCore;
 
@@ -55,11 +59,11 @@ public static class HttpServerSupport
         "deflate"
     ];
 
-    public static string GetRequestCompressionEncoding(this HttpRequest Request)
+    public static string GetRequestCompressionEncoding(this HttpRequest request)
     {
-        var acceptEncoding = Request.Headers["Accept-Encoding"].FirstOrDefault()
-            ?? Request.Headers["Transfer-Encoding"].FirstOrDefault()
-            ?? Request.Headers["TE"].FirstOrDefault();
+        var acceptEncoding = request.Headers["Accept-Encoding"].FirstOrDefault()
+            ?? request.Headers["Transfer-Encoding"].FirstOrDefault()
+            ?? request.Headers["TE"].FirstOrDefault();
 
         if (acceptEncoding is not null && !string.IsNullOrWhiteSpace(acceptEncoding))
         {
@@ -76,11 +80,16 @@ public static class HttpServerSupport
         return "none";
     }
 
-    public static IApplicationBuilder UseApplicationFeatures(this IApplicationBuilder app, IFileProvider FileProvider, DynDocFeatures Features)
+    public static IApplicationBuilder UseApplicationFeatures(this IApplicationBuilder app, IFileProvider fileProvider, DynDocFeatures features)
     {
         return app.Use(async (context, next) =>
         {
-            if (await ApplicationAddFeatures(context, context.Request, context.Response, FileProvider, Features).ConfigureAwait(continueOnCapturedContext: false))
+            if (await ApplicationAddFeatures(context,
+                                             context.Request,
+                                             context.Response,
+                                             fileProvider,
+                                             features,
+                                             context.RequestAborted).ConfigureAwait(continueOnCapturedContext: false))
             {
                 return;
             }
@@ -94,36 +103,37 @@ public static class HttpServerSupport
     /// feature to a web server request.
     /// </summary>
     /// <returns>True if response is redirected and completed, False if response is allowed to continue</returns>
-    public static async Task<bool> ApplicationAddFeatures(this HttpContext Context,
-                                                          HttpRequest Request,
-                                                          HttpResponse Response,
-                                                          IFileProvider FileProvider,
-                                                          DynDocFeatures Features)
+    public static Task<bool> ApplicationAddFeatures(this HttpContext context,
+                                                    HttpRequest request,
+                                                    HttpResponse response,
+                                                    IFileProvider fileProvider,
+                                                    DynDocFeatures features,
+                                                    CancellationToken cancellationToken)
     {
-        if (Context.Connection.RemoteIpAddress is not null
-            && !Request.Path.StartsWithSegments("/robots.txt", StringComparison.Ordinal)
-            && (Features & DynDocFeatures.DenyBotNets) != 0
-            && BotNetRanges.Encompasses(Context.Connection.RemoteIpAddress))
+        if (context.Connection.RemoteIpAddress is not null
+            && !request.Path.StartsWithSegments("/robots.txt", StringComparison.Ordinal)
+            && (features & DynDocFeatures.DenyBotNets) != 0
+            && BotNetRanges.Encompasses(context.Connection.RemoteIpAddress))
         {
-            Response.StatusCode = (int)HttpStatusCode.NotFound;
-            return true;
+            response.StatusCode = (int)HttpStatusCode.NotFound;
+            return AsyncCompatExtensions.TrueResult;
         }
 
-        var requestExt = Path.GetExtension(Request.Path);
+        var requestExt = Path.GetExtension(request.Path);
 
-        if ((Features & DynDocFeatures.DynDoc) != 0 &&
-            Request.Path.StartsWithSegments("/dyndoc", StringComparison.OrdinalIgnoreCase))
+        if ((features & DynDocFeatures.DynDoc) != 0 &&
+            request.Path.StartsWithSegments("/dyndoc", StringComparison.OrdinalIgnoreCase))
         {
             try
             {
-                var encodedPath = Request.Query["path"].FirstOrDefault();
-                var encodedQuery = Request.Query["query"].FirstOrDefault();
+                var encodedPath = request.Query["path"].FirstOrDefault();
+                var encodedQuery = request.Query["query"].FirstOrDefault();
 
                 if ((string.IsNullOrWhiteSpace(encodedQuery)
                     || string.IsNullOrWhiteSpace(encodedPath))
-                    && Request.Path.HasValue)
+                    && request.Path.HasValue)
                 {
-                    var requestPath = Request.Path.Value;
+                    var requestPath = request.Path.Value;
                     var docSeparator = requestPath.LastIndexOf('/');
                     var querySeparator = requestPath.LastIndexOf('/', docSeparator - 1);
 
@@ -136,29 +146,29 @@ public static class HttpServerSupport
                 {
                     var query = Encoding.UTF8.GetString(Convert.FromBase64String(encodedQuery));
 
-                    Request.Path = PathString.FromUriComponent(encodedPath);
-                    Request.QueryString = QueryString.FromUriComponent(query);
+                    request.Path = PathString.FromUriComponent(encodedPath);
+                    request.QueryString = QueryString.FromUriComponent(query);
 
-                    requestExt = Path.GetExtension(Request.Path);
+                    requestExt = Path.GetExtension(request.Path);
                 }
             }
             catch
             {
             }
         }
-        else if ((Features & DynDocFeatures.DynDoc) != 0 &&
-            Request.Path.StartsWithSegments("/docid", StringComparison.OrdinalIgnoreCase))
+        else if ((features & DynDocFeatures.DynDoc) != 0 &&
+            request.Path.StartsWithSegments("/docid", StringComparison.OrdinalIgnoreCase))
         {
             try
             {
-                var encodedPath = Request.Query["path"].FirstOrDefault();
-                var encodedQuery = Request.Query["query"].FirstOrDefault();
+                var encodedPath = request.Query["path"].FirstOrDefault();
+                var encodedQuery = request.Query["query"].FirstOrDefault();
 
                 if ((string.IsNullOrWhiteSpace(encodedQuery)
                     || string.IsNullOrWhiteSpace(encodedPath))
-                    && Request.Path.HasValue)
+                    && request.Path.HasValue)
                 {
-                    var requestPath = Request.Path.Value;
+                    var requestPath = request.Path.Value;
                     var docSeparator = requestPath.LastIndexOf('/');
                     var querySeparator = requestPath.LastIndexOf('/', docSeparator - 1);
 
@@ -174,13 +184,13 @@ public static class HttpServerSupport
 
                     if (query is null)
                     {
-                        return false;
+                        return AsyncCompatExtensions.FalseResult;
                     }
 
-                    Request.Path = PathString.FromUriComponent(encodedPath);
-                    Request.QueryString = QueryString.FromUriComponent(query);
+                    request.Path = PathString.FromUriComponent(encodedPath);
+                    request.QueryString = QueryString.FromUriComponent(query);
 
-                    requestExt = Path.GetExtension(Request.Path);
+                    requestExt = Path.GetExtension(request.Path);
                 }
             }
             catch
@@ -190,33 +200,33 @@ public static class HttpServerSupport
 
         if (requestExt.Equals(".aspx", StringComparison.OrdinalIgnoreCase))
         {
-            Request.Path = Request.Path.Value!.Remove(Request.Path.Value.Length - requestExt.Length);
+            request.Path = request.Path.Value!.Remove(request.Path.Value.Length - requestExt.Length);
         }
         else if (requestExt.Equals(".asp", StringComparison.OrdinalIgnoreCase))
         {
-            Request.Path = Request.Path.Value!.Remove(Request.Path.Value.Length - requestExt.Length);
+            request.Path = request.Path.Value!.Remove(request.Path.Value.Length - requestExt.Length);
         }
         else if ((requestExt.Equals(".html", StringComparison.OrdinalIgnoreCase) ||
             requestExt.Equals(".htm", StringComparison.OrdinalIgnoreCase)) &&
-            !FileProvider.GetFileInfo(Request.Path).Exists &&
-            !FileProvider.GetDirectoryContents(Request.Path).Exists)
+            !fileProvider.GetFileInfo(request.Path).Exists &&
+            !fileProvider.GetDirectoryContents(request.Path).Exists)
         {
-            Request.Path = Request.Path.Value!.Remove(Request.Path.Value.Length - requestExt.Length);
+            request.Path = request.Path.Value!.Remove(request.Path.Value.Length - requestExt.Length);
         }
 
-        if ((Features & DynDocFeatures.Redir) != 0 &&
-            Request.Path.StartsWithSegments("/redir", StringComparison.OrdinalIgnoreCase))
+        if ((features & DynDocFeatures.Redir) != 0 &&
+            request.Path.StartsWithSegments("/redir", StringComparison.OrdinalIgnoreCase))
         {
 
             string msg;
             
             try
             {
-                var encodedQuery = Request.Query["query"].FirstOrDefault();
+                var encodedQuery = request.Query["query"].FirstOrDefault();
 
                 if (string.IsNullOrWhiteSpace(encodedQuery))
                 {
-                    encodedQuery = Request.Path.Value
+                    encodedQuery = request.Path.Value
                         .AsSpan("/redir/".Length)
                         .Split('/')
                         .ElementAtOrDefault(0)
@@ -225,54 +235,79 @@ public static class HttpServerSupport
                 
                 var docquery = Encoding.UTF8.GetString(Convert.FromBase64String(encodedQuery));
                 
-                Response.Redirect(docquery, permanent: true);
+                response.Redirect(docquery, permanent: true);
                 
-                return true;
+                return AsyncCompatExtensions.TrueResult;
             }
             catch (Exception ex)
             {
                 msg = ex.JoinMessages();
             }
 
-            await Response.WriteAsync(msg, Context.RequestAborted).ConfigureAwait(continueOnCapturedContext: false);
-            return true;
+            static async Task<bool> WriteError(string msg, HttpResponse response, CancellationToken cancellationToken)
+            {
+                await response.WriteAsync(msg, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                return true;
+            }
+
+            return WriteError(msg, response, cancellationToken);
         }
 
-        if ((Features & DynDocFeatures.Checksum) != 0 && !string.IsNullOrWhiteSpace(requestExt) && CheckSums.ContainsKey(requestExt))
+        if ((features & DynDocFeatures.Checksum) != 0
+            && !string.IsNullOrWhiteSpace(requestExt)
+            && CheckSums.TryGetValue(requestExt, out var hashProviderFunc))
         {
-            var checksumFile = FileProvider.GetFileInfo(Request.Path).PhysicalPath;
+            var checksumFile = fileProvider.GetFileInfo(request.Path).PhysicalPath;
             var baseFile = checksumFile?.Remove(checksumFile.Length - requestExt.Length);
             var baseFileExtension = Path.GetExtension(baseFile);
 
-            if (checksumFile is not null &&
-                File.Exists(baseFile) &&
-                PublicCacheableExtensions.Any(ext => ext.Equals(baseFileExtension, StringComparison.OrdinalIgnoreCase)))
+            if (baseFile is not null
+                && checksumFile is not null
+                && File.Exists(baseFile)
+                && PublicCacheableExtensions.Any(ext => ext.Equals(baseFileExtension, StringComparison.OrdinalIgnoreCase)))
             {
-
                 var baseFileWriteTime = File.GetLastWriteTimeUtc(baseFile);
 
-                if (File.GetLastWriteTimeUtc(checksumFile) < baseFileWriteTime)
+                if (File.GetLastWriteTimeUtc(checksumFile) >= baseFileWriteTime)
                 {
+                    response.ContentType = "text/plain";
+                    response.AppendHeader("Last-Modified", baseFileWriteTime);
 
-                    using var hashProvider = CheckSums[requestExt]();
+                    return AsyncCompatExtensions.FalseResult;
+                }
+
+                static async Task<bool> CreateChecksumFile(string baseFile,
+                                                           DateTime baseFileWriteTime,
+                                                           string checksumFile,
+                                                           HttpResponse response,
+                                                           Func<HashAlgorithm> hashProviderFunc,
+                                                           CancellationToken cancellationToken)
+                {
+                    using var hashProvider = hashProviderFunc();
                     using var baseFileStream = File.OpenRead(baseFile);
                     using var checksumFileWriter = new StreamWriter(checksumFile, append: false, encoding: Encoding.UTF8);
 
+#if NET5_0_OR_GREATER
+                    var hash = await hashProvider.ComputeHashAsync(baseFileStream, cancellationToken).ConfigureAwait(false);
+#else
                     var hash = hashProvider.ComputeHash(baseFileStream);
+#endif
 
-                    Array.ForEach(hash, b => checksumFileWriter.Write(b.ToString("x2")));
+                    await checksumFileWriter.WriteAsync(hash.ToHexString().AsMemory(), cancellationToken).ConfigureAwait(false);
+                    await checksumFileWriter.WriteAsync(" *".AsMemory(), cancellationToken).ConfigureAwait(false);
+                    await checksumFileWriter.WriteLineAsync(Path.GetFileName(baseFile).AsMemory(), cancellationToken).ConfigureAwait(false);
 
-                    checksumFileWriter.Write(" *");
-                    checksumFileWriter.WriteLine(Path.GetFileName(baseFile));
+                    response.ContentType = "text/plain";
+                    response.AppendHeader("Last-Modified", baseFileWriteTime);
 
+                    return false;
                 }
 
-                Response.ContentType = "text/plain";
-                Response.AppendHeader("Last-Modified", baseFileWriteTime);
+                return CreateChecksumFile(baseFile, baseFileWriteTime, checksumFile, response, hashProviderFunc, cancellationToken);
             }
         }
 
-        return false;
+        return AsyncCompatExtensions.FalseResult;
     }
 
     public static IPAddress? GetClientTrueIPAddress(this HttpContext context)
@@ -281,7 +316,7 @@ public static class HttpServerSupport
 
         if (address is not null && !string.IsNullOrWhiteSpace(address))
         {
-            var delim = address.IndexOf(",", StringComparison.Ordinal);
+            var delim = address.IndexOf(',');
             if (delim >= 0)
             {
                 address = address.Remove(delim);
@@ -428,37 +463,35 @@ public static class HttpServerSupport
         }
     }
 
-    public static bool IsPartialScriptSupportBrowser(this HttpRequest Request)
+    public static bool IsPartialScriptSupportBrowser(this HttpRequest request)
     {
 
-        if (!string.IsNullOrWhiteSpace(Request.Headers["X-Wap-Profile"]) ||
-            Request.Headers.Keys is not null && Request.Headers.Keys.Any(t => t.StartsWith("X-OperaMini", StringComparison.OrdinalIgnoreCase)) ||
-            !string.IsNullOrWhiteSpace(Request.Headers["Accept"]) && Request.Headers["Accept"].Any(t => t is not null && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
+        if (!string.IsNullOrWhiteSpace(request.Headers["X-Wap-Profile"])
+            || request.Headers.Keys is not null
+            && request.Headers.Keys.Any(t => t.StartsWith("X-OperaMini", StringComparison.OrdinalIgnoreCase))
+            || !string.IsNullOrWhiteSpace(request.Headers["Accept"])
+            && request.Headers["Accept"].Any(t => t is not null
+            && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
         {
-
             return true;
-
         }
 
         return false;
-
     }
 
-    public static bool IsMobileBrowser(this HttpRequest Request)
+    public static bool IsMobileBrowser(this HttpRequest request)
     {
-
-        if (Request.Headers["User-Agent"].Any(t => t is not null && t.Contains("Mobile", StringComparison.OrdinalIgnoreCase)) ||
-            !string.IsNullOrWhiteSpace(Request.Headers["X-Wap-Profile"]) ||
-            Request.Headers.Keys is not null && Request.Headers.Keys.Any(t => t.StartsWith("X-OperaMini", StringComparison.OrdinalIgnoreCase)) ||
-            !string.IsNullOrWhiteSpace(Request.Headers["Accept"]) && Request.Headers["Accept"].Any(t => t is not null && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
+        if (request.Headers["User-Agent"].Any(t => t is not null && t.Contains("Mobile", StringComparison.OrdinalIgnoreCase))
+            || !string.IsNullOrWhiteSpace(request.Headers["X-Wap-Profile"])
+            || request.Headers.Keys is not null && request.Headers.Keys.Any(t => t.StartsWith("X-OperaMini", StringComparison.OrdinalIgnoreCase))
+            || !string.IsNullOrWhiteSpace(request.Headers["Accept"])
+            && request.Headers["Accept"].Any(t => t is not null
+            && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
         {
-
             return true;
-
         }
 
         return false;
-
     }
 
     public static MarkupString HtmlStringToMarkupString(object value)

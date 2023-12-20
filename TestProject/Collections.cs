@@ -62,4 +62,26 @@ public class Collections
         Assert.Equal("0d:0a", enumerableHex);
     }
 
+    [Fact]
+    public void BitmapTests()
+    {
+        var buffer = new byte[512];
+
+        buffer.AsSpan().Fill(0xff);
+
+        Assert.True(buffer.GetBit(9));
+        Assert.True(buffer.GetBit(10));
+
+        buffer.AsSpan().Fill(0x00);
+
+        Assert.False(buffer.GetBit(9));
+        Assert.False(buffer.GetBit(10));
+
+        buffer.SetBit(9);
+
+        Assert.True(buffer.GetBit(9));
+        Assert.False(buffer.GetBit(10));
+
+        Assert.Equal(2, buffer[1]);
+    }
 }

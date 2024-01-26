@@ -1,6 +1,10 @@
 ﻿using LTRData.Extensions.Buffers;
 using LTRData.Extensions.Formatting;
 using LTRLib.LTRGeneric;
+using LTRLib.Net;
+#if NET471_OR_GREATER || NETCOREAPP
+using Microsoft.AspNetCore.Http;
+#endif
 using System;
 using System.Linq;
 using Xunit;
@@ -84,4 +88,28 @@ public class Collections
 
         Assert.Equal(2, buffer[1]);
     }
+
+#if NET471_OR_GREATER || NETCOREAPP
+    [Fact]
+    public void QueryStrings()
+    {
+        var q = QueryString.Create("a", "b");
+
+        Assert.Equal("?a=b", q.Value);
+
+        q = q.Add("c", "d");
+
+        Assert.Equal("?a=b&c=d", q.Value);
+
+        Assert.Equal("b", q.Get("a"));
+        Assert.Equal("d", q.Get("c"));
+
+        q = q.Remove("a");
+
+        Assert.Equal("?c=d", q.Value);
+
+        Assert.Null(q.Get("a"));
+        Assert.Equal("d", q.Get("c"));
+    }
+#endif
 }

@@ -36,7 +36,7 @@ public static class HttpExtensions
 
         buffer.Remove(key);
 
-        return QueryString.FromUriComponent($"?{query}");
+        return QueryString.FromUriComponent($"?{buffer}");
     }
 
     public static QueryString AddIfNotNull(this in QueryString query, string key, string? value)

@@ -1,4 +1,4 @@
-﻿#if NET472_OR_GREATER || NETSTANDARD || NETCOREAPP
+﻿#if NET6_OR_GREATER
 
 using LTRLib.MathExpression;
 using SixLabors.ImageSharp;

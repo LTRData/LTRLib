@@ -41,8 +41,8 @@
     <Product>LTRLib</Product>
     <ProductName>LTRLib</ProductName>
     <Authors>Olof Lagerkvist</Authors>
-    <Copyright>2011 - 2023, Olof Lagerkvist, LTR Data</Copyright>
-    <PackageVersion>1.0.29</PackageVersion>
+    <Copyright>2011 - 2024, Olof Lagerkvist, LTR Data</Copyright>
+    <PackageVersion>1.0.30</PackageVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
   </PropertyGroup>

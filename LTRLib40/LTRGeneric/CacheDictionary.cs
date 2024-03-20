@@ -24,30 +24,37 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
 
     public CacheDictionary()
     {
-        Cache = new ConcurrentDictionary<TKey, (DateTime ExpiryTime, Task<TValue> Task)>();
+        Cache = new();
     }
 
     public CacheDictionary(IEqualityComparer<TKey> Comparer)
     {
-        Cache = new ConcurrentDictionary<TKey, (DateTime ExpiryTime, Task<TValue> Task)>(Comparer);
+        Cache = new(Comparer);
     }
 
     public void CleanExpired()
     {
-        var toremove = new List<KeyValuePair<TKey, (DateTime ExpiryTime, Task<TValue> Task)>>();
+        List<KeyValuePair<TKey, (DateTime ExpiryTime, Task<TValue> Task)>>? toremove = null;
 
         lock (Cache)
         {
-            foreach (var Record in Cache)
+            foreach (var record in Cache)
             {
-                if (Record.Value.ExpiryTime < DateTime.UtcNow
-                    || Record.Value.Task.IsCanceled
-                    || Record.Value.Task.IsFaulted
-                    || (Record.Value.Task.IsCompleted && Record.Value.Task.Result is null))
+                if (record.Value.ExpiryTime < DateTime.UtcNow
+                    || record.Value.Task.IsCanceled
+                    || record.Value.Task.IsFaulted
+                    || (record.Value.Task.IsCompleted && record.Value.Task.Result is null))
                 {
-                    toremove.Add(Record);
+                    toremove ??= [];
+
+                    toremove.Add(record);
                 }
             }
+        }
+
+        if (toremove is null)
+        {
+            return;
         }
 
         foreach (var oldrecord in toremove)
@@ -102,9 +109,11 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
         });
     }
 
-    public void AddOrUpdate(TKey Key, double SecondsToLive, Task<TValue> Value) => AddOrUpdate(Key, DateTime.UtcNow.AddSeconds(SecondsToLive), Value);
+    public void AddOrUpdate(TKey Key, double SecondsToLive, Task<TValue> Value)
+        => AddOrUpdate(Key, DateTime.UtcNow.AddSeconds(SecondsToLive), Value);
 
-    public void AddOrUpdate(TKey Key, TimeSpan TimeToLive, Task<TValue> Value) => AddOrUpdate(Key, DateTime.UtcNow + TimeToLive, Value);
+    public void AddOrUpdate(TKey Key, TimeSpan TimeToLive, Task<TValue> Value)
+        => AddOrUpdate(Key, DateTime.UtcNow + TimeToLive, Value);
 
     public Task<TValue> GetOrAdd(TKey Key, DateTime ExpiryDateTimeUtc, Func<TKey, Task<TValue>> ValueFactory)
     {
@@ -115,9 +124,11 @@ public class CacheDictionary<TKey, TValue> where TKey : notnull
         return item.Task;
     }
 
-    public Task<TValue> GetOrAdd(TKey Key, TimeSpan TimeToLive, Func<TKey, Task<TValue>> ValueFactory) => GetOrAdd(Key, DateTime.UtcNow + TimeToLive, ValueFactory);
+    public Task<TValue> GetOrAdd(TKey Key, TimeSpan TimeToLive, Func<TKey, Task<TValue>> ValueFactory)
+        => GetOrAdd(Key, DateTime.UtcNow + TimeToLive, ValueFactory);
 
-    public Task<TValue> GetOrAdd(TKey Key, double SecondsToLive, Func<TKey, Task<TValue>> ValueFactory) => GetOrAdd(Key, TimeSpan.FromSeconds(SecondsToLive), ValueFactory);
+    public Task<TValue> GetOrAdd(TKey Key, double SecondsToLive, Func<TKey, Task<TValue>> ValueFactory)
+        => GetOrAdd(Key, TimeSpan.FromSeconds(SecondsToLive), ValueFactory);
 
     public int Count // Implements ICollection(Of KeyValuePair(Of TKey, TValue)).Count
     {

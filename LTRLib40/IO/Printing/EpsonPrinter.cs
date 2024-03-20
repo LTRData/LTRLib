@@ -64,7 +64,7 @@ public static class EpsonPrinter
         Korea = 13
     }
 
-    public static byte[] GetInternationalCharacterSetControl(InternationalCharacterSet CharSet) => new byte[] { 0x1B, 0x52, (byte)CharSet };
+    public static byte[] GetInternationalCharacterSetControl(InternationalCharacterSet CharSet) => [0x1B, 0x52, (byte)CharSet];
 
     public enum CharacterCodeTable : byte
     {
@@ -93,7 +93,7 @@ public static class EpsonPrinter
 
     }
 
-    public static byte[] GetCharacterCodeControl(CharacterCodeTable CodeTable) => new byte[] { 0x1B, 0x74, (byte)CodeTable };
+    public static byte[] GetCharacterCodeControl(CharacterCodeTable CodeTable) => [0x1B, 0x74, (byte)CodeTable];
 
     public enum RealtimeStatusRequest : byte
     {
@@ -103,7 +103,7 @@ public static class EpsonPrinter
         PaperRollSensorStatus = 4
     }
 
-    public static byte[] GetTransmitStatusRealtimeControl(RealtimeStatusRequest TransmitStatus) => new byte[] { 0x10, 0x4, (byte)TransmitStatus };
+    public static byte[] GetTransmitStatusRealtimeControl(RealtimeStatusRequest TransmitStatus) => [0x10, 0x4, (byte)TransmitStatus];
 
     public enum BufferedStatusRequest : byte
     {
@@ -111,7 +111,7 @@ public static class EpsonPrinter
         DrawerKickout = 2
     }
 
-    public static byte[] GetTransmitStatusBufferedControl(BufferedStatusRequest TransmitStatus) => new byte[] { 0x1D, 0x72, (byte)TransmitStatus };
+    public static byte[] GetTransmitStatusBufferedControl(BufferedStatusRequest TransmitStatus) => [0x1D, 0x72, (byte)TransmitStatus];
 
     public enum RealtimePrinterStatusResponse : byte
     {
@@ -173,11 +173,11 @@ public static class EpsonPrinter
         return lst.ToArray();
     }
 
-    public static byte[] GetDrawerKickoutRealTimeControl(byte DrawerNumber, short PulseTime) => new byte[] { 0x10, 0x14, 0x1, DrawerNumber, (byte)Math.Round(PulseTime / 100d) };
+    public static byte[] GetDrawerKickoutRealTimeControl(byte DrawerNumber, short PulseTime) => [0x10, 0x14, 0x1, DrawerNumber, (byte)Math.Round(PulseTime / 100d)];
 
-    public static byte[] GetDrawerKickoutBufferedControl(byte DrawerNumber, short OnTime, short OffTime) => new byte[] { 0x1B, 0x70, DrawerNumber, (byte)Math.Round(OnTime / 2d), (byte)Math.Round(OffTime / 2d) };
+    public static byte[] GetDrawerKickoutBufferedControl(byte DrawerNumber, short OnTime, short OffTime) => [0x1B, 0x70, DrawerNumber, (byte)Math.Round(OnTime / 2d), (byte)Math.Round(OffTime / 2d)];
 
-    public static byte[] GetLeftMarginControl(ushort value) => new byte[] { 0x1D, 0x4C, (byte)(value & 0xFF), (byte)(value >> 8) };
+    public static byte[] GetLeftMarginControl(ushort value) => [0x1D, 0x4C, (byte)(value & 0xFF), (byte)(value >> 8)];
 
     public static string CenterReceiptText(string TextRow, int NormalFontMaxChars)
     {

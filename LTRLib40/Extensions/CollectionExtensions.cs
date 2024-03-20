@@ -331,7 +331,7 @@ public static class CollectionExtensions
     /// <param name="e">Array of enumerators</param>
     /// <param name="Separator">Separator object that will appear in enumeration after each array
     /// element has been enumerated</param>
-    public static IEnumerable<T> GetFlatEnumerable<T>(this IEnumerable<T>[] e, T Separator) => e.GetFlatEnumerable(new[] { Separator });
+    public static IEnumerable<T> GetFlatEnumerable<T>(this IEnumerable<T>[] e, T Separator) => e.GetFlatEnumerable([Separator]);
 
     /// <summary>
     /// Returns an IEnumerable(Of T) object that enumerates elements enumerated by all elements in
@@ -362,7 +362,7 @@ public static class CollectionExtensions
     /// <param name="e">Array of enumerators</param>
     /// <param name="Separator">Separator object that will appear in resulting array after each
     /// source array element has been enumerated</param>
-    public static T[] ToFlatArray<T>(this IEnumerable<T>[] e, T Separator) => e.GetFlatEnumerable(new[] { Separator }).ToArray();
+    public static T[] ToFlatArray<T>(this IEnumerable<T>[] e, T Separator) => e.GetFlatEnumerable([Separator]).ToArray();
 
     /// <summary>
     /// Returns an new array of objects enumerated by elements in source array.
@@ -393,7 +393,7 @@ public static class CollectionExtensions
     /// <param name="e">Enumerator of enumerators</param>
     /// <param name="Separator">Separator object that will be returned in target enumeration after
     /// each source enumeration has been enumerated</param>
-    public static IEnumerable<T> GetFlatEnumerable<T>(this IEnumerable<IEnumerable<T>> e, T Separator) => e.GetFlatEnumerable(new[] { Separator });
+    public static IEnumerable<T> GetFlatEnumerable<T>(this IEnumerable<IEnumerable<T>> e, T Separator) => e.GetFlatEnumerable([Separator]);
 
     /// <summary>
     /// Returns an IEnumerable(Of T) object that enumerates elements enumerated by an enumerator.

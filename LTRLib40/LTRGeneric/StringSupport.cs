@@ -89,7 +89,7 @@ public static class StringSupport
             try
             {
                 var Method = t.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, typesStringAndFormatProvider, null);
-                return Method?.Invoke(null, new object[] { data, DateTimeFormatInfo.CurrentInfo });
+                return Method?.Invoke(null, [data, DateTimeFormatInfo.CurrentInfo]);
             }
             catch (Exception ex) when (ex.InnerException is not null)
             {
@@ -101,7 +101,7 @@ public static class StringSupport
             try
             {
                 var Method = t.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, typesStringAndFormatProvider, null);
-                return Method?.Invoke(null, new object[] { data, NumberFormatInfo.CurrentInfo });
+                return Method?.Invoke(null, [data, NumberFormatInfo.CurrentInfo]);
             }
             catch (Exception ex) when (ex.InnerException is not null)
             {
@@ -169,7 +169,7 @@ public static class StringSupport
         {
             try
             {
-                return t.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, typesStringAndFormatProvider, null)?.Invoke(null, new object[] { data, format });
+                return t.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, typesStringAndFormatProvider, null)?.Invoke(null, [data, format]);
             }
             catch (Exception ex) when (ex.InnerException is not null)
             {

@@ -41,14 +41,22 @@ public static class CodeCompiler
 
     private static string[] GetDefaultLibrariesList(CompilerVersion compilerVersion)
     {
-        var references = new List<string>() { "System.dll", "System.Xml.dll", "System.Drawing.dll", "System.Management.dll", "System.Windows.Forms.dll" };
+        var references = new List<string>()
+        {
+            "System.dll",
+            "System.Xml.dll",
+            "System.Drawing.dll",
+            "System.Management.dll",
+            "System.Windows.Forms.dll"
+        };
+
         if (compilerVersion >= CompilerVersion.v3_5)
         {
             references.Add("System.Core.dll");
             references.Add("System.Xml.Linq.dll");
         }
 
-        return references.ToArray();
+        return [.. references];
     }
 
     private static readonly Dictionary<CompilerLanguage, Dictionary<CompilerVersion, CodeDomProvider>> CodeProviders = [];

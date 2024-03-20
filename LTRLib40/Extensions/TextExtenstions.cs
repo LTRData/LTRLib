@@ -105,7 +105,7 @@ public static class TextExtensions
             return (typeof(Reflection.MembersStringParser<>)
                 .MakeGenericType(obj.GetType())
                 .GetMethod("ToString", BindingFlags.Public | BindingFlags.Static)!
-                .Invoke(null, new[] { obj }) as string)
+                .Invoke(null, [obj]) as string)
                 ?? obj.ToString()
                 ?? obj.GetType().FullName!;
         }

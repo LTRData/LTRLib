@@ -11,6 +11,9 @@ using LTRLib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+#if NET45_OR_GREATER || NETCOREAPP
+using System.ComponentModel.DataAnnotations.Schema;
+#endif
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -186,7 +189,7 @@ public static class ExpressionSupport
         throw new NotSupportedException($"More than one element type detected for list type {Type}.");
     }
 
-    #if NETCOREAPP3_0_OR_GREATER || !NETCOREAPP
+#if NETCOREAPP3_0_OR_GREATER || !NETCOREAPP
 
     private sealed class ExpressionMemberEqualityComparer : IEqualityComparer<MemberInfo>
     {
@@ -209,15 +212,17 @@ public static class ExpressionSupport
 
     public static Dictionary<IEnumerable<MemberInfo>, string> GetDataFieldMappings(Type ElementType)
     {
+        while (ElementType.HasElementType)
+        {
+            ElementType = ElementType.GetElementType()!;
+        }
 
         Dictionary<IEnumerable<MemberInfo>, string>? mappings = null;
 
         lock (_GetDataFieldMappings_dataMappings)
         {
-
             if (!_GetDataFieldMappings_dataMappings.TryGetValue(ElementType, out mappings))
             {
-
                 mappings = CreateMemberToFieldDictionary();
 
                 mappings.AddRange(from prop in ElementType.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
@@ -227,7 +232,7 @@ public static class ExpressionSupport
                                         && ((PropertyInfo)prop).CanWrite
                                         || prop.MemberType == MemberTypes.Field
                                         && !((FieldInfo)prop).IsInitOnly
-                                  select new KeyValuePair<IEnumerable<MemberInfo>, string>(new[] { prop }, prop.Name));
+                                  select new KeyValuePair<IEnumerable<MemberInfo>, string>([prop], prop.Name));
 
                 var submappings = from props in mappings.Keys.ToArray()
                                   let prop = props.First()
@@ -290,25 +295,36 @@ public static class ExpressionSupport
     {
         public static string GetDataTableName(Type entityType)
         {
-            PropertyInfo itemsProperty = typeof(TContext).GetProperty("Items")
-                ?? throw new MissingMemberException("Property Items not found");
-
-            string? prop = null;
-
-            lock (_GetDataTableName_properties)
+#if NET45_OR_GREATER || NETCOREAPP
+            if (entityType.GetCustomAttribute<TableAttribute>(inherit: false) is { } tableAttribute)
             {
-                if (!_GetDataTableName_properties.TryGetValue(entityType, out prop))
-                {
-                    prop = itemsProperty
-                        .GetCustomAttributes(true)
-                        .OfType<XmlElementAttribute>()
-                        .Single(attr => attr.Type is not null && attr.Type.IsAssignableFrom(entityType)).ElementName;
-
-                    _GetDataTableName_properties.Add(entityType, prop);
-                }
+                return tableAttribute.Name;
             }
+            else
+#endif
+            if (typeof(TContext).GetProperty("Items") is { } itemsProperty)
+            {
+                string? prop = null;
 
-            return prop;
+                lock (_GetDataTableName_properties)
+                {
+                    if (!_GetDataTableName_properties.TryGetValue(entityType, out prop))
+                    {
+                        prop = itemsProperty
+                            .GetCustomAttributes(true)
+                            .OfType<XmlElementAttribute>()
+                            .Single(attr => attr.Type is not null && attr.Type.IsAssignableFrom(entityType)).ElementName;
+
+                        _GetDataTableName_properties.Add(entityType, prop);
+                    }
+                }
+
+                return prop;
+            }
+            else
+            {
+                throw new MissingMemberException($"Entity type {entityType} has no [Table] attribute and context type {typeof(TContext)} has no Items property");
+            }
         }
     }
 

@@ -242,7 +242,7 @@ public static class StringSupport
 
         if (PG)
         {
-            Digits = Digits.Append((char)(((Digits.Length + 2) % 10) + '0')).ToArray();
+            Digits = [.. Digits, (char)(((Digits.Length + 2) % 10) + '0')];
         }
 
         return $"{Digits.AsMemory()}{CalculateLuhn(Digits)}";

@@ -170,7 +170,7 @@ public static class EpsonPrinter
     {
         var lst = new List<byte>() { 0x1D, 0x48, (byte)BarCodeHRIPosition, 0x1D, 0x68, BarCodeHeight, 0x1D, 0x6B, (byte)((byte)BarCodeType + 0x41), (byte)Data.Length };
         lst.AddRange(Data);
-        return lst.ToArray();
+        return [.. lst];
     }
 
     public static byte[] GetDrawerKickoutRealTimeControl(byte DrawerNumber, short PulseTime) => [0x10, 0x14, 0x1, DrawerNumber, (byte)Math.Round(PulseTime / 100d)];

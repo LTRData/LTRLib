@@ -74,13 +74,13 @@ public class MathExpressionParser : IMathExpressionParser
 
     public MathExpressionParser(params Type[] extraProviderTypes)
     {
-        ProviderTypes = ProviderTypes.Concat(extraProviderTypes).ToArray();
+        ProviderTypes = [.. ProviderTypes, .. extraProviderTypes];
     }
 
     public MathExpressionParser(CultureInfo cultureInfo, params Type[] extraProviderTypes)
     {
         FormatInfo = cultureInfo;
-        ProviderTypes = ProviderTypes.Concat(extraProviderTypes).ToArray();
+        ProviderTypes = [.. ProviderTypes, .. extraProviderTypes];
     }
 
     public Expression ParseExpression(string line, out ParameterExpression[] parameters)

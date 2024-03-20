@@ -321,6 +321,6 @@ public static class IOSupport
             Line.Add((byte)B);
         }
 
-        return Line.ToArray();
+        return [.. Line];
     }
 }

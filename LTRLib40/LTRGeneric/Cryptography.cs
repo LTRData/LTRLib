@@ -46,7 +46,7 @@ public static class Cryptography
         Random.NextBytes(Challenge);
         var Bytes = new List<byte>(Challenge);
         Bytes.AddRange(Encoding.Unicode.GetBytes(SharedKey));
-        Response = HashProviderCache<T>.Instance.ComputeHash(Bytes.ToArray());
+        Response = HashProviderCache<T>.Instance.ComputeHash([.. Bytes]);
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public static class Cryptography
     {
         var Bytes = new List<byte>(Challenge);
         Bytes.AddRange(Encoding.Unicode.GetBytes(SharedKey));
-        return HashProviderCache<T>.Instance.ComputeHash(Bytes.ToArray());
+        return HashProviderCache<T>.Instance.ComputeHash([.. Bytes]);
     }
 
     /// <summary>
@@ -175,7 +175,6 @@ public static class Cryptography
 
     public static MemoryStream DecompressStream(BinaryReader reader, bool throwOnDecoderError)
     {
-
         var uncompressed = new MemoryStream();
 
         var BufferedFlags = 0U;
@@ -184,49 +183,36 @@ public static class Cryptography
 
         try
         {
-
-            do
+            for(; ;)
             {
-
                 if (BufferedFlagCount == 0)
                 {
-
                     if (reader.BaseStream.CanSeek && reader.BaseStream.Position > reader.BaseStream.Length - 4L)
                     {
-
                         break;
-
                     }
 
                     BufferedFlags = reader.ReadUInt32();
 
                     BufferedFlagCount = 32;
-
                 }
 
                 BufferedFlagCount -= 1;
 
                 if ((BufferedFlags & 1U << BufferedFlagCount) == 0U)
                 {
-
                     if (reader.BaseStream.CanSeek && reader.BaseStream.Position > reader.BaseStream.Length - 1L)
                     {
-
                         break;
-
                     }
 
                     uncompressed.WriteByte(reader.ReadByte());
                 }
-
                 else
                 {
-
                     if (reader.BaseStream.CanSeek && reader.BaseStream.Position > reader.BaseStream.Length - 2L)
                     {
-
                         break;
-
                     }
 
                     var MatchBytes = reader.ReadUInt16();
@@ -236,100 +222,72 @@ public static class Cryptography
 
                     if (MatchLength == 7)
                     {
-
                         if (!LastLengthHalfByte.HasValue)
                         {
-
                             LastLengthHalfByte = reader.ReadByte();
 
                             MatchLength = (ushort)(LastLengthHalfByte.Value & 0xF);
                         }
-
                         else
                         {
-
                             MatchLength = (ushort)(LastLengthHalfByte.Value >> 4);
 
                             LastLengthHalfByte = default;
-
                         }
 
                         if (MatchLength == 15)
                         {
-
                             MatchLength = reader.ReadByte();
 
                             if (MatchLength == 255)
                             {
-
                                 MatchLength = reader.ReadUInt16();
 
                                 if (MatchLength < 15 + 7)
                                 {
-
                                     if (throwOnDecoderError)
                                     {
-
                                         throw new InvalidDataException();
                                     }
-
                                     else
                                     {
-
                                         return uncompressed;
-
                                     }
-
                                 }
 
                                 MatchLength = (ushort)(MatchLength - (15 + 7));
-
                             }
 
                             MatchLength = (ushort)(MatchLength + 15);
-
                         }
 
                         MatchLength = (ushort)(MatchLength + 7);
-
                     }
 
                     MatchLength = (ushort)(MatchLength + 3);
 
                     for (ushort i = 0, loopTo = (ushort)(MatchLength - 1); i <= loopTo; i++)
                     {
-
                         if (MatchOffset > uncompressed.Position)
                         {
-
                             if (throwOnDecoderError)
                             {
-
                                 throw new InvalidDataException();
                             }
-
                             else
                             {
-
                                 return uncompressed;
-
                             }
 
                         }
 
                         uncompressed.WriteByte(uncompressed.GetBuffer()[(int)(uncompressed.Position - MatchOffset)]);
-
                     }
-
                 }
             }
-
-            while (true);
         }
-
         catch (EndOfStreamException)
         {
-
         }
 
         return uncompressed;

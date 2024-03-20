@@ -102,7 +102,6 @@ public class ResourceLoader
 
     public static byte[]? ReadEmbeddedResource(string name)
     {
-
         using var ResourceStream = OpenEmbeddedResource(name);
         if (ResourceStream is null)
         {

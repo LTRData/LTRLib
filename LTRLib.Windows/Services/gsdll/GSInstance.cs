@@ -146,7 +146,7 @@ public class GSInstance : IDisposable
 
         try
         {
-            InitWithArgs(parameters.ToArray());
+            InitWithArgs([.. parameters]);
         }
         finally
         {

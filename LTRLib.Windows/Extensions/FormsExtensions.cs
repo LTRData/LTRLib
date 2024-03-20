@@ -16,6 +16,8 @@ using System.Windows.Forms;
 
 #if NET30_OR_GREATER || NETCOREAPP
 using System.Windows.Media.Media3D;
+using LTRData.Extensions.Buffers;
+
 #endif
 
 using LTRLib.IO;
@@ -38,10 +40,10 @@ public static class FormsExtensions
     {
         using var buffer = new MemoryStream();
         img.Save(buffer, ImageFormat.Png);
-        return DrawingSupport.PngImageToBase64Url(buffer.ToArray());
+        return DrawingSupport.PngImageToBase64Url(buffer.GetBuffer(), 0, (int)buffer.Length);
     }
 
-    #if NET30_OR_GREATER || NETCOREAPP
+#if NET30_OR_GREATER || NETCOREAPP
 
     /// <summary>
     /// Calculates the area covered by a size.
@@ -66,7 +68,7 @@ public static class FormsExtensions
         return new Point3D(Rectangle.X + Rectangle.SizeX / 2d, Rectangle.Y + Rectangle.SizeY / 2d, Rectangle.Z + Rectangle.SizeZ / 2d);
     }
 
-    #endif
+#endif
 
     /// <summary>
     /// Calculates the area covered by a size.
@@ -209,7 +211,7 @@ public static class FormsExtensions
 
 #else
 
-        return string.Join(Environment.NewLine, resultLines.ToArray());
+        return string.Join(Environment.NewLine, [.. resultLines]);
 
 #endif
     }

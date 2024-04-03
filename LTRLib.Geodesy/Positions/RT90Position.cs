@@ -265,9 +265,9 @@ public class RT90Position
         return obj.PointX == PointX && obj.PointY == PointY;
     }
 
-    public static bool operator ==(RT90Position p0, RT90Position p1) => p0.Equals(p1);
+    public static bool operator ==(RT90Position? p0, RT90Position? p1) => ReferenceEquals(p0, p1) || p0 is not null && p0.Equals(p1);
 
-    public static bool operator !=(RT90Position p0, RT90Position p1) => !p0.Equals(p1);
+    public static bool operator !=(RT90Position? p0, RT90Position? p1) => !ReferenceEquals(p0, p1) && (p0 is null || !p0.Equals(p1));
 
     public override bool Equals(Position? obj)
     {

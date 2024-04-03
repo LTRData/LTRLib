@@ -227,13 +227,13 @@ public abstract class Position
     /// Builds a string representation of current position.
     /// </summary>
 
-    public static bool operator ==(Position p0, Position p1) => p0.Equals(p1);
+    public static bool operator ==(Position? p0, Position? p1) => ReferenceEquals(p0, p1) || p0 is not null && p0.Equals(p1);
 
-    public static bool operator !=(Position p0, Position p1) => !p0.Equals(p1);
+    public static bool operator !=(Position? p0, Position? p1) => !ReferenceEquals(p0, p1) && (p0 is null || !p0.Equals(p1));
 
-    public static bool operator ==(Position p0, WGS84Position p1) => p0.Equals(p1);
+    public static bool operator ==(Position? p0, WGS84Position? p1) => ReferenceEquals(p0, p1) || p0 is not null && p0.Equals(p1);
 
-    public static bool operator !=(Position p0, WGS84Position p1) => !p0.Equals(p1);
+    public static bool operator !=(Position? p0, WGS84Position? p1) => !ReferenceEquals(p0, p1) && (p0 is null || !p0.Equals(p1));
 
     public abstract override string ToString();
 

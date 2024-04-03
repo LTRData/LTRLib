@@ -236,9 +236,9 @@ public class WGS84Position
     public override int GetHashCode() => new { Latitude, Longitude }.GetHashCode();
 #endif
 
-    public static bool operator ==(WGS84Position p0, WGS84Position p1) => ReferenceEquals(p0, p1) || (p0 is not null && p0.Equals(p1));
+    public static bool operator ==(WGS84Position? p0, WGS84Position? p1) => ReferenceEquals(p0, p1) || (p0 is not null && p0.Equals(p1));
 
-    public static bool operator !=(WGS84Position p0, WGS84Position p1) => !(p0 == p1);
+    public static bool operator !=(WGS84Position? p0, WGS84Position? p1) => !(p0 == p1);
 
     /// <summary>
     /// Calculates four corner positions of a square around this position.

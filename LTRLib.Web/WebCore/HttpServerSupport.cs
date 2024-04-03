@@ -61,9 +61,15 @@ public static class HttpServerSupport
 
     public static string GetRequestCompressionEncoding(this HttpRequest request)
     {
+#if NET6_0_OR_GREATER
+        var acceptEncoding = request.Headers.AcceptEncoding.FirstOrDefault()
+            ?? request.Headers.TransferEncoding.FirstOrDefault()
+            ?? request.Headers.TE.FirstOrDefault();
+#else
         var acceptEncoding = request.Headers["Accept-Encoding"].FirstOrDefault()
             ?? request.Headers["Transfer-Encoding"].FirstOrDefault()
             ?? request.Headers["TE"].FirstOrDefault();
+#endif
 
         if (acceptEncoding is not null && !string.IsNullOrWhiteSpace(acceptEncoding))
         {
@@ -103,12 +109,12 @@ public static class HttpServerSupport
     /// feature to a web server request.
     /// </summary>
     /// <returns>True if response is redirected and completed, False if response is allowed to continue</returns>
-    public static Task<bool> ApplicationAddFeatures(this HttpContext context,
-                                                    HttpRequest request,
-                                                    HttpResponse response,
-                                                    IFileProvider fileProvider,
-                                                    DynDocFeatures features,
-                                                    CancellationToken cancellationToken)
+    public static ValueTask<bool> ApplicationAddFeatures(this HttpContext context,
+                                                         HttpRequest request,
+                                                         HttpResponse response,
+                                                         IFileProvider fileProvider,
+                                                         DynDocFeatures features,
+                                                         CancellationToken cancellationToken)
     {
         if (context.Connection.RemoteIpAddress is not null
             && !request.Path.StartsWithSegments("/robots.txt", StringComparison.Ordinal)
@@ -116,7 +122,7 @@ public static class HttpServerSupport
             && BotNetRanges.Encompasses(context.Connection.RemoteIpAddress))
         {
             response.StatusCode = (int)HttpStatusCode.NotFound;
-            return AsyncCompatExtensions.TrueResult;
+            return new(true);
         }
 
         var requestExt = Path.GetExtension(request.Path);
@@ -184,7 +190,7 @@ public static class HttpServerSupport
 
                     if (query is null)
                     {
-                        return AsyncCompatExtensions.FalseResult;
+                        return new(false);
                     }
 
                     request.Path = PathString.FromUriComponent(encodedPath);
@@ -237,14 +243,14 @@ public static class HttpServerSupport
                 
                 response.Redirect(docquery, permanent: true);
                 
-                return AsyncCompatExtensions.TrueResult;
+                return new(true);
             }
             catch (Exception ex)
             {
                 msg = ex.JoinMessages();
             }
 
-            static async Task<bool> WriteError(string msg, HttpResponse response, CancellationToken cancellationToken)
+            static async ValueTask<bool> WriteError(string msg, HttpResponse response, CancellationToken cancellationToken)
             {
                 await response.WriteAsync(msg, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
                 return true;
@@ -273,15 +279,15 @@ public static class HttpServerSupport
                     response.ContentType = "text/plain";
                     response.AppendHeader("Last-Modified", baseFileWriteTime);
 
-                    return AsyncCompatExtensions.FalseResult;
+                    return new(false);
                 }
 
-                static async Task<bool> CreateChecksumFile(string baseFile,
-                                                           DateTime baseFileWriteTime,
-                                                           string checksumFile,
-                                                           HttpResponse response,
-                                                           Func<HashAlgorithm> hashProviderFunc,
-                                                           CancellationToken cancellationToken)
+                static async ValueTask<bool> CreateChecksumFile(string baseFile,
+                                                                DateTime baseFileWriteTime,
+                                                                string checksumFile,
+                                                                HttpResponse response,
+                                                                Func<HashAlgorithm> hashProviderFunc,
+                                                                CancellationToken cancellationToken)
                 {
                     using var hashProvider = hashProviderFunc();
                     using var baseFileStream = File.OpenRead(baseFile);
@@ -307,7 +313,7 @@ public static class HttpServerSupport
             }
         }
 
-        return AsyncCompatExtensions.FalseResult;
+        return new(false);
     }
 
     public static IPAddress? GetClientTrueIPAddress(this HttpContext context)
@@ -465,31 +471,54 @@ public static class HttpServerSupport
 
     public static bool IsPartialScriptSupportBrowser(this HttpRequest request)
     {
-
+#if NET6_0_OR_GREATER
         if (!string.IsNullOrWhiteSpace(request.Headers["X-Wap-Profile"])
             || request.Headers.Keys is not null
             && request.Headers.Keys.Any(t => t.StartsWith("X-OperaMini", StringComparison.OrdinalIgnoreCase))
-            || !string.IsNullOrWhiteSpace(request.Headers["Accept"])
-            && request.Headers["Accept"].Any(t => t is not null
-            && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
+                || !string.IsNullOrWhiteSpace(request.Headers.Accept)
+            && request.Headers.Accept.Any(t => t is not null
+                && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
         {
             return true;
         }
+#else
+        if (!string.IsNullOrWhiteSpace(request.Headers["X-Wap-Profile"])
+            || request.Headers.Keys is not null
+            && request.Headers.Keys.Any(t => t.StartsWith("X-OperaMini", StringComparison.OrdinalIgnoreCase))
+                || !string.IsNullOrWhiteSpace(request.Headers["Accept"])
+            && request.Headers["Accept"].Any(t => t is not null
+                && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+#endif
 
         return false;
     }
 
     public static bool IsMobileBrowser(this HttpRequest request)
     {
+#if NET6_0_OR_GREATER
+        if (request.Headers.UserAgent.Any(t => t is not null && t.Contains("Mobile", StringComparison.OrdinalIgnoreCase))
+            || !string.IsNullOrWhiteSpace(request.Headers["X-Wap-Profile"])
+            || request.Headers.Keys is not null && request.Headers.Keys.Any(t => t.StartsWith("X-OperaMini", StringComparison.OrdinalIgnoreCase))
+            || !string.IsNullOrWhiteSpace(request.Headers.Accept)
+            && request.Headers.Accept.Any(t => t is not null
+                && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+#else
         if (request.Headers["User-Agent"].Any(t => t is not null && t.Contains("Mobile", StringComparison.OrdinalIgnoreCase))
             || !string.IsNullOrWhiteSpace(request.Headers["X-Wap-Profile"])
             || request.Headers.Keys is not null && request.Headers.Keys.Any(t => t.StartsWith("X-OperaMini", StringComparison.OrdinalIgnoreCase))
             || !string.IsNullOrWhiteSpace(request.Headers["Accept"])
             && request.Headers["Accept"].Any(t => t is not null
-            && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
+                && t.Contains("wap", StringComparison.OrdinalIgnoreCase)))
         {
             return true;
         }
+#endif
 
         return false;
     }

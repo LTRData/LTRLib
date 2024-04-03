@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 #if NETCOREAPP || NETSTANDARD || NET461_OR_GREATER
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 #endif
 
 namespace LTRLib.Web;
@@ -134,9 +135,9 @@ public static class HttpShared
     [Obsolete("Use QueryString methods instead")]
     public static string? Get(this IHeaderDictionary dict, string key) => dict[key].FirstOrDefault();
 
-    public static void AppendHeader(this HttpResponse response, string key, string value) => response.Headers.Add(key, value);
+    public static void AppendHeader(this HttpResponse response, string key, StringValues value) => response.Headers.Append(key, value);
 
-    public static void AppendHeader(this HttpResponse response, string key, DateTime value) => response.Headers.Add(key, value.ToUniversalTime().ToString("R"));
+    public static void AppendHeader(this HttpResponse response, string key, DateTime value) => response.Headers.Append(key, value.ToUniversalTime().ToString("R"));
 
     [Obsolete("Use QueryString methods instead")]
     public static string? GetParam(this HttpRequest request, string key) => request.Query[key].FirstOrDefault();

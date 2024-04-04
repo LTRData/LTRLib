@@ -35,7 +35,7 @@ public static class XmlSupport
 
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 
-    public static string[]? ArrayFromWebCompatibleQueryString(IEnumerable<string> @params)
+    public static string[]? ArrayFromWebCompatibleQueryString(IEnumerable<string>? @params)
     {
         if (@params is null)
         {
@@ -56,7 +56,7 @@ public static class XmlSupport
         return array;
     }
 
-    public static string[]? ArrayFromWebCompatibleQueryString(string @params)
+    public static string[]? ArrayFromWebCompatibleQueryString(string? @params)
     {
         if (@params is null)
         {

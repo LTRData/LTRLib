@@ -104,8 +104,8 @@ public static class PlacemarkSupport
         var segment = coordinates
             .Take(coordinates.Length - 1)
             .Select((item, i) => new LineSegment(item, coordinates[i + 1]))
-            .OrderBy(s => s.Distance(poscoordinate))
-            .First();
+            .MinBy(s => s.Distance(poscoordinate))!;
+
         var segmentbearing = new WGS84Position(segment.P0.Y, segment.P0.X).GetBearing(new WGS84Position(segment.P1.Y, segment.P1.X));
         return segmentbearing;
     }
@@ -116,8 +116,8 @@ public static class PlacemarkSupport
         var segment = coordinates
             .Take(coordinates.Length - 1)
             .Select((item, i) => new LineSegment(item, coordinates[i + 1]))
-            .OrderBy(s => s.Distance(position.Coordinate))
-            .First();
+            .MinBy(s => s.Distance(position.Coordinate))!;
+
         var segmentbearing = new WGS84Position(segment.P0.Y, segment.P0.X).GetBearing(new WGS84Position(segment.P1.Y, segment.P1.X));
         return segmentbearing;
     }
@@ -129,8 +129,8 @@ public static class PlacemarkSupport
         var segment = coordinates
             .Take(coordinates.Length - 1)
             .Select((item, i) => new LineSegment(item, coordinates[i + 1]))
-            .OrderBy(s => s.Distance(poscoordinate))
-            .First();
+            .MinBy(s => s.Distance(poscoordinate))!;
+
         var segmentwgs84 = (P0: new WGS84Position(segment.P0.Y, segment.P0.X), P1: new WGS84Position(segment.P1.Y, segment.P1.X));
         return segmentwgs84;
     }
@@ -142,8 +142,8 @@ public static class PlacemarkSupport
         var segment = coordinates
             .Take(coordinates.Length - 1)
             .Select((item, i) => new LineSegment(item, coordinates[i + 1]))
-            .OrderBy(s => s.Distance(poscoordinate))
-            .First();
+            .MinBy(s => s.Distance(poscoordinate))!;
+
         var segmentwgs84 = (P0: new WGS84Position(segment.P0.Y, segment.P0.X), P1: new WGS84Position(segment.P1.Y, segment.P1.X));
         return segmentwgs84;
     }
@@ -169,8 +169,7 @@ public static class PlacemarkSupport
         {
             var closest = list
                 .Select(region => new { muni = region, dist = region.polygons.Distance(point) })
-                .OrderBy(reg_dist => reg_dist.dist)
-                .First();
+                .MinBy(reg_dist => reg_dist.dist)!;
 
             var distance = closest.dist * 111195;
 

@@ -1,5 +1,6 @@
 ﻿#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
 
+using LTRData.Extensions.Buffers;
 using System;
 using System.Drawing;
 using System.Linq;
@@ -23,10 +24,7 @@ public static class Math3DExtensions
     public static double DistanceToHSB(this Color Color1, Color Color2) => new Vector3D(Color1.GetHue(), Color1.GetSaturation(), Color1.GetBrightness()).DistanceTo(new Vector3D(Color2.GetHue(), Color2.GetSaturation(), Color2.GetBrightness()));
 
     public static Color GetNearestColorRGB(this Color Color, Color[] Colors)
-        => (from c in Colors
-            let Distance = c.DistanceToRGB(Color)
-            orderby Distance ascending
-            select c).First();
+        => Colors.MinBy(c => c.DistanceToRGB(Color));
     
     private static Color GetClosestConsoleCompatibleColor(Color Color) => Color.FromArgb(Color.A, GetClosestConsoleCompatibleColorComponent(Color.R), GetClosestConsoleCompatibleColorComponent(Color.G), GetClosestConsoleCompatibleColorComponent(Color.B));
 
@@ -41,10 +39,7 @@ public static class Math3DExtensions
 
     public static Color GetNearestColorHSB(this Color Color, Color[] Colors)
     {
-        return (from c in Colors
-                let Distance = c.DistanceToHSB(Color)
-                orderby Distance ascending
-                select c).First();
+        return Colors.MinBy(c => c.DistanceToHSB(Color));
     }
 
 #if NET461_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP

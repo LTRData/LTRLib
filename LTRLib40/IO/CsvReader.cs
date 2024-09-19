@@ -18,11 +18,17 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using LTRData.Extensions.IO;
 using LTRLib.Extensions;
 
 namespace LTRLib.IO;
 
 public abstract partial class CsvReader : MarshalByRefObject, IEnumerable, IEnumerator, IDisposable
+#if NET462_OR_GREATER || NETSTANDARD || NETCOREAPP
+    , IAsyncDisposable
+#endif
 {
     protected readonly char[] _Delimiters = [','];
 
@@ -71,26 +77,48 @@ public abstract partial class CsvReader : MarshalByRefObject, IEnumerable, IEnum
     // IDisposable
     protected virtual void Dispose(bool disposing)
     {
-
         if (!disposedValue)
         {
-
             if (disposing)
             {
                 // TODO: dispose managed state (managed objects).
                 BaseReader?.Dispose();
+            }
 
+            // TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
+
+            // TODO: set large fields to null.
+        }
+
+        disposedValue = true;
+    }
+
+#if NET462_OR_GREATER || NETSTANDARD || NETCOREAPP
+    // IAsyncDisposable
+    public virtual async ValueTask DisposeAsync()
+    {
+        if (!disposedValue)
+        {
+            // TODO: dispose managed state (managed objects).
+            if (BaseReader is IAsyncDisposable asyncDisposable)
+            {
+                await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                BaseReader?.Dispose();
             }
 
             // TODO: free unmanaged resources (unmanaged objects) and override Finalize() below.
 
             // TODO: set large fields to null.
 
+            GC.SuppressFinalize(this);
         }
 
         disposedValue = true;
-
     }
+#endif
 
     // TODO: override Finalize() only if Dispose( disposing As Boolean) above has code to free unmanaged resources.
     ~CsvReader()
@@ -121,12 +149,18 @@ public abstract partial class CsvReader : MarshalByRefObject, IEnumerable, IEnum
 }
 
 [ComVisible(false)]
-public partial class CsvReader<T> : CsvReader, IEnumerable<T>, IEnumerator<T> where T : class, new()
+public partial class CsvReader<T> : CsvReader, IEnumerable<T>, IEnumerator<T>
+#if NET462_OR_GREATER || NETSTANDARD || NETCOREAPP
+    , IAsyncEnumerable<T>, IAsyncEnumerator<T>
+#endif
+    where T : class, new()
 {
     protected readonly Action<T, string>?[] _Properties;
 
     private static readonly MethodInfo _EnumParse
         = typeof(Enum).GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, [typeof(Type), typeof(string)], null)!;
+
+    public CancellationToken CancellationToken { get; set; }
 
     /// <summary>Generate a specific member setter for a specific reference type</summary>
     /// <param name="member_name">The member's name as defined in <typeparamref name="T"/></param>
@@ -137,26 +171,18 @@ public partial class CsvReader<T> : CsvReader, IEnumerable<T>, IEnumerator<T> wh
 
         var param_value = Expression.Parameter(typeof(string), "value");             // ' the member's new value
 
-        var member_info = typeof(T).GetMember(member_name, BindingFlags.FlattenHierarchy | BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FirstOrDefault(m => m is PropertyInfo || m is FieldInfo);
+        var member_info = typeof(T)
+            .GetMember(member_name, BindingFlags.FlattenHierarchy | BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .FirstOrDefault(m => m is PropertyInfo { CanWrite: true } or FieldInfo { IsInitOnly: false, IsLiteral: false });
 
         Expression member;
 
         if (member_info is FieldInfo field_info)
         {
-            if (field_info.IsInitOnly || field_info.IsLiteral)
-            {
-                return null;
-            }
-
             member = Expression.Field(param_this, field_info);
         }
         else if (member_info is PropertyInfo property_info)
         {
-            if (!property_info.CanWrite)
-            {
-                return null;
-            }
-
             member = Expression.Property(param_this, property_info);
         }
         else
@@ -165,6 +191,7 @@ public partial class CsvReader<T> : CsvReader, IEnumerable<T>, IEnumerator<T> wh
         }
 
         Expression assign_value;
+
         if (ReferenceEquals(member.Type, typeof(string)))
         {
             assign_value = param_value;
@@ -229,6 +256,14 @@ public partial class CsvReader<T> : CsvReader, IEnumerable<T>, IEnumerator<T> wh
 
         var field_names = line.Split(_Delimiters, StringSplitOptions.None);
 
+        if (_Textquotes.Length > 0)
+        {
+            for (var i = 0; i < field_names.Length; i++)
+            {
+                field_names[i] = field_names[i].Trim(_Textquotes);
+            }
+        }
+
         _Properties = Array.ConvertAll(field_names, GenerateReferenceTypeMemberSetter);
     }
 
@@ -257,18 +292,16 @@ public partial class CsvReader<T> : CsvReader, IEnumerable<T>, IEnumerator<T> wh
 
         while (startIdx < line.Length)
         {
-
             var scanIdx = startIdx;
+         
             if (Array.IndexOf(_Textquotes, line[scanIdx]) >= 0 && scanIdx + 1 < line.Length)
             {
-
                 scanIdx = line.IndexOfAny(_Textquotes, scanIdx + 1);
 
                 if (scanIdx < 0)
                 {
                     scanIdx = startIdx;
                 }
-
             }
 
             var i = line.IndexOfAny(_Delimiters, scanIdx);
@@ -298,5 +331,71 @@ public partial class CsvReader<T> : CsvReader, IEnumerable<T>, IEnumerator<T> wh
 
     public new IEnumerator<T> GetEnumerator() => this;
 
+#if NET462_OR_GREATER || NETSTANDARD || NETCOREAPP
+    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        CancellationToken = cancellationToken;
+        return this;
+    }
+#endif
+
+    public async ValueTask<bool> MoveNextAsync()
+    {
+        var line = await BaseReader.ReadLineAsync(CancellationToken).ConfigureAwait(false);
+
+        if (line is null)
+        {
+            Current = null!;
+            return false;
+        }
+
+        if (line.Length == 0)
+        {
+            Current = null!;
+            return true;
+        }
+
+        var fields = new List<string>(_Properties.Length);
+        var startIdx = 0;
+
+        while (startIdx < line.Length)
+        {
+            var scanIdx = startIdx;
+         
+            if (Array.IndexOf(_Textquotes, line[scanIdx]) >= 0 && scanIdx + 1 < line.Length)
+            {
+                scanIdx = line.IndexOfAny(_Textquotes, scanIdx + 1);
+
+                if (scanIdx < 0)
+                {
+                    scanIdx = startIdx;
+                }
+            }
+
+            var i = line.IndexOfAny(_Delimiters, scanIdx);
+
+            if (i < 0)
+            {
+                fields.Add(line.AsSpan(startIdx).Trim(_Textquotes).ToString());
+                break;
+            }
+
+            fields.Add(line.AsSpan(startIdx, i - startIdx).Trim(_Textquotes).ToString());
+
+            startIdx = i + 1;
+        }
+
+        var obj = new T();
+
+        for (int i = 0, loopTo = Math.Min(fields.Count - 1, _Properties.GetUpperBound(0)); i <= loopTo; i++)
+        {
+            _Properties[i]?.Invoke(obj, fields[i]);
+        }
+
+        Current = obj;
+
+        return true;
+    }
 }
 #endif

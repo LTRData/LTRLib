@@ -12,9 +12,10 @@
   <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net35`))' &gt;= 0">
     <Reference Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
-  
+
   <ItemGroup Condition="('$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net461`))' &gt;= 0) Or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="*" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="*" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0">

@@ -46,8 +46,8 @@ public class IPAddressRanges : NumericRanges<uint>
 
     public void Add(string range)
     {
-        var start = IPAddressToNumeric(range.AsSpan().Split('-').ElementAt(0));
-        var end = IPAddressToNumeric(range.AsSpan().Split('-').ElementAt(1));
+        var start = IPAddressToNumeric(range.AsSpan().TokenEnum('-').ElementAt(0));
+        var end = IPAddressToNumeric(range.AsSpan().TokenEnum('-').ElementAt(1));
         Add((Math.Min(start, end), Math.Max(start, end)));
     }
 
@@ -56,8 +56,8 @@ public class IPAddressRanges : NumericRanges<uint>
     public void AddRange(IEnumerable<string> ranges)
     {
         AddRange(from range in ranges
-                 let start = IPAddressToNumeric(range.AsSpan().Split('-').ElementAt(0))
-                 let end = IPAddressToNumeric(range.AsSpan().Split('-').ElementAt(1))
+                 let start = IPAddressToNumeric(range.AsSpan().TokenEnum('-').ElementAt(0))
+                 let end = IPAddressToNumeric(range.AsSpan().TokenEnum('-').ElementAt(1))
                  select (Math.Min(start, end), Math.Max(start, end)));
     }
 

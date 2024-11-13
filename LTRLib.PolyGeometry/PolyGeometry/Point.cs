@@ -49,7 +49,7 @@ public struct Point : IEquatable<Point>, IPolyGeometry
     public static Point Parse(ReadOnlyMemory<char> text)
     {
         var xy = 
-            text.TrimStart('(').TrimEnd(')').Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(
+            text.TrimStart('(').TrimEnd(')').TokenEnum(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(
             v => double.Parse(v.Span.Trim(), provider: NumberFormatInfo.InvariantInfo)).ToArray();
 
         return new Point(xy[0], xy[1]);
@@ -60,7 +60,7 @@ public struct Point : IEquatable<Point>, IPolyGeometry
     public static Point Parse(ReadOnlyMemory<char> text)
     {
         var xy = 
-            text.TrimStart('(').TrimEnd(')').Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(
+            text.TrimStart('(').TrimEnd(')').TokenEnum(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(
             v => double.Parse(v.Span.Trim().ToString(), NumberFormatInfo.InvariantInfo)).ToArray();
 
         return new Point(xy[0], xy[1]);

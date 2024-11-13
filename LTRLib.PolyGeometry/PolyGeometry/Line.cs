@@ -62,7 +62,7 @@ public struct Line : IPolyGeometry, IEquatable<Line>
 #if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
     public static Line Parse(string text)
     {
-        var points = text.AsMemory().Split(',').Take(2).Select(Point.Parse).ToArray();
+        var points = text.AsMemory().TokenEnum(',').Take(2).Select(Point.Parse).ToArray();
         return new Line(points[0], points[1]);
     }
 #else

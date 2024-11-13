@@ -50,7 +50,7 @@ public static class PlacemarkSupport
     {
         if (wkt.StartsWith("POINT (", StringComparison.Ordinal))
         {
-            var xy = wkt.AsMemory("POINT (".Length).TrimEnd(')').Split(' ').Take(2).ToArray();
+            var xy = wkt.AsMemory("POINT (".Length).TrimEnd(')').TokenEnum(' ').Take(2).ToArray();
             return PointFromLatLon(xy[1].Span, xy[0].Span);
         }
         else
@@ -171,7 +171,7 @@ public static class PlacemarkSupport
                 .Select(region => new { muni = region, dist = region.polygons.Distance(point) })
                 .MinBy(reg_dist => reg_dist.dist)!;
 
-            var distance = closest.dist * 111195;
+            var distance = closest.dist * 111_195;
 
             if (distance < distanceTolerance)
             {

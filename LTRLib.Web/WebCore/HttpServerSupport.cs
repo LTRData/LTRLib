@@ -234,7 +234,7 @@ public static class HttpServerSupport
                 {
                     encodedQuery = request.Path.Value
                         .AsSpan("/redir/".Length)
-                        .Split('/')
+                        .TokenEnum('/')
                         .ElementAtOrDefault(0)
                         .ToString();
                 }

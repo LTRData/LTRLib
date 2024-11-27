@@ -27,7 +27,7 @@
 
   <ItemGroup Condition="('$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net461`))' &gt;= 0) Or '$(TargetFramework.CompareTo(`netcoreapp`))' &gt;= 0">
     <PackageReference Include="System.Text.Json" Version="*" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.*" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.*" />
   </ItemGroup>
 
 </Project>

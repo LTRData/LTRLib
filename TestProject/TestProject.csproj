@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0-windows;net48;net462</TargetFrameworks>
+    <TargetFrameworks>net8.0-windows;net9.0-windows;net48;net462</TargetFrameworks>
     <RegisterForComInterop>false</RegisterForComInterop>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -9,7 +9,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="*" />
     <PackageReference Include="xunit" Version="*" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="*">
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.*" Condition="'$(TargetFramework.CompareTo(`net472`))' &lt; 0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.*" Condition="'$(TargetFramework.CompareTo(`net472`))' &gt;= 0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

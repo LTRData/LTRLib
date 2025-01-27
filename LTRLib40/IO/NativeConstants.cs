@@ -401,13 +401,13 @@ public static class NativeConstants
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct DiskExtent
     {
-        public uint DiskNumber { get; }
+        public int DiskNumber { get; }
 
         public long StartingOffset { get; }
 
         public long ExtentLength { get; }
 
-        public DiskExtent(uint DiskNumber, long StartingOffset, long ExtentLength)
+        public DiskExtent(int DiskNumber, long StartingOffset, long ExtentLength)
         {
             this.DiskNumber = DiskNumber;
             this.StartingOffset = StartingOffset;
@@ -416,7 +416,7 @@ public static class NativeConstants
 
         public DiskExtent(long StartingOffset, long ExtentLength)
         {
-            DiskNumber = uint.MaxValue;
+            DiskNumber = -1;
             this.StartingOffset = StartingOffset;
             this.ExtentLength = ExtentLength;
         }

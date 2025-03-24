@@ -7,6 +7,7 @@
 
 #if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
 
+using LTRLib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,11 +36,11 @@ internal static class MembersStringParser<T>
         var ObjectToStringMethod = typeof(object).GetMethod("ToString")!;
 
         var fields = from member in typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Public)
-                     select new KeyValuePair<string, MemberExpression>(member.Name, Expression.Field(param_this, member));
+                     select new KeyValuePair<string, MemberExpression>(member.GetColumnName(), Expression.Field(param_this, member));
 
         var props = from member in typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)
                     where member.GetIndexParameters().Length == 0 && member.CanRead
-                    select new KeyValuePair<string, MemberExpression>(member.Name, Expression.Property(param_this, member));
+                    select new KeyValuePair<string, MemberExpression>(member.GetColumnName(), Expression.Property(param_this, member));
 
         var Accessors = (from field in fields.Concat(props)
                          let isnull = Expression.ReferenceEqual(Expression.TypeAs(field.Value, typeof(object)), Expression.Constant(null))

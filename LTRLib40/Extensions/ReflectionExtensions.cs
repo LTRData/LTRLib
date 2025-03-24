@@ -5,7 +5,11 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
 using System.Security;
-
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+using System.ComponentModel.DataAnnotations.Schema;
+#endif
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Linq;
 #endif
@@ -222,7 +226,7 @@ namespace LTRLib.Extensions
         /// </summary>
         /// <typeparam name="T">Type of elements in enumeration</typeparam>
         /// <param name="o">IEnumerable reference variable to check for Null reference</param>
-        public static IEnumerable<T> Nz<T>(this IEnumerable<T>? o) => o ?? Enumerable.Empty<T>();
+        public static IEnumerable<T> Nz<T>(this IEnumerable<T>? o) => o ?? [];
 
 #endif
 
@@ -249,6 +253,36 @@ namespace LTRLib.Extensions
         /// <typeparam name="T">Type of source variable</typeparam>
         /// <param name="obj">Source object to clone</param>
         public static T CreateTypedClone<T>(this T obj) where T : ICloneable => (T)obj.Clone();
+
+#if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
+        [return: NotNullIfNotNull(nameof(obj))]
+#endif
+        public static string? ToMembersString(this object? obj)
+        {
+            if (obj is null)
+            {
+                return "{null}";
+            }
+            else
+            {
+                return (typeof(Reflection.MembersStringParser<>)
+                    .MakeGenericType(obj.GetType())
+                    .GetMethod("ToString", BindingFlags.Public | BindingFlags.Static)!
+                    .Invoke(null, [obj]) as string)
+                    ?? obj.ToString()
+                    ?? obj.GetType().FullName!;
+            }
+        }
+
+        public static string ToMembersString<T>(this T o) where T : struct => Reflection.MembersStringParser<T>.ToString(o);
+#endif
+
+#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+        public static string GetColumnName(this MemberInfo memberInfo) => memberInfo.GetCustomAttribute<ColumnAttribute>()?.Name ?? memberInfo.Name;
+#else
+        public static string GetColumnName(this MemberInfo memberInfo) => memberInfo.Name;
+#endif
 
         #region ISynchronizeInvoke typed extensions
 

@@ -138,7 +138,10 @@ public static class ExpressionSupport
                                            where i.IsGenericType && i.GetGenericArguments().Length == GenericArguments.Length
                                            select i)
                     {
-                        newMethod = interf.GetMethods(BindingFlags.Public | BindingFlags.Instance).FirstOrDefault(m => methodNames.Contains(m.Name) && ParameterCompatibilityComparer.Compatible(m, ReturnType, AlternateArgsTypes));
+                        newMethod = interf
+                            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                            .FirstOrDefault(m => methodNames.Contains(m.Name)
+                                && ParameterCompatibilityComparer.Compatible(m, ReturnType, AlternateArgsTypes));
 
                         if (newMethod is not null)
                         {
@@ -154,7 +157,7 @@ public static class ExpressionSupport
         return newMethod;
     }
 
-    private static readonly Dictionary<Type, Type[]> _GetListItemsType_listItemsTypes = [];
+    private static readonly Dictionary<Type, Type[]> listItemsTypes = [];
 
     public static Type GetListItemsType(Type Type)
     {
@@ -165,15 +168,15 @@ public static class ExpressionSupport
 
         Type[]? i = null;
 
-        lock (_GetListItemsType_listItemsTypes)
+        lock (listItemsTypes)
         {
-            if (!_GetListItemsType_listItemsTypes.TryGetValue(Type, out i))
+            if (!listItemsTypes.TryGetValue(Type, out i))
             {
-                i = (from ifc in Type.GetInterfaces()
+                i = [.. from ifc in Type.GetInterfaces()
                      where ifc.IsGenericType && ifc.GetGenericTypeDefinition() == typeof(IList<>)
-                     select ifc.GetGenericArguments()[0]).ToArray();
+                     select ifc.GetGenericArguments()[0]];
 
-                _GetListItemsType_listItemsTypes.Add(Type, i);
+                listItemsTypes.Add(Type, i);
             }
         }
 
@@ -208,7 +211,7 @@ public static class ExpressionSupport
     public static Dictionary<IEnumerable<MemberInfo>, string> CreateMemberToFieldDictionary()
         => new(new SequenceEqualityComparer<MemberInfo>(new ExpressionMemberEqualityComparer()));
 
-    private static readonly Dictionary<Type, Dictionary<IEnumerable<MemberInfo>, string>> _GetDataFieldMappings_dataMappings = [];
+    private static readonly Dictionary<Type, Dictionary<IEnumerable<MemberInfo>, string>> dataFieldMappings = [];
 
     public static Dictionary<IEnumerable<MemberInfo>, string> GetDataFieldMappings(Type ElementType)
     {
@@ -219,9 +222,9 @@ public static class ExpressionSupport
 
         Dictionary<IEnumerable<MemberInfo>, string>? mappings = null;
 
-        lock (_GetDataFieldMappings_dataMappings)
+        lock (dataFieldMappings)
         {
-            if (!_GetDataFieldMappings_dataMappings.TryGetValue(ElementType, out mappings))
+            if (!dataFieldMappings.TryGetValue(ElementType, out mappings))
             {
                 mappings = CreateMemberToFieldDictionary();
 
@@ -232,7 +235,7 @@ public static class ExpressionSupport
                                         && ((PropertyInfo)prop).CanWrite
                                         || prop.MemberType == MemberTypes.Field
                                         && !((FieldInfo)prop).IsInitOnly
-                                  select new KeyValuePair<IEnumerable<MemberInfo>, string>([prop], prop.Name));
+                                  select new KeyValuePair<IEnumerable<MemberInfo>, string>([prop], prop.GetColumnName()));
 
                 var submappings = from props in mappings.Keys.ToArray()
                                   let prop = props.First()
@@ -245,11 +248,11 @@ public static class ExpressionSupport
                                   let type = GetListItemsType(prop.MemberType == MemberTypes.Property ? ((PropertyInfo)prop).PropertyType : ((FieldInfo)prop).FieldType)
                                   where !type.IsPrimitive && !ReferenceEquals(type, typeof(string))
                                   from submapping in GetDataFieldMappings(type)
-                                  select new KeyValuePair<IEnumerable<MemberInfo>, string>(submapping.Key.Concat(props), $"{prop.Name}.{submapping.Value}");
+                                  select new KeyValuePair<IEnumerable<MemberInfo>, string>(submapping.Key.Concat(props), $"{prop.GetColumnName()}.{submapping.Value}");
 
                 mappings.AddRange(submappings);
 
-                _GetDataFieldMappings_dataMappings.Add(ElementType, mappings);
+                dataFieldMappings.Add(ElementType, mappings);
             }
         }
 
@@ -363,7 +366,7 @@ public static class ExpressionSupport
                          let f = m as FieldInfo
                          where p is not null && p.CanRead && p.CanWrite && p.GetIndexParameters().Length == 0 || f is not null && !f.IsInitOnly
                          let proptype = p is not null ? p.PropertyType : f.FieldType
-                         let name = m.Name
+                         let name = m.GetColumnName()
                          let member = Expression.PropertyOrField(target, m.Name)
                          select new { name, proptype, member }).ToArray();
 

@@ -21,7 +21,6 @@ namespace LTRLib.IO;
 
 public abstract partial class CsvWriter : MarshalByRefObject, IDisposable
 {
-
     public TextWriter BaseWriter { get; }
 
     public string? Delimiter { get; }
@@ -57,36 +56,29 @@ public abstract partial class CsvWriter : MarshalByRefObject, IDisposable
 
     public static void Write<T>(string FilePath, IEnumerable<T> objects)
     {
-
         using var csvwriter = new CsvWriter<T>(FilePath);
 
         csvwriter.WriteAll(objects);
-
     }
 
     public static void Write<T>(string FilePath, string delimiters, IEnumerable<T> objects)
     {
-
         using var csvwriter = new CsvWriter<T>(FilePath, delimiters);
 
         csvwriter.WriteAll(objects);
-
     }
 
     public static void Write<T>(string FilePath, string delimiters, string textquotes, IEnumerable<T> objects)
     {
-
         using var csvwriter = new CsvWriter<T>(FilePath, delimiters, textquotes);
 
         csvwriter.WriteAll(objects);
-
     }
 
     public static string Convert<T>(string delimiter, string textquotes, T obj) => CsvWriter<T>.Convert(delimiter, textquotes, obj);
 
     public static IEnumerable<string> ConvertAll<T>(string delimiter, string textquotes, IEnumerable<T> objects)
     {
-
         yield return CsvWriter<T>.GetHeaderLine(delimiter);
 
         foreach (var obj in objects)
@@ -133,7 +125,6 @@ public abstract partial class CsvWriter : MarshalByRefObject, IDisposable
     }
 
     #endregion
-
 }
 
 [ComVisible(false)]
@@ -152,7 +143,6 @@ public partial class CsvWriter<T> : CsvWriter
         /// <param name="name"></param>
         public PropertyDescriptor(MethodInfo prop, string name)
         {
-
             ReturnType = prop.ReturnType;
 
             PropertyName = name;
@@ -180,10 +170,7 @@ public partial class CsvWriter<T> : CsvWriter
             var lambda = Expression.Lambda<Func<T, string>>(value_as_string, param_this);
 
             Accessor = lambda.Compile();
-
         }
-
-
     }
 
     protected static readonly PropertyDescriptor[] _Properties;
@@ -192,38 +179,31 @@ public partial class CsvWriter<T> : CsvWriter
 
     public CsvWriter(string FilePath) : this(File.CreateText(FilePath))
     {
-
     }
 
     public CsvWriter(string FilePath, string delimiters) : this(File.CreateText(FilePath), delimiters)
     {
-
     }
 
     public CsvWriter(string FilePath, string delimiters, string textquotes) : this(File.CreateText(FilePath), delimiters, textquotes)
     {
-
     }
 
     public CsvWriter(TextWriter Writer) : this(Writer, null, null)
     {
-
     }
 
     public CsvWriter(TextWriter Writer, string delimiters) : this(Writer, delimiters, null)
     {
-
     }
 
     static CsvWriter()
     {
-
-        _Properties = (from prop in typeof(T).GetProperties()
+        _Properties = [.. from prop in typeof(T).GetProperties()
                        where prop.CanRead && prop.GetIndexParameters().Length == 0
                        let accessor = prop.GetGetMethod()
                        where accessor is not null
-                       select new PropertyDescriptor(accessor, prop.Name)).ToArray();
-
+                       select new PropertyDescriptor(accessor, prop.GetColumnName())];
     }
 
     public CsvWriter(TextWriter Writer, string? delimiter, string? textquotes) : this(Writer, delimiter, textquotes, writeheader: true)
@@ -251,14 +231,12 @@ public partial class CsvWriter<T> : CsvWriter
 #endif
 
         return string.Join(delimiter, parsed_fields);
-
     }
 
     public void Write(T obj) => BaseWriter.WriteLine(Convert(Delimiter, TextQuotes, obj));
 
     public void WriteAll(IEnumerable<T> objects)
     {
-
         foreach (var obj in objects)
         {
             Write(obj);
@@ -267,16 +245,13 @@ public partial class CsvWriter<T> : CsvWriter
 
     public static string Convert(string? delimiter, string? textquotes, T obj)
     {
-
         string field_converter(PropertyDescriptor prop)
         {
             var value = prop.Accessor(obj);
 
             if (!string.IsNullOrEmpty(textquotes) && !prop.ReturnType.IsValueType)
             {
-
                 value = string.Concat(textquotes, value, textquotes);
-
             }
 
             return value;
@@ -289,7 +264,6 @@ public partial class CsvWriter<T> : CsvWriter
 #endif
 
         return string.Join(delimiter, parsed_fields);
-
     }
 
 }

@@ -23,7 +23,7 @@ public class SimplePropertyDescriptor : PropertyDescriptor
     private class SimpleMemberDescriptor : MemberDescriptor
     {
         public SimpleMemberDescriptor(PropertyInfo prop)
-            : base(prop.Name, prop.GetCustomAttributes(inherit: false).OfType<Attribute>().ToArray())
+            : base(prop.Name, [.. prop.GetCustomAttributes(inherit: false).OfType<Attribute>()])
         {
         }
     }

@@ -24,15 +24,15 @@ public class FieldComparer
 
         static MemberHolder()
         {
-            fields = (from field1 in typeof(TSource).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+            fields = [.. from field1 in typeof(TSource).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                       join field2 in typeof(TTarget).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly) on field1.Name equals field2.Name
-                      select new[] { field1, field2 }).ToArray();
+                      select new[] { field1, field2 }];
 
-            properties = (from prop1 in typeof(TSource).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+            properties = [.. from prop1 in typeof(TSource).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                           where prop1.GetIndexParameters().Length == 0 && prop1.CanRead && prop1.CanWrite
                           join prop2 in typeof(TTarget).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly) on prop1.Name equals prop2.Name
                           where prop2.GetIndexParameters().Length == 0 && prop2.CanRead && prop2.CanWrite
-                          select new[] { prop1, prop2 }).ToArray();
+                          select new[] { prop1, prop2 }];
         }
     }
 

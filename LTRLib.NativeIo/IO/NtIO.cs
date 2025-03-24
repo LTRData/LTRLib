@@ -59,7 +59,7 @@ public class NativeDirectoryEntryInfo
     internal unsafe NativeDirectoryEntryInfo(string? basePath, void* finder)
     {
         DirectoryPath = basePath;
-        FileName = new string((char*)((byte*)finder + 104), 0, (int)((uint)(*(int*)((byte*)finder + 60)) >> 1));
+        FileName = new string((char*)((byte*)finder + 104), 0, (int)((uint)*(int*)((byte*)finder + 60) >> 1));
         ShortName = new string((char*)((byte*)finder + 70), 0, (int)((uint)((byte*)finder)[68] >> 1));
         FileIndex = *(uint*)((byte*)finder + 4);
         CreationTime = DateTime.FromFileTime(*(long*)((byte*)finder + 8));

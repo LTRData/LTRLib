@@ -87,7 +87,7 @@ public static class SqlExtensions
             command.CommandText = query;
             command.Parameters.AddRange(parameters);
 
-            return command.ExecuteReader().OfType<IDataRecord>().Select(DataExtensions.RecordToEntityObject<T>).ToArray();
+            return [.. command.ExecuteReader().OfType<IDataRecord>().Select(DataExtensions.RecordToEntityObject<T>)];
         }
         finally
         {

@@ -10,7 +10,7 @@ public partial class Diskdrive
     /// Gets information about physical and logical devices.
     /// </summary>
     /// <returns>List of physical device objects.</returns>
-    public static List<Diskdrive> GetPresentDrives() => GetInstances().OfType<Diskdrive>().Where(disk => disk.MediaLoaded).ToList();
+    public static List<Diskdrive> GetPresentDrives() => [.. GetInstances().OfType<Diskdrive>().Where(disk => disk.MediaLoaded)];
 
     /// <summary>
     /// Implements ToString method for physical disk drive.
@@ -24,7 +24,7 @@ public partial class CdRomDrive
     /// Gets information about physical and logical devices.
     /// </summary>
     /// <returns>List of physical device objects.</returns>
-    public static List<CdRomDrive> GetPresentDrives() => GetInstances().OfType<CdRomDrive>().Where(disk => disk.MediaLoaded).ToList();
+    public static List<CdRomDrive> GetPresentDrives() => [.. GetInstances().OfType<CdRomDrive>().Where(disk => disk.MediaLoaded)];
 
     /// <summary>
     /// Implements ToString method for physical disk drive.

@@ -215,18 +215,16 @@ public static class PlacemarkSupport
 
     public static Region[] ParseKmlRegions(this IEnumerable<Placemark> kmlPlacemarks)
     {
-        return kmlPlacemarks
+        return [.. kmlPlacemarks
             .Select(PlacemarkToMunicipality)
-            .Where(item => item.polygons.IsValid)
-            .ToArray();
+            .Where(item => item.polygons.IsValid)];
     }
 
     public static async Task<Region[]> ParseKmlRegions(this Task<IEnumerable<Placemark>> kmlPlacemarks)
     {
-        return (await kmlPlacemarks.ConfigureAwait(false))
+        return [.. (await kmlPlacemarks.ConfigureAwait(false))
             .Select(PlacemarkToMunicipality)
-            .Where(item => item.polygons.IsValid)
-            .ToArray();
+            .Where(item => item.polygons.IsValid)];
     }
 
     public static string? FindRegionForPoint(this IEnumerable<Region> regions, Geometry point, double distanceTolerance, ref Region? last_found)

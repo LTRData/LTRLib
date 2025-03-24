@@ -248,7 +248,7 @@ public class GaussKreuger
         var A = e2;
         var B = (5.0 * e2 * e2 - e2 * e2 * e2) / 6.0;
         var C = (104.0 * e2 * e2 * e2 - 45.0 * e2 * e2 * e2 * e2) / 120.0;
-        var D = (1237.0 * e2 * e2 * e2 * e2) / 1260.0;
+        var D = 1237.0 * e2 * e2 * e2 * e2 / 1260.0;
         var beta1 = n / 2.0 - 2.0 * n * n / 3.0 + 5.0 * n * n * n / 16.0 + 41.0 * n * n * n * n / 180.0;
         var beta2 = 13.0 * n * n / 48.0 - 3.0 * n * n * n / 5.0 + 557.0 * n * n * n * n / 1440.0;
         var beta3 = 61.0 * n * n * n / 240.0 - 103.0 * n * n * n * n / 140.0;

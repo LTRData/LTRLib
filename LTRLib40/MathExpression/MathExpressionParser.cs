@@ -87,7 +87,7 @@ public class MathExpressionParser : IMathExpressionParser
     {
         var subExpr = new Dictionary<string, Expression>(StringComparer.Ordinal);
         line = ParseExpression(line, subExpr);
-        parameters = subExpr.Values.OfType<ParameterExpression>().ToArray();
+        parameters = [.. subExpr.Values.OfType<ParameterExpression>()];
         return subExpr[line];
     }
 
@@ -162,7 +162,7 @@ public class MathExpressionParser : IMathExpressionParser
                 key = ParseOperation(
                     operands[startidx],
                     subExpr,
-                    sub_operands
+                    [.. sub_operands
                     .Where((op, i) => (i & 1) == 0)
                     .Select(op =>
                     {
@@ -171,8 +171,7 @@ public class MathExpressionParser : IMathExpressionParser
                             ?? throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operand, subExpr)}'");
 
                         return subExpr[subkey];
-                    })
-                    .ToArray());
+                    })]);
             }
             else
             {
@@ -204,7 +203,7 @@ public class MathExpressionParser : IMathExpressionParser
                 
                 if (startIdx + count <= operands.Count)
                 {
-                    var key = ParseExpression(operands.Skip(startIdx).Take(count).ToList(), subExpr)
+                    var key = ParseExpression([.. operands.Skip(startIdx).Take(count)], subExpr)
                         ?? throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
 
                     operands.RemoveRange(startIdx, count);
@@ -243,7 +242,7 @@ public class MathExpressionParser : IMathExpressionParser
             {
                 if (!subExpr.ContainsKey(operands[1]))
                 {
-                    key = ParseExpression(operands.Skip(1).ToList(), subExpr);
+                    key = ParseExpression([.. operands.Skip(1)], subExpr);
                     
                     if (key is null)
                     {
@@ -273,7 +272,7 @@ public class MathExpressionParser : IMathExpressionParser
             {
                 while (operands.Count > 3)
                 {
-                    key = ParseExpression(operands.Take(3).ToList(), subExpr);
+                    key = ParseExpression([.. operands.Take(3)], subExpr);
                     if (key is null)
                     {
                         throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
@@ -285,7 +284,7 @@ public class MathExpressionParser : IMathExpressionParser
 
                 if (!subExpr.ContainsKey(operands[2]))
                 {
-                    key = ParseExpression(operands.Skip(2).ToList(), subExpr);
+                    key = ParseExpression([.. operands.Skip(2)], subExpr);
                     if (key is null)
                     {
                         throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
@@ -298,7 +297,7 @@ public class MathExpressionParser : IMathExpressionParser
 
                 if (!subExpr.ContainsKey(operands[0]))
                 {
-                    key = ParseExpression(operands.Take(1).ToList(), subExpr);
+                    key = ParseExpression([.. operands.Take(1)], subExpr);
                     if (key is null)
                     {
                         throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
@@ -374,11 +373,11 @@ public class MathExpressionParser : IMathExpressionParser
     }
 
     private MethodInfo? GetMathDoubleMethod(string method, int paramCount) => ProviderTypes
-        .Select(type => type.GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase, null, Enumerable.Repeat(typeof(double), paramCount).ToArray(), null))
+        .Select(type => type.GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase, null, [.. Enumerable.Repeat(typeof(double), paramCount)], null))
         .FirstOrDefault(m => m is not null && m.ReturnType == typeof(double));
 
     private MethodInfo? GetMathIntMethod(string method, int paramCount) => ProviderTypes
-        .Select(type => type.GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase, null, Enumerable.Repeat(typeof(long), paramCount).ToArray(), null))
+        .Select(type => type.GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase, null, [.. Enumerable.Repeat(typeof(long), paramCount)], null))
         .FirstOrDefault(m => m is not null && m.ReturnType == typeof(long));
 
     private FieldInfo? GetMathConstant(string constant) => ProviderTypes

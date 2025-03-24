@@ -86,7 +86,7 @@ public static class NumericExtensions
     /// <param name="b">Second value</param>
     /// <returns>Least common multiple for values a and b.</returns>
     public static long LeastCommonMultiple(long a, long b)
-        => (a / GreatestCommonDivisor(a, b)) * b;
+        => a / GreatestCommonDivisor(a, b) * b;
 
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
     /// <summary>

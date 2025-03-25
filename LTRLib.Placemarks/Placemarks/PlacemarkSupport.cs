@@ -98,25 +98,18 @@ public static class PlacemarkSupport
     }
 
     public static double GetNearestGeographicalBearing(this Geometry geometry, WGS84Position position)
-    {
-        var poscoordinate = new Coordinate(position.Longitude, position.Latitude);
-        var coordinates = geometry.Coordinates;
-        var segment = coordinates
-            .Take(coordinates.Length - 1)
-            .Select((item, i) => new LineSegment(item, coordinates[i + 1]))
-            .MinBy(s => s.Distance(poscoordinate))!;
-
-        var segmentbearing = new WGS84Position(segment.P0.Y, segment.P0.X).GetBearing(new WGS84Position(segment.P1.Y, segment.P1.X));
-        return segmentbearing;
-    }
+        => GetNearestGeographicalBearing(geometry, new Coordinate(position.Longitude, position.Latitude));
 
     public static double GetNearestGeographicalBearing(this Geometry geometry, Point position)
+        => GetNearestGeographicalBearing(geometry, position.Coordinate);
+
+    public static double GetNearestGeographicalBearing(this Geometry geometry, Coordinate position)
     {
         var coordinates = geometry.Coordinates;
         var segment = coordinates
             .Take(coordinates.Length - 1)
             .Select((item, i) => new LineSegment(item, coordinates[i + 1]))
-            .MinBy(s => s.Distance(position.Coordinate))!;
+            .MinBy(s => s.Distance(position))!;
 
         var segmentbearing = new WGS84Position(segment.P0.Y, segment.P0.X).GetBearing(new WGS84Position(segment.P1.Y, segment.P1.X));
         return segmentbearing;
@@ -129,11 +122,31 @@ public static class PlacemarkSupport
         var segment = coordinates
             .Take(coordinates.Length - 1)
             .Select((item, i) => new LineSegment(item, coordinates[i + 1]))
-            .MinBy(s => s.Distance(poscoordinate))!;
+            .MinBy(s => s.Distance(poscoordinate));
+
+        if (segment is null)
+        {
+            return default;
+        }
 
         var segmentwgs84 = (P0: new WGS84Position(segment.P0.Y, segment.P0.X), P1: new WGS84Position(segment.P1.Y, segment.P1.X));
         return segmentwgs84;
     }
+
+    public static LineSegment? GetNearestSegment(this Geometry geometry, Coordinate coordinate)
+    {
+        var coordinates = geometry.Coordinates;
+        var segment = coordinates
+            .Take(coordinates.Length - 1)
+            .Select((item, i) => new LineSegment(item, coordinates[i + 1]))
+            .MinBy(s => s.Distance(coordinate));
+
+        return segment;
+    }
+
+    public static Coordinate GetNearestEndPoint(this LineSegment segment, Coordinate coordinate)
+        => segment.P0.Distance(coordinate) < segment.P1.Distance(coordinate)
+        ? segment.P0.CoordinateValue : segment.P1.CoordinateValue;
 
     public static (WGS84Position P0, WGS84Position P1) GetNearestGeographicalSegment(this Geometry geometry, Point position)
     {

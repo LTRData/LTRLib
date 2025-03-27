@@ -50,8 +50,10 @@ public static class PlacemarkSupport
     {
         if (wkt.StartsWith("POINT (", StringComparison.Ordinal))
         {
-            var xy = wkt.AsMemory("POINT (".Length).TrimEnd(')').TokenEnum(' ').Take(2).ToArray();
-            return PointFromLatLon(xy[1].Span, xy[0].Span);
+            var xy = wkt.AsSpan("POINT (".Length).TrimEnd(')');
+            var y = xy.TokenEnum(' ').ElementAt(0);
+            var x = xy.TokenEnum(' ').ElementAt(1);
+            return PointFromLatLon(x, y);
         }
         else
         {
@@ -80,6 +82,9 @@ public static class PlacemarkSupport
 
     public static Geometry PointFromGeoPosition(WGS84Position position) =>
         new Point(position.Longitude, position.Latitude);
+
+    public static double GetBearingDifference(double heading1, double heading2)
+        => 180 - Math.Abs(Math.Abs(heading1 - heading2) - 180);
 
     public static double GetNearestGeographicalDistance(this Geometry geometry, WGS84Position position)
     {
@@ -118,11 +123,8 @@ public static class PlacemarkSupport
     public static (WGS84Position P0, WGS84Position P1) GetNearestGeographicalSegment(this Geometry geometry, WGS84Position position)
     {
         var poscoordinate = new Coordinate(position.Longitude, position.Latitude);
-        var coordinates = geometry.Coordinates;
-        var segment = coordinates
-            .Take(coordinates.Length - 1)
-            .Select((item, i) => new LineSegment(item, coordinates[i + 1]))
-            .MinBy(s => s.Distance(poscoordinate));
+
+        var segment = GetNearestGeographicalSegment(geometry, poscoordinate);
 
         if (segment is null)
         {
@@ -148,17 +150,18 @@ public static class PlacemarkSupport
         => segment.P0.Distance(coordinate) < segment.P1.Distance(coordinate)
         ? segment.P0.CoordinateValue : segment.P1.CoordinateValue;
 
-    public static (WGS84Position P0, WGS84Position P1) GetNearestGeographicalSegment(this Geometry geometry, Point position)
+    public static LineSegment? GetNearestGeographicalSegment(this Geometry geometry, Point position)
+        => GetNearestGeographicalSegment(geometry, position.Coordinate);
+
+    public static LineSegment? GetNearestGeographicalSegment(this Geometry geometry, Coordinate poscoordinate)
     {
-        var poscoordinate = position.Coordinate;
         var coordinates = geometry.Coordinates;
         var segment = coordinates
             .Take(coordinates.Length - 1)
             .Select((item, i) => new LineSegment(item, coordinates[i + 1]))
-            .MinBy(s => s.Distance(poscoordinate))!;
+            .MinBy(s => s.Distance(poscoordinate));
 
-        var segmentwgs84 = (P0: new WGS84Position(segment.P0.Y, segment.P0.X), P1: new WGS84Position(segment.P1.Y, segment.P1.X));
-        return segmentwgs84;
+        return segment;
     }
 
     public static Region? FindRegion(this IEnumerable<Region> list, Geometry point, double distanceTolerance, ref Region? last_found)

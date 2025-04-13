@@ -135,6 +135,36 @@ public static class PlacemarkSupport
         return segmentwgs84;
     }
 
+    public static WGS84Position? GetNearestGeographicalPoint(this Geometry geometry, WGS84Position position)
+    {
+        var poscoordinate = new Coordinate(position.Longitude, position.Latitude);
+
+        var closestPoint = GetNearestGeographicalPoint(geometry, poscoordinate);
+
+        if (closestPoint is null)
+        {
+            return null;
+        }
+
+        var segmentwgs84 = new WGS84Position(closestPoint.Y, closestPoint.X);
+
+        return segmentwgs84;
+    }
+
+    private static Coordinate? GetNearestGeographicalPoint(Geometry geometry, Coordinate coordinate)
+    {
+        var segment = GetNearestGeographicalSegment(geometry, coordinate);
+
+        if (segment is null)
+        {
+            return null;
+        }
+
+        var closestPoint = segment.ClosestPoint(coordinate);
+
+        return closestPoint;
+    }
+
     public static LineSegment? GetNearestSegment(this Geometry geometry, Coordinate coordinate)
     {
         var coordinates = geometry.Coordinates;

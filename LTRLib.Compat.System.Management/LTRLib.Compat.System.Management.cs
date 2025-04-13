@@ -5,6 +5,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable IDE0057 // Use range operator
@@ -37,6 +39,7 @@ public class ManagementPath
                 condition = className.Substring(delimiter + 1);
                 className = className.Substring(0, delimiter);
             }
+
             Query = new(className, condition, null);
         }
         else
@@ -111,8 +114,10 @@ public class ManagementScope
     public ManagementOptions Options { get; set; } = new();
 }
 
-public abstract class ManagementBaseObject
+public abstract class ManagementBaseObject : IDisposable
 {
+    public bool IsDisposed { get; private set; }
+
     public virtual CimReadOnlyKeyedCollection<CimMethodParameter>? Properties { get; }
 
     public abstract object? this[string key] { get; set; }
@@ -120,6 +125,25 @@ public abstract class ManagementBaseObject
     public virtual string? ClassPath { get; }
 
     public void Refresh() => (this as ManagementObject)?.Get();
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!IsDisposed)
+        {
+            IsDisposed = true;
+        }
+    }
+
+    ~ManagementBaseObject()
+    {
+        Dispose(disposing: false);
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
 }
 
 public class ManagementParameters : ManagementBaseObject
@@ -161,8 +185,8 @@ public class ManagementObject : ManagementBaseObject
     {
         get => key switch
         {
-            "__CLASS" => CimInstance?.CimSystemProperties?.ClassName,
-            _ => CimInstance?.CimInstanceProperties?[key]?.Value,
+            "__CLASS" => CimInstance.CimSystemProperties?.ClassName,
+            _ => CimInstance.CimInstanceProperties?[key]?.Value,
         };
         set => CimInstance.CimInstanceProperties[key].Value = value;
     }
@@ -170,24 +194,26 @@ public class ManagementObject : ManagementBaseObject
     public ManagementObject(ManagementScope scope, ManagementPath path, ObjectGetOptions options)
     {
         CimSession = CimSession.Create(null);
-        if (string.IsNullOrWhiteSpace(path.Query.Condition))
-        {
-            CimInstance = new(path.ClassName, path.NamespacePath);
-            CimInstance = CimSession.GetInstance(path.NamespacePath, CimInstance);
-        }
-        else
-        {
-            CimInstance = CimSession.QueryInstances(scope.Path.NamespacePath, "WQL", path.Query.ToString()).FirstOrDefault() ??
-                new(path.ClassName, path.NamespacePath);
-        }
+
         Scope = scope;
         Path = path;
         Options = options;
+
+        CimInstance = Get();
     }
 
     public ManagementObject(CimInstance current)
     {
         CimInstance = current;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            CimInstance?.Dispose();
+            CimSession?.Dispose();
+        }
     }
 
     public CimSession? CimSession { get; }
@@ -202,21 +228,47 @@ public class ManagementObject : ManagementBaseObject
 
     public override string? ClassPath => Path?.ClassName;
 
-    public void Delete()
-        => (CimSession ?? throw new InvalidOperationException("CimSession object needed for this operation"))
+    public void Delete() => (CimSession ?? throw new InvalidOperationException("CimSession object needed for this operation"))
         .DeleteInstance(CimInstance);
 
-    public void Get()
+    public CimInstance Get()
     {
-        CimInstance?.Dispose();
-        CimInstance = null!;
-
-        if (CimSession is null)
+        if (Path is null || CimSession is null)
         {
-            throw new InvalidOperationException("CimSession object needed for this operation");
+            throw new InvalidOperationException("This operation requires a CimSession object and a query");
         }
 
-        CimInstance = CimSession.GetInstance(Path?.NamespacePath, CimInstance);
+        CimInstance?.Dispose();
+
+        if (string.IsNullOrWhiteSpace(Path.Query.Condition))
+        {
+            CimInstance = new(Path.ClassName, Path.NamespacePath);
+            CimInstance = CimSession.GetInstance(Path.NamespacePath, CimInstance);
+        }
+        else
+        {
+            var query = CimSession.QueryInstances(Path.NamespacePath,
+                                                  "WQL",
+                                                  Path.Query.ToString());
+
+            var array = query?.ToList();
+
+            if (array is null || array.Count == 0)
+            {
+                CimInstance = new(Path.ClassName, Path.NamespacePath);
+            }
+            else
+            {
+                foreach (var item in array.Skip(1))
+                {
+                    item.Dispose();
+                }
+
+                CimInstance = array[0];
+            }
+        }
+
+        return CimInstance;
     }
 
     public void Put()
@@ -228,7 +280,11 @@ public class ManagementObject : ManagementBaseObject
 
     public ManagementParameters GetMethodParameters(string methodName)
     {
-        var parameterDeclarations = CimInstance.CimClass.CimClassMethods[methodName].Parameters;
+        var methodDeclaration = CimInstance.CimClass.CimClassMethods[methodName]
+            ?? throw new MissingMethodException(methodName);
+
+        var parameterDeclarations = methodDeclaration.Parameters;
+
         return new(parameterDeclarations);
     }
 
@@ -241,7 +297,7 @@ public class ManagementObject : ManagementBaseObject
             throw new InvalidOperationException("CimSession object needed for this operation");
         }
 
-        var result = CimSession.InvokeMethod(CimInstance, methodName, (CimMethodParametersCollection)((ManagementParameters)inParams).Properties);
+        var result = CimSession.InvokeMethod(CimInstance, methodName, (CimMethodParametersCollection)((ManagementParameters)inParams)?.Properties!);
 
         return new(result);
     }
@@ -270,7 +326,7 @@ public class ManagementObjectCollection : IReadOnlyCollection<ManagementObject>
 
     internal ManagementObjectCollection(IEnumerable<CimInstance> enumerable)
     {
-        Collection = new(enumerable);
+        Collection = [.. enumerable];
     }
 
     public void CopyTo(Array array, int index) => (Collection as ICollection).CopyTo(array, index);
@@ -298,7 +354,6 @@ public class ManagementObjectCollection : IReadOnlyCollection<ManagementObject>
 
         public void Reset() => throw new NotImplementedException();
     }
-
 }
 
 public class ManagementObjectSearcher(ManagementScope mgmtScope, SelectQuery selectQuery)
@@ -319,6 +374,7 @@ public class ManagementObjectSearcher(ManagementScope mgmtScope, SelectQuery sel
         {
             list = new(cimSession.QueryInstances(Scope.Path.NamespacePath, "WQL", SelectQuery.ToString()));
         }
+
         return list;
     }
 }
@@ -347,6 +403,7 @@ public class SelectQuery
         {
             fields = string.Join(", ", SelectedProperties);
         }
+
         if (string.IsNullOrWhiteSpace(Condition))
         {
             return $"select {fields} from {ClassName}";

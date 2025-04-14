@@ -12,25 +12,4 @@
     <PackageReference Include="System.Management" Version="6.0.*" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Management\CdRomDrive.CS">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Management\Diskdrive.CS">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Management\EncryptableVolume.CS">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Management\Logicaldisk.CS">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Management\Volume.CS">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Management\Win32_OperatingSystem.CS">
-      <SubType>Component</SubType>
-    </Compile>
-  </ItemGroup>
-
 </Project>

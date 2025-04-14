@@ -1,12 +1,10 @@
-﻿using LTRData.Extensions.Async;
-using Microsoft.Management.Infrastructure;
+﻿using Microsoft.Management.Infrastructure;
 using Microsoft.Management.Infrastructure.Generic;
 using Microsoft.Management.Infrastructure.Options;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression
@@ -96,7 +94,10 @@ public class ManagementClass(ManagementScope scope, ManagementPath path, ObjectG
     public async Task<ManagementParameters> InvokeMethodAsync(string methodName, ManagementBaseObject inParams, InvokeMethodOptions _)
     {
         using var cimSession = CimSession.Create(null);
-        var result = await cimSession.InvokeMethodAsync(Path.NamespacePath, Path.ClassName, methodName, (CimMethodParametersCollection)((ManagementParameters)inParams).Properties);
+        var result = await cimSession.InvokeMethodAsync(Path.NamespacePath, Path.ClassName, methodName, (CimMethodParametersCollection)((ManagementParameters)inParams).Properties)
+            .ToAsyncEnumerable()
+            .LastAsync()
+            .ConfigureAwait(false);
 
         return new(result);
     }
@@ -318,7 +319,10 @@ public class ManagementObject : ManagementBaseObject
             throw new InvalidOperationException("CimSession object needed for this operation");
         }
 
-        var result = await CimSession.InvokeMethodAsync(CimInstance, methodName, (CimMethodParametersCollection)((ManagementParameters)inParams)?.Properties!);
+        var result = await CimSession.InvokeMethodAsync(CimInstance, methodName, (CimMethodParametersCollection)((ManagementParameters)inParams)?.Properties!)
+            .ToAsyncEnumerable()
+            .LastAsync()
+            .ConfigureAwait(false);
 
         return new(result);
     }

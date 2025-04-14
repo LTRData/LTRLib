@@ -59,7 +59,7 @@ public class ManagementPath
     public string NamespacePath { get; set; } = @"root\cimv2";
 }
 
-public class ManagementClass(ManagementScope scope, ManagementPath path, ObjectGetOptions options)
+public class ManagementClass(ManagementScope scope, ManagementPath path, ObjectGetOptions options) : ManagementDisposable
 {
     public ManagementScope Scope { get; } = scope ?? new();
     public ManagementPath Path { get; } = path;
@@ -124,17 +124,9 @@ public class ManagementScope
     public ManagementOptions Options { get; set; } = new();
 }
 
-public abstract class ManagementBaseObject : IDisposable
+public abstract class ManagementDisposable : IDisposable
 {
     public bool IsDisposed { get; private set; }
-
-    public virtual CimReadOnlyKeyedCollection<CimMethodParameter>? Properties { get; }
-
-    public abstract object? this[string key] { get; set; }
-
-    public virtual string? ClassPath { get; }
-
-    public void Refresh() => (this as ManagementObject)?.Get();
 
     protected virtual void Dispose(bool disposing)
     {
@@ -144,7 +136,7 @@ public abstract class ManagementBaseObject : IDisposable
         }
     }
 
-    ~ManagementBaseObject()
+    ~ManagementDisposable()
     {
         Dispose(disposing: false);
     }
@@ -154,6 +146,17 @@ public abstract class ManagementBaseObject : IDisposable
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
+}
+
+public abstract class ManagementBaseObject : ManagementDisposable
+{
+    public virtual CimReadOnlyKeyedCollection<CimMethodParameter>? Properties { get; }
+
+    public abstract object? this[string key] { get; set; }
+
+    public virtual string? ClassPath { get; }
+
+    public void Refresh() => (this as ManagementObject)?.Get();
 }
 
 public class ManagementParameters : ManagementBaseObject
@@ -381,7 +384,7 @@ public class ManagementObjectCollection : IReadOnlyCollection<ManagementObject>
     }
 }
 
-public class ManagementObjectSearcher(ManagementScope mgmtScope, SelectQuery selectQuery)
+public class ManagementObjectSearcher(ManagementScope mgmtScope, SelectQuery selectQuery) : ManagementDisposable
 {
     public EnumerationOptions? Options { get; set; }
     public ManagementScope Scope { get; } = mgmtScope;

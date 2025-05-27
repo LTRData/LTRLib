@@ -68,4 +68,15 @@ public class MathExpressions
         var value11 = expr11();
         Assert.Equal(1 << 10, value11);
     }
+
+    [Fact]
+    public void DoubleNegative()
+    {
+        const string exprstr = "-35-(-35)";
+        var math = new MathExpressionParser(CultureInfo.InvariantCulture);
+
+        var expr = math.ParseExpression<Func<double>>(exprstr);
+        var value = expr();
+        Assert.Equal(-35 - (-35), value);
+    }
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0-windows;net9.0-windows;net48;net462</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net48;net462</TargetFrameworks>
     <RegisterForComInterop>false</RegisterForComInterop>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -33,7 +33,9 @@
     <ProjectReference Include="..\LTRLib.Placemarks\LTRLib.Placemarks.csproj" />
     <ProjectReference Include="..\LTRLib.PolyGeometry\LTRLib.PolyGeometry.csproj" />
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
-    <ProjectReference Include="..\LTRLib\LTRLib.csproj" />
+    <ProjectReference Include="..\LTRLib.Web\LTRLib.Web.csproj" />
+    <ProjectReference Include="..\LTRLib.Xml\LTRLib.Xml.csproj" />
+    <ProjectReference Include="..\LTRLib.NativeIo\LTRLib.NativeIo.csproj" />
   </ItemGroup>
 
 </Project>

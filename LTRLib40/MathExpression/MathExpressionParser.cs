@@ -129,6 +129,7 @@ public class MathExpressionParser : IMathExpressionParser
         for (; ; )
         {
             var endidx = operands.IndexOf(")");
+            
             if (endidx < 0)
             {
                 if (operands.IndexOf("(") >= 0)
@@ -242,15 +243,14 @@ public class MathExpressionParser : IMathExpressionParser
             {
                 if (!subExpr.ContainsKey(operands[1]))
                 {
-                    key = ParseExpression([.. operands.Skip(1)], subExpr);
+                    key = ParseExpression([operands[1]], subExpr);
                     
                     if (key is null)
                     {
                         throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
                     }
-                    
-                    operands.RemoveRange(1, operands.Count - 1);
-                    operands.Insert(1, key);
+
+                    operands[1] = key;
                     
                     continue;
                 }

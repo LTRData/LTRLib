@@ -190,7 +190,7 @@ public static partial class NativeVolume
             .Where(extent => !extent.Allocated)
             .Select(extent => new SeekStreamSegment(vol_stream, extent.StartPosition, extent.Length, vol_size_info.BytesPerSector, ownsBaseStream: true));
 
-        return new CombinedSeekStream(unalloc_streams.ToArray());
+        return new CombinedSeekStream([.. unalloc_streams]);
     }
 
     public static Task<CombinedSeekStream> OpenDiskRangesAsStreamAsync(string diskDevice, IEnumerable<NativeConstants.DiskExtent> except_extents, FileAccess access, CancellationToken cancellationToken) =>

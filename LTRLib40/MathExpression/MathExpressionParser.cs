@@ -96,7 +96,7 @@ public class MathExpressionParser : IMathExpressionParser
     public TDelegate ParseExpression<TDelegate>(string line) => Expression.Lambda<TDelegate>(ParseExpression(line, out var parameters), parameters).Compile();
 
     private static string FriendlyString(IEnumerable<string> operands, Dictionary<string, Expression> subExpr) => operands
-        .Select(o => subExpr.ContainsKey(o) ? subExpr[o].ToString() : o)
+        .Select(o => subExpr.TryGetValue(o, out var value) ? value.ToString() : o)
         .Join(" ")
         .ToLowerInvariant();
 
@@ -417,9 +417,7 @@ public class MathExpressionParser : IMathExpressionParser
 
             if (operandType is not null)
             {
-                methodOperands = operands
-                    .Select(op => Expression.ConvertChecked(op, operandType))
-                    .ToArray();
+                methodOperands = [.. operands.Select(op => Expression.ConvertChecked(op, operandType))];
             }
 
             expr = (Expression)methodInfo.Invoke(null, methodOperands)!;

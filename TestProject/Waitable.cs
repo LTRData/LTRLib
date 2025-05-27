@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using Xunit;
+using System;
 using System.Threading;
 using LTRLib.LTRGeneric;
+using System.Runtime.InteropServices;
 
 namespace LTRLib;
 
@@ -17,8 +19,27 @@ public class Waitable
         };
 
         process.StartInfo.UseShellExecute = false;
+
+#if NET471_OR_GREATER || NETCOREAPP || NETSTANDARD
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            process.StartInfo.FileName = "cmd.exe";
+            process.StartInfo.Arguments = "/c exit 20";
+        }
+        else
+        {
+            process.StartInfo.FileName = "/bin/sh";
+#if NETCOREAPP || NETSTANDARD2_1_OR_GREATER
+            process.StartInfo.ArgumentList.Add("-c");
+            process.StartInfo.ArgumentList.Add("exit 20");
+#else
+            process.StartInfo.Arguments = "-c 'exit 20'";
+#endif
+        }
+#else
         process.StartInfo.FileName = "cmd.exe";
         process.StartInfo.Arguments = "/c exit 20";
+#endif
 
         process.Start();
 

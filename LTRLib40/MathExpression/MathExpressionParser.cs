@@ -237,31 +237,53 @@ public class MathExpressionParser : IMathExpressionParser
         {
             string? key;
 
-            // Operators with single operand
+            // Ignore + as prefix operator
             if ((operands.Count >= 2) &&
+                operands[0] == "+")
+            {
+                operands.RemoveAt(0);
+                continue;
+            }
+            // Operators with single operand
+            else if ((operands.Count >= 2) &&
                 IsKnownOperator(operands[0], 1))
             {
                 if (!subExpr.ContainsKey(operands[1]))
                 {
+                    if (IsKnownOperator(operands[1], 1))
+                    {
+                        key = ParseExpression([.. operands.Skip(1)], subExpr);
+
+                        if (key is null)
+                        {
+                            throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
+                        }
+
+                        operands.RemoveRange(1, operands.Count - 1);
+                        operands.Add(key);
+
+                        continue;
+                    }
+
                     key = ParseExpression([operands[1]], subExpr);
-                    
+
                     if (key is null)
                     {
                         throw new NotSupportedException($"Unsupported operator in expression: '{FriendlyString(operands, subExpr)}'");
                     }
 
                     operands[1] = key;
-                    
+
                     continue;
                 }
-                
+
                 key = ParseOperation(operands[0], subExpr, subExpr[operands[1]]);
-                
+
                 if (key is not null)
                 {
                     operands.RemoveRange(0, 2);
                     operands.Insert(0, key);
-                    
+
                     continue;
                 }
             }
@@ -366,7 +388,12 @@ public class MathExpressionParser : IMathExpressionParser
             operandType = null;
         }
 
-        var paramList = Enumerable.Repeat(typeof(Expression), paramCount).ToArray();
+        var paramList = new Type[paramCount];
+
+        for (var i = 0; i < paramCount; i++)
+        {
+            paramList[i] = typeof(Expression);
+        }
 
         return typeof(Expression)
             .GetMethod(method, BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase, null, paramList, null);
@@ -384,9 +411,10 @@ public class MathExpressionParser : IMathExpressionParser
         .Select(type => type.GetField(constant, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase))
         .FirstOrDefault(f => (f is not null) && f.FieldType == typeof(double));
 
-    private bool IsKnownOperator(string method, int argumentCount) => GetExpressionFactoryMethod(method, argumentCount, out _) is not null ||
-        GetMathDoubleMethod(method, argumentCount) is not null ||
-        GetMathIntMethod(method, argumentCount) is not null;
+    private bool IsKnownOperator(string method, int argumentCount) => method == "+"
+        || GetExpressionFactoryMethod(method, argumentCount, out _) is not null
+        || GetMathDoubleMethod(method, argumentCount) is not null
+        || GetMathIntMethod(method, argumentCount) is not null;
 
     private string? ParseOperation(string method, Dictionary<string, Expression> subExpr, params Expression[] operands)
     {

@@ -12,9 +12,7 @@ public class MathExpressions
     {
         var math = new MathExpressionParser(CultureInfo.InvariantCulture);
 
-        var expr2 = math.ParseExpression<Func<double>>("sin(0.4) * 2");
-        var value2 = expr2();
-        Assert.Equal(Math.Sin(0.4) * 2, value2);
+        Assert.Equal(Math.Sin(0.4) * 2, math.ParseExpression<Func<double>>("sin(0.4) * 2")());
     }
 
     [Fact]
@@ -22,41 +20,23 @@ public class MathExpressions
     {
         var math = new MathExpressionParser(CultureInfo.InvariantCulture);
 
-        var expr1 = math.ParseExpression<Func<double>>("atan2(312,2)");
-        var value1 = expr1();
-        Assert.Equal(Math.Atan2(312, 2), value1);
+        Assert.Equal(Math.Atan2(312, 2), math.ParseExpression<Func<double>>("atan2(312,2)")());
 
-        var expr3 = math.ParseExpression<Func<double>>("e ** 2");
-        var value3 = expr3();
-        Assert.Equal(Math.Pow(Math.E, 2), value3);
+        Assert.Equal(Math.Pow(Math.E, 2), math.ParseExpression<Func<double>>("e ** 2")());
 
-        var expr4 = math.ParseExpression<Func<double>>("169 - 5 - 3 - 1");
-        var value4 = expr4();
-        Assert.Equal(169 - 5 - 3 - 1, value4);
+        Assert.Equal(169 - 5 - 3 - 1, math.ParseExpression<Func<double>>("169 - 5 - 3 - 1")());
 
-        var expr5 = math.ParseExpression<Func<double>>("169 - (5 - 3 - 1)");
-        var value5 = expr5();
-        Assert.Equal(169 - (5 - 3 - 1), value5);
+        Assert.Equal(169 - (5 - 3 - 1), math.ParseExpression<Func<double>>("169 - (5 - 3 - 1)")());
 
-        var expr6 = math.ParseExpression<Func<double>>("169 (5 - 3 - 1)");
-        var value6 = expr6();
-        Assert.Equal(169 * (5 - 3 - 1), value6);
+        Assert.Equal(169 * (5 - 3 - 1), math.ParseExpression<Func<double>>("169 (5 - 3 - 1)")());
 
-        var expr7 = math.ParseExpression<Func<double>>("169 - 5 * 3 - 1");
-        var value7 = expr7();
-        Assert.Equal(169 - 5 * 3 - 1, value7);
+        Assert.Equal(169 - 5 * 3 - 1, math.ParseExpression<Func<double>>("169 - 5 * 3 - 1")());
 
-        var expr8 = math.ParseExpression<Func<double>>("169 - 5 - 3 * 1");
-        var value8 = expr8();
-        Assert.Equal(169 - 5 - 3 * 1, value8);
+        Assert.Equal(169 - 5 - 3 * 1, math.ParseExpression<Func<double>>("169 - 5 - 3 * 1")());
 
-        var expr9 = math.ParseExpression<Func<double>>("169 * 5 - 3 - 1");
-        var value9 = expr9();
-        Assert.Equal(169 * 5 - 3 - 1, value9);
+        Assert.Equal(169 * 5 - 3 - 1, math.ParseExpression<Func<double>>("169 * 5 - 3 - 1")());
 
-        var expr10 = math.ParseExpression<Func<double>>("2.5 + 400 / (.1 - .01) * 2");
-        var value10 = expr10();
-        Assert.Equal(2.5 + 400 / (.1 - .01) * 2, value10);
+        Assert.Equal(2.5 + 400 / (.1 - .01) * 2, math.ParseExpression<Func<double>>("2.5 + 400 / (.1 - .01) * 2")());
     }
 
     [Fact]
@@ -64,29 +44,28 @@ public class MathExpressions
     {
         var math = new MathExpressionParser(CultureInfo.InvariantCulture);
 
-        var expr11 = math.ParseExpression<Func<double>>("1 << 10");
-        var value11 = expr11();
-        Assert.Equal(1 << 10, value11);
+        Assert.Equal(1 << 10, math.ParseExpression<Func<double>>("1 << 10")());
     }
 
     [Fact]
-    public void DoubleNegative()
+    public void Test4()
     {
         var math = new MathExpressionParser(CultureInfo.InvariantCulture);
 
-        const string exprstr1 = "-35-(-35)";
-        var expr1 = math.ParseExpression<Func<double>>(exprstr1);
-        var value1 = expr1();
-        Assert.Equal(-35 - (-35), value1);
+        Assert.Equal(-35 - (-35), math.ParseExpression<Func<double>>("-35-(-35)")());
 
-        const string exprstr2 = "-(35-(-35))";
-        var expr2 = math.ParseExpression<Func<double>>(exprstr2);
-        var value2 = expr2();
-        Assert.Equal(-(35 - (-35)), value2);
+        Assert.Equal(-(35 - (-35)), math.ParseExpression<Func<double>>("-(35-(-35))")());
 
-        const string exprstr3 = "-(35)-(-35)";
-        var expr3 = math.ParseExpression<Func<double>>(exprstr3);
-        var value3 = expr3();
-        Assert.Equal(-35 - (-35), value3);
+        Assert.Equal(-35 - (-35), math.ParseExpression<Func<double>>("-(35)-(-35)")());
+
+        Assert.Equal(- -35, math.ParseExpression<Func<double>>("--35")());
+
+        Assert.Equal(+35, math.ParseExpression<Func<double>>("+35")());
+
+        Assert.Equal(+-35, math.ParseExpression<Func<double>>("+-35")());
+
+        Assert.Equal(-+35, math.ParseExpression<Func<double>>("-+35")());
+
+        Assert.Equal(+-+35, math.ParseExpression<Func<double>>("+-+35")());
     }
 }

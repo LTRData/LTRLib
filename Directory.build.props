@@ -20,7 +20,7 @@
 
     <AssemblyOriginatorKeyFile>..\LTRLib40\LTRLib40.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
-    <RegisterForComInterop Condition="'$(TargetFramework)|$(Configuration)' == 'net48|Release'">true</RegisterForComInterop>
+    <!-- <RegisterForComInterop Condition="'$(TargetFramework)|$(Configuration)' == 'net48|Release'">true</RegisterForComInterop> -->
 
     <DebugType>portable</DebugType>
 
@@ -42,7 +42,7 @@
     <ProductName>LTRLib</ProductName>
     <Authors>Olof Lagerkvist</Authors>
     <Copyright>2011 - 2025, Olof Lagerkvist, LTR Data</Copyright>
-    <PackageVersion>1.0.38</PackageVersion>
+    <PackageVersion>1.0.39</PackageVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
   </PropertyGroup>

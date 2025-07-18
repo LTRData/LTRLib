@@ -59,9 +59,11 @@ public readonly struct SunTime
 
         SunNoon = TimeSpan.FromMilliseconds(Milliseconds12Hours - MillisecondsPerRadian * lon) - EqTime;
 
-        Sunrise = TimeSpan.FromMilliseconds(Milliseconds12Hours - MillisecondsPerRadian * (lon + HourAngle)) - EqTime;
-
-        Sunset = TimeSpan.FromMilliseconds(Milliseconds12Hours - MillisecondsPerRadian * (lon - HourAngle)) - EqTime;
+        if (!double.IsNaN(HourAngle))
+        {
+            Sunrise = TimeSpan.FromMilliseconds(Milliseconds12Hours - MillisecondsPerRadian * (lon + HourAngle)) - EqTime;
+            Sunset = TimeSpan.FromMilliseconds(Milliseconds12Hours - MillisecondsPerRadian * (lon - HourAngle)) - EqTime;
+        }
     }
 
     public TimeSpan EqTime { get; }
@@ -71,7 +73,7 @@ public readonly struct SunTime
     public double SunElevation { get; }
     public double Azimuth { get; }
     public double HourAngle { get; }
-    public TimeSpan Sunrise { get; }
+    public TimeSpan? Sunrise { get; }
     public TimeSpan SunNoon { get; }
-    public TimeSpan Sunset { get; }
+    public TimeSpan? Sunset { get; }
 }

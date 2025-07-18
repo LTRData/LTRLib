@@ -1,4 +1,6 @@
-﻿using LTRLib.Geodesy.Positions;
+﻿using LTRLib.Geodesy.Conversion;
+using LTRLib.Geodesy.Positions;
+using System;
 using Xunit;
 
 namespace LTRLib;
@@ -45,5 +47,29 @@ public class Positions
 
         var mh = pos2.ToMaidenhead();
         Assert.Equal("JO77BR89", mh);
+    }
+
+    [Fact]
+    public void MidnightSun()
+    {
+        var sun = new SunTime(new DateTime(2025, 7, 18), new WGS84Position(68.440, 22.475));
+
+        Assert.Null(sun.Sunrise);
+    }
+
+    [Fact]
+    public void MoonPhase()
+    {
+        var moon = MoonPhaseCalculator.GetMoonPhase(new DateTime(2025, 7, 18));
+        var symbol = MoonPhaseCalculator.GetMoonPhaseSymbol(moon);
+        Assert.Equal("🌗", symbol);
+    }
+
+    [Fact]
+    public void MoonPhase2()
+    {
+        var moon = MoonPhaseCalculator.GetMoonPhase(new DateTime(2025, 7, 19));
+        var symbol = MoonPhaseCalculator.GetMoonPhaseSymbol(moon);
+        Assert.Equal("🌘", symbol);
     }
 }

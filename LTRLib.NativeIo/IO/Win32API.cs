@@ -525,11 +525,11 @@ internal static class Win32API
                                                         [In][MarshalAs(UnmanagedType.LPTStr)] string? Value,
                                                         [In][MarshalAs(UnmanagedType.LPTStr)] string? FileName);
 
-    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    public static extern string GetCommandLine();
+    [DllImport("kernel32.dll", SetLastError = true, EntryPoint = "GetCommandLineW", CharSet = CharSet.Unicode)]
+    public static extern nint GetCommandLine();
 
     [DllImport("shell32.dll", SetLastError = true, EntryPoint = "CommandLineToArgvW", CharSet = CharSet.Unicode)]
-    public static extern nint CommandLineToArgv([MarshalAs(UnmanagedType.LPWStr)][In] string lpCmdLine, out int pNumArgs);
+    public static extern nint CommandLineToArgv(nint lpCmdLine, out int pNumArgs);
 
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     public static extern nint LocalFree(nint hMem);

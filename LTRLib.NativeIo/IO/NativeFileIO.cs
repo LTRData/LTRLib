@@ -19,6 +19,8 @@ using static LTRLib.IO.NativeConstants;
 using System.Diagnostics;
 using static LTRLib.IO.Win32API;
 using System.Runtime.Versioning;
+using System.Runtime.CompilerServices;
+
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 using LTRData.Extensions.Formatting;
 using LTRData.Extensions.Buffers;
@@ -344,10 +346,19 @@ public static class NativeFileIO
     }
 
     [SecuritySafeCritical]
-    public static string[] CommandLineToArgumentArray(string CommandLine)
+    public static unsafe string[] CommandLineToArgumentArray(string? CommandLine)
     {
-        var ArgsPtr = CommandLineToArgv(CommandLine ?? GetCommandLine(), out var NumArgs);
-        
+        fixed (char* ptr = CommandLine)
+        {
+            return CommandLineToArgumentArray(ptr != null ? (nint)ptr : GetCommandLine());
+        }
+    }
+
+    [SecuritySafeCritical]
+    private static string[] CommandLineToArgumentArray(nint CommandLine)
+    {
+        var ArgsPtr = CommandLineToArgv(CommandLine, out var NumArgs);
+
         if (ArgsPtr == default)
         {
             throw new Win32Exception();
@@ -613,7 +624,7 @@ public static class NativeFileIO
 
         var extents = new DiskExtents();
 
-#if NETCOREAPP && !NETCOREAPP3_0_OR_GREATER
+#if NETCOREAPP || NET451_OR_GREATER || NETSTANDARD
         var struct_size = SizeOf<DiskExtents>();
 #else
         var struct_size = SizeOf(typeof(DiskExtents));

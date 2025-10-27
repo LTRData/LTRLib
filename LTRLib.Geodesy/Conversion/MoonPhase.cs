@@ -1,8 +1,11 @@
-﻿using System;
+﻿using LTRLib.Geodesy.Positions;
+using System;
 
 namespace LTRLib.Geodesy.Conversion;
 
-public class MoonPhaseCalculator
+public readonly record struct LunarPosition(double Azimuth, double Elevation);
+
+public static class MoonPhaseCalculator
 {
     /// <summary>
     /// Calculates moon phase (0 - 1) for a specified day
@@ -84,32 +87,33 @@ public class MoonPhaseCalculator
         return jd;
     }
 
-#if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
+    public readonly record struct LunarEclipticCoordinates(double Lon, double Lat);
 
     /// <summary>
     /// Returns moon position in the sky for a specified time and location on earth.
     /// </summary>
-    /// <param name="date">UTC date and time</param>
-    /// <param name="latitude">Latitude in degrees</param>
-    /// <param name="longitude">Longitude in degrees</param>
-    /// <returns>Azimuth and elevation, in radians, where moon is found in the sky</returns>
-    public static (double Azimuth, double Elevation) GetMoonPosition(DateTime date, double latitude, double longitude)
+    /// <param name="datetime">date and time</param>
+    /// <param name="position">Position</param>
+    /// <returns>Azimuth and elevation, in degrees, where moon is found in the sky</returns>
+    public static LunarPosition GetMoonPosition(DateTime datetime, WGS84Position position)
     {
-        var jd = GetJulianDate(date);
+        datetime = datetime.ToUniversalTime();
+
+        var jd = GetJulianDate(datetime);
 
         // Calculate moon's ecliptic coordinates
-        (var eclLon, var eclLat) = GetMoonEclipticCoordinates(jd);
+        var ecl = GetMoonEclipticCoordinates(jd);
 
         // Convert to equatorial coordinates
-        (var ra, var dec) = EclipticToEquatorial(eclLon, eclLat, jd);
+        (var ra, var dec) = EclipticToEquatorial(ecl.Lon, ecl.Lat, jd);
 
         // Calculate local sidereal time
-        var lst = LocalSiderealTime(jd, longitude);
+        var lst = LocalSiderealTime(jd, position.Longitude);
 
         // Convert to horizontal coordinates
-        (var azimuth, var elevation) = EquatorialToHorizontal(ra, dec, lst, latitude);
+        var lunarPosition = EquatorialToHorizontal(ra, dec, lst, position.Latitude);
 
-        return (azimuth, elevation);
+        return lunarPosition;
     }
 
     /// <summary>
@@ -117,7 +121,7 @@ public class MoonPhaseCalculator
     /// </summary>
     /// <param name="jd">Julian date</param>
     /// <returns>Coordinates in degrees</returns>
-    public static (double eclLon, double eclLat) GetMoonEclipticCoordinates(double jd)
+    public static LunarEclipticCoordinates GetMoonEclipticCoordinates(double jd)
     {
         // Simplified calculation for moon's ecliptic longitude and latitude
         // For higher accuracy, use precise lunar ephemeris data
@@ -131,8 +135,10 @@ public class MoonPhaseCalculator
         var L = L0 + 6.289 * Math.Sin(Calculations.DegreesToRadians(M));
         var B = 5.128 * Math.Sin(Calculations.DegreesToRadians(M));
 
-        return (L, B);
+        return new(L, B);
     }
+
+    public readonly record struct LunarEquatorialCoordinates(double Ra, double Dec);
 
     /// <summary>
     /// Returns moon equatorial coordinates for a specified time.
@@ -141,7 +147,7 @@ public class MoonPhaseCalculator
     /// <param name="eclLat">Ecliptic coordinates in degrees</param>
     /// <param name="jd">Julian date</param>
     /// <returns>Coordinates in radians</returns>
-    public static (double ra, double dec) EclipticToEquatorial(double eclLon, double eclLat, double jd)
+    public static LunarEquatorialCoordinates EclipticToEquatorial(double eclLon, double eclLat, double jd)
     {
         // Obliquity of the ecliptic
         var T = (jd - 2451545.0) / 36525.0;
@@ -152,7 +158,7 @@ public class MoonPhaseCalculator
         var dec = Math.Asin(Math.Sin(Calculations.DegreesToRadians(eclLat)) * Math.Cos(Calculations.DegreesToRadians(epsilon)) +
                                Math.Cos(Calculations.DegreesToRadians(eclLat)) * Math.Sin(Calculations.DegreesToRadians(epsilon)) * Math.Sin(Calculations.DegreesToRadians(eclLon)));
 
-        return (ra, dec);
+        return new(ra, dec);
     }
 
     /// <summary>
@@ -182,8 +188,8 @@ public class MoonPhaseCalculator
     /// <param name="dec">Equatorial coordinates in radians</param>
     /// <param name="lst">Local siderial time, in degrees</param>
     /// <param name="latitude">Latitude, in degrees</param>
-    /// <returns>Coordinates in radians</returns>
-    public static (double Azimuth, double Elevation) EquatorialToHorizontal(double ra, double dec, double lst, double latitude)
+    /// <returns>Azimuth and elevation in degrees</returns>
+    public static LunarPosition EquatorialToHorizontal(double ra, double dec, double lst, double latitude)
     {
         var ha = Calculations.DegreesToRadians(lst) - ra;
 
@@ -205,7 +211,6 @@ public class MoonPhaseCalculator
             azimuth = 2 * Math.PI - azimuth;
         }
 
-        return (azimuth, elevation);
+        return new(Calculations.RadiansToDegrees(azimuth), Calculations.RadiansToDegrees(elevation));
     }
-#endif
 }

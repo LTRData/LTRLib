@@ -52,9 +52,9 @@ public class Positions
     [Fact]
     public void MidnightSun()
     {
-        var sun = new SunTime(new DateTime(2025, 7, 18), new WGS84Position(68.440, 22.475));
+        var sun = new SolarDayEvents(new DateTime(2025, 7, 18), new WGS84Position(68.440, 22.475));
 
-        Assert.Null(sun.Sunrise);
+        Assert.Null(sun.SunriseUtc);
     }
 
     [Fact]

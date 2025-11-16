@@ -16,7 +16,6 @@ using System.Windows.Forms;
 
 #if NET30_OR_GREATER || NETCOREAPP
 using System.Windows.Media.Media3D;
-using LTRData.Extensions.Buffers;
 
 #endif
 
@@ -168,7 +167,7 @@ public static class FormsExtensions
             Width = Console.WindowWidth - 1;
         }
 
-        var origLines = Msg.Nz().Replace("\r", "").Split('\n');
+        var origLines = Msg?.Replace("\r", "").Split('\n') ?? [];
 
         var resultLines = new List<string>(origLines.Length);
 

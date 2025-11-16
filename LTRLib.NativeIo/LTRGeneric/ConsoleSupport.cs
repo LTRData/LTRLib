@@ -5,7 +5,6 @@ using System.Security;
 using System.Security.Permissions;
 using System.Text;
 using LTRData.Extensions.Formatting;
-using LTRLib.Extensions;
 using LTRLib.IO;
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression

@@ -2,42 +2,34 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net20;net30;net35;net40;net46;net48;netstandard2.0;netstandard2.1;net6.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net20;net30;net35;net40;net46;net48;netstandard2.0;netstandard2.1;net6.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Guid>053adaf4-1a90-4caa-819c-37023abf90f7</Guid>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RegisterForComInterop>false</RegisterForComInterop>
     <NoWarn>$(NoWarn);0618</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net35`))' &gt;= 0">
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework.StartsWith(`netstandard`))'">
-    <PackageReference Include="System.ComponentModel.Annotations" Version="*" />
-  </ItemGroup>
-
-  <ItemGroup Condition="('$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net461`))' &gt;= 0) Or '$(TargetFramework)' == 'netstandard2.0'">
+  <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0')) And !$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net5.0'))">
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="*" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="*" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0">
-    <PackageReference Include="System.ValueTuple" Version="*" />
-  </ItemGroup>
+	<ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0'))">
+		<PackageReference Include="System.ValueTuple" Version="*" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net461`))' &lt; 0">
-    <PackageReference Include="System.ValueTuple" Version="4.5.*" Condition="'$(TargetFramework.CompareTo(`net45`))' &gt;= 0" />
-  </ItemGroup>
+	<ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net45')) And !$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net461'))">
+		<PackageReference Include="System.ValueTuple" Version="4.5.*" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0">
-    <PackageReference Include="LTRData.Extensions" Version="*" />
-  </ItemGroup>
+	<ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0')) Or $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net35'))">
+		<PackageReference Include="LTRData.Extensions" Version="*" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.*" Condition="'$(TargetFramework.CompareTo(`net45`))' &gt;= 0 And '$(TargetFramework.CompareTo(`net5`))' &lt; 0" />
-    <PackageReference Include="System.IO.Pipelines" Version="8.0.*" Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0 And '$(TargetFramework.CompareTo(`net8`))' &lt;= 0" />
-    <PackageReference Include="System.IO.Pipelines" Version="9.0.*" Condition="'$(TargetFramework.CompareTo(`net8`))' &gt;= 0" />
+	<ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.*" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net45'))" />
+    <PackageReference Include="System.IO.Pipelines" Version="8.0.*" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0')) And !$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))" />
+    <PackageReference Include="System.IO.Pipelines" Version="9.0.*" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))" />
   </ItemGroup>
 
 </Project>

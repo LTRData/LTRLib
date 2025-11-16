@@ -28,18 +28,6 @@ namespace LTRLib.IO;
 [SupportedOSPlatform("windows")]
 public static partial class NativeVolume
 {
-
-    public static IEnumerable<FileExtent> EnumerateFileExtents(string path) => EnumerateFileExtents(path, 0);
-
-    public static IEnumerable<FileExtent> EnumerateFileExtents(string path, long start)
-    {
-        using var file = NativeFileIO.OpenFileHandle(path, FileMode.Open, 0, FileShare.ReadWrite | FileShare.Delete, NativeConstants.FILE_FLAG_BACKUP_SEMANTICS);
-        foreach (var extent in EnumerateFileExtents(file, start))
-        {
-            yield return extent;
-        }
-    }
-
 #if NET7_0_OR_GREATER
     [LibraryImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -62,6 +50,17 @@ public static partial class NativeVolume
                                                        uint* lpBytesReturned,
                                                        NativeOverlapped* lpOverlapped);
 #endif
+
+    public static IEnumerable<FileExtent> EnumerateFileExtents(string path) => EnumerateFileExtents(path, 0);
+
+    public static IEnumerable<FileExtent> EnumerateFileExtents(string path, long start)
+    {
+        using var file = NativeFileIO.OpenFileHandle(path, FileMode.Open, 0, FileShare.ReadWrite | FileShare.Delete, NativeConstants.FILE_FLAG_BACKUP_SEMANTICS);
+        foreach (var extent in EnumerateFileExtents(file, start))
+        {
+            yield return extent;
+        }
+    }
 
     internal static unsafe FileExtent? GetNextFileExtent(SafeFileHandle file, long start_vcn)
     {

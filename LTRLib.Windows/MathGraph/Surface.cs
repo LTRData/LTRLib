@@ -1,6 +1,6 @@
 ﻿#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 
-using LTRLib.MathExpression;
+using LTRData.MathExpression;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;

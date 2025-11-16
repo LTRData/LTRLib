@@ -14,12 +14,10 @@ using System.Security;
 using System.Security.Permissions;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
-using LTRLib.Extensions;
 using static LTRLib.IO.NativeConstants;
 using System.Diagnostics;
 using static LTRLib.IO.Win32API;
 using System.Runtime.Versioning;
-using System.Runtime.CompilerServices;
 
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 using LTRData.Extensions.Formatting;

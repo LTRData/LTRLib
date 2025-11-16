@@ -7,6 +7,7 @@
 
 #if NET461_OR_GREATER || NETSTANDARD || NETCOREAPP
 
+using LTRData.Xml;
 using LTRLib.LTRGeneric;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +16,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace LTRLib.Net;
+namespace LTRLib.Web;
 
 [ComVisible(false)]
 public class LinkReference<T> : MarshalByRefObject where T : class
@@ -36,7 +37,7 @@ public class LinkReference<T> : MarshalByRefObject where T : class
         this.@ref = @ref;
     }
 
-    private static readonly CacheDictionary<string, T?> ObjCache = new();
+    private static CacheDictionary<string, T?> ObjCache => field ??= new();
 
     [XmlIgnore]
     protected TimeSpan Cachetime { get; set; } = new TimeSpan(0, 0, 20);

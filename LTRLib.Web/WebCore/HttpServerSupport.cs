@@ -31,7 +31,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.FileProviders;
 using static LTRLib.Web.HttpShared;
-using static LTRLib.Extensions.NetExtensions;
+using static LTRData.Extensions.NetExtensions;
 using Microsoft.AspNetCore.Http.Extensions;
 
 using HttpUtility = System.Web.HttpUtility;

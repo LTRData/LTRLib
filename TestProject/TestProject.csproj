@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0;net48;net462</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0;net48;net462</TargetFrameworks>
     <RegisterForComInterop>false</RegisterForComInterop>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -10,11 +10,11 @@
     <PackageReference Include="System.Memory" Version="*" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="*" />
     <PackageReference Include="xunit" Version="*" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.*" Condition="'$(TargetFramework.CompareTo(`net472`))' &lt; 0">
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.*" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net472'))">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.*" Condition="'$(TargetFramework.CompareTo(`net472`))' &gt;= 0">
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.*" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net472'))">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -24,18 +24,14 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup Condition="('$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net461`))' &gt;= 0) Or '$(TargetFramework.CompareTo(`netcoreapp`))' &gt;= 0">
+  <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0')) And !$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net5.0'))">
     <PackageReference Include="System.Text.Json" Version="*" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.*" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LTRLib.Geodesy\LTRLib.Geodesy.csproj" />
-    <ProjectReference Include="..\LTRLib.Placemarks\LTRLib.Placemarks.csproj" />
-    <ProjectReference Include="..\LTRLib.PolyGeometry\LTRLib.PolyGeometry.csproj" />
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
     <ProjectReference Include="..\LTRLib.Web\LTRLib.Web.csproj" />
-    <ProjectReference Include="..\LTRLib.Xml\LTRLib.Xml.csproj" />
     <ProjectReference Include="..\LTRLib.NativeIo\LTRLib.NativeIo.csproj" />
   </ItemGroup>
 

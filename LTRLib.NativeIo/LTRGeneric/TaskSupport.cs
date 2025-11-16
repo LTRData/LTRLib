@@ -12,7 +12,6 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Collections.Generic;
 #if NET40_OR_GREATER || NETSTANDARD || NETCOREAPP
 using System.Threading.Tasks;
 using System.IO;

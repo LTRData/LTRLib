@@ -21,7 +21,7 @@ using System.Text;
 using System.Web;
 using System.Xml.Serialization;
 using static LTRLib.Web.HttpShared;
-using static LTRLib.Extensions.NetExtensions;
+using static LTRData.Extensions.NetExtensions;
 using LTRData.Extensions.Formatting;
 
 namespace LTRLib.Web;

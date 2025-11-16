@@ -8,7 +8,6 @@
 #if NET45_OR_GREATER || NETSTANDARD || NETCOREAPP
 using LTRData.Extensions.Buffers;
 #endif
-using LTRLib.Extensions;
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections;

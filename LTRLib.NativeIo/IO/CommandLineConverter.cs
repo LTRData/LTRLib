@@ -7,7 +7,6 @@
 
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 
-using LTRLib.Extensions;
 using LTRLib.LTRGeneric;
 using System;
 using System.Diagnostics;

@@ -1,0 +1,53 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <BuildType Name="Release with doc" />
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM" />
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="license.txt" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="doc/doc40.shfbproj" Type="7cf6df6d-3b04-46f8-a40b-537d21bca0b4">
+    <BuildType Solution="Release with doc|*" Project="Release" />
+    <Platform Project="AnyCPU" />
+    <Build Solution="Debug|Any CPU" Project="false" />
+    <Build Solution="Release|Any CPU" Project="false" />
+  </Project>
+  <Project Path="LTRLib.CodeCompiler/LTRLib.CodeCompiler.csproj">
+    <BuildType Solution="Release with doc|*" Project="Release" />
+  </Project>
+  <Project Path="LTRLib.Data.Linq/LTRLib.Data.Linq.csproj">
+    <BuildType Solution="Release with doc|*" Project="Release" />
+  </Project>
+  <Project Path="LTRLib.Management/LTRLib.Management.csproj">
+    <BuildType Solution="Release with doc|*" Project="Release" />
+  </Project>
+  <Project Path="LTRLib.NativeIo/LTRLib.NativeIo.csproj">
+    <BuildType Solution="Release with doc|*" Project="Release" />
+  </Project>
+  <Project Path="LTRLib.Web/LTRLib.Web.csproj">
+    <BuildType Solution="Release with doc|*" Project="Release" />
+  </Project>
+  <Project Path="LTRLib.Windows.Shell/LTRLib.Windows.Shell.vbproj">
+    <BuildType Solution="Release with doc|*" Project="Release" />
+  </Project>
+  <Project Path="LTRLib.Windows/LTRLib.Windows.csproj">
+    <BuildType Solution="Release with doc|*" Project="Release" />
+  </Project>
+  <Project Path="LTRLib/LTRLib.csproj">
+    <BuildType Solution="Release with doc|*" Project="Release" />
+  </Project>
+  <Project Path="LTRLib40/LTRLib40.csproj">
+    <BuildType Solution="Release with doc|*" Project="Release" />
+  </Project>
+  <Project Path="TestProject/TestProject.csproj">
+    <BuildType Solution="Release with doc|*" Project="Release" />
+  </Project>
+</Solution>

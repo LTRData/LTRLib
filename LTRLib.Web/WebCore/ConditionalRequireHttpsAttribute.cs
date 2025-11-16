@@ -12,10 +12,10 @@
 #if NETCOREAPP || NETSTANDARD || NET461_OR_GREATER
 
 using System.Runtime.InteropServices;
-using LTRLib.Extensions;
+using LTRData.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using static LTRLib.Extensions.NetExtensions;
+using static LTRData.Extensions.NetExtensions;
 
 namespace LTRLib.WebCore;
 

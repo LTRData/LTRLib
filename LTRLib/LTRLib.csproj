@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net20;net30;net35;net40;net46;net48;net6.0;net6.0-windows;net8.0;net9.0;net8.0-windows;net9.0-windows</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net20;net30;net35;net40;net46;net48;net6.0;net6.0-windows;net8.0;net9.0;net10.0;net8.0-windows;net9.0-windows;net10.0-windows</TargetFrameworks>
     <AssemblyName>LTRLib</AssemblyName>
     <OutputPath>..\$(Configuration)\</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -11,20 +11,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LTRLib.CodeCompiler\LTRLib.CodeCompiler.csproj" />
-    <ProjectReference Include="..\LTRLib.Compat.System.Management\LTRLib.Compat.System.Management.csproj" Condition="'$(TargetFramework.CompareTo(`net461`))' &gt;= 0" />
     <ProjectReference Include="..\LTRLib.Data.Linq\LTRLib.Data.Linq.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0 And '$(TargetFramework.CompareTo(`net5`))' &lt; 0" />
-    <ProjectReference Include="..\LTRLib.Data\LTRLib.Data.csproj" />
-    <ProjectReference Include="..\LTRLib.Geodesy\LTRLib.Geodesy.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0" />
-    <ProjectReference Include="..\LTRLib.Graphics\LTRLib.Graphics.csproj" />
     <ProjectReference Include="..\LTRLib.Management\LTRLib.Management.csproj" />
-    <ProjectReference Include="..\LTRLib.PerformanceCounters\LTRLib.PerformanceCounters.csproj" />
-    <ProjectReference Include="..\LTRLib.Placemarks\LTRLib.Placemarks.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0" />
-    <ProjectReference Include="..\LTRLib.PolyGeometry\LTRLib.PolyGeometry.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0" />
-    <ProjectReference Include="..\LTRLib.Net\LTRLib.Net.csproj" Condition="'$(TargetFramework.CompareTo(`net40`))' &gt;= 0" />
     <ProjectReference Include="..\LTRLib.Web\LTRLib.Web.csproj" Condition="'$(TargetFramework.CompareTo(`net40`))' &gt;= 0" />
     <ProjectReference Include="..\LTRLib.Windows\LTRLib.Windows.csproj" Condition="('$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net35`))' &gt;= 0) Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
     <ProjectReference Include="..\LTRLib.Windows.Shell\LTRLib.Windows.Shell.vbproj" Condition="('$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net35`))' &gt;= 0) Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
-    <ProjectReference Include="..\LTRLib.Xml\LTRLib.Xml.csproj" />
     <ProjectReference Include="..\LTRLib.NativeIo\LTRLib.NativeIo.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0" />
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
   </ItemGroup>

@@ -11,7 +11,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using LTRLib.Extensions;
 
 namespace LTRLib.LTRGeneric;
 

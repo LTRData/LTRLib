@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net35;net40;net46;net48;net6.0-windows;net8.0-windows;net9.0-windows</TargetFrameworks>
+    <TargetFrameworks>net35;net40;net46;net48;net6.0-windows;net8.0-windows;net9.0-windows;net10.0-windows</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0">
+  <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net35'))">
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
@@ -32,9 +32,6 @@
     <Compile Update="Forms\AsyncMessageBox.vb" />
     <Compile Update="Forms\GridDialog.vb" />
     <Compile Update="Forms\PropertyDialog.vb" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &gt;= 0">
   </ItemGroup>
 
 </Project>

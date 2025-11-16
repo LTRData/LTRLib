@@ -9,10 +9,9 @@
 using System;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using LTRData.Geodesy.Positions;
 
 namespace LTRLib.Imaging;
-
-using Geodesy.Positions;
 
 /// <summary>
 /// Routines for extracting geo tags from images.

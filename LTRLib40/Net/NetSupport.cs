@@ -44,8 +44,8 @@ public static class NetSupport
 
     public static WebHeaderCollection GetHttpHeaders(Uri uri)
     {
-
         Stream stream;
+
         if (uri.Scheme == "https")
         {
             stream = IOSupport.OpenSslStream(uri, (_, _, _, _) => true);
@@ -57,7 +57,6 @@ public static class NetSupport
 
         using (stream)
         {
-
             var rd = new StreamReader(stream, Encoding.UTF8);
             var wr = new StreamWriter(stream, Encoding.ASCII);
 
@@ -81,13 +80,10 @@ public static class NetSupport
 
                 headers.Add(line);
             }
-
             while (true);
 
             return headers;
-
         }
-
     }
 
     private static readonly Dictionary<string, byte[]> _DownloadAndCacheData_cache = [];
@@ -124,5 +120,4 @@ public static class NetSupport
             return null;
         }
     }
-
 }

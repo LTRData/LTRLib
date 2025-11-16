@@ -1,23 +1,12 @@
 ﻿using LTRLib.Extensions;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace LTRLib;
 
 public class TextExtensions
 {
-    [Fact]
-    public void TextExtTest()
-    {
-        var a = new object();
-        a.ToMembersString();
-    }
-
     [Fact]
     public void StringBuilderExtTest()
     {

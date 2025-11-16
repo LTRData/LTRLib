@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net35;net40;net46;net48;net6.0-windows;net8.0-windows;net9.0-windows</TargetFrameworks>
+    <TargetFrameworks>net35;net40;net46;net48;net6.0-windows;net8.0-windows;net9.0-windows;net10.0-windows</TargetFrameworks>
     <Guid>00bb958a-7f98-4fcd-b514-c22d8e6741cd</Guid>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
@@ -9,16 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LTRLib.Geodesy\LTRLib.Geodesy.csproj" />
+	<PackageReference Include="LTRData.Geodesy" Version="*" />
+	<PackageReference Include="LTRData.MathExpression" Version="*" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\LTRLib.NativeIo\LTRLib.NativeIo.csproj" />
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net3`))' &gt;= 0">
-    <ProjectReference Include="..\LTRLib.Placemarks\LTRLib.Placemarks.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework.CompareTo(`net5`))' &lt; 0">
+  <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net35'))">
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 

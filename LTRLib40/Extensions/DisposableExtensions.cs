@@ -1,13 +1,17 @@
-﻿using LTRLib.LTRGeneric;
+﻿#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
+using LTRData.Extensions.Collections;
+#endif
+using LTRLib.LTRGeneric;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace LTRLib.Extensions;
 
 public static class DisposableExtensions
 {
-    public static DisposableList<T> ToDisposableList<T>(this IEnumerable<T> collection) where T : IDisposable => new(collection);
+#if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
+    public static DisposableList<T> ToDisposableList<T>(this IEnumerable<T> collection) where T : IDisposable => [.. collection];
+#endif
 
 #if NET35_OR_GREATER || NETSTANDARD || NETCOREAPP
 
@@ -17,7 +21,7 @@ public static class DisposableExtensions
     {
         var dict = collection is ICollection<TValue> collectionTValue
             ? new DisposableDictionary<TKey, TValue>(collectionTValue.Count)
-            : new DisposableDictionary<TKey, TValue>();
+            : [];
 
         foreach (var item in collection)
         {

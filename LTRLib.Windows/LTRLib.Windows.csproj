@@ -11,6 +11,7 @@
   <ItemGroup>
 	<PackageReference Include="LTRData.Geodesy" Version="*" />
 	<PackageReference Include="LTRData.MathExpression" Version="*" />
+	<PackageReference Include="LTRData.Net" Version="*" />
   </ItemGroup>
   
   <ItemGroup>

@@ -13,7 +13,6 @@
     <ProjectReference Include="..\LTRLib.CodeCompiler\LTRLib.CodeCompiler.csproj" />
     <ProjectReference Include="..\LTRLib.Data.Linq\LTRLib.Data.Linq.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0 And '$(TargetFramework.CompareTo(`net5`))' &lt; 0" />
     <ProjectReference Include="..\LTRLib.Management\LTRLib.Management.csproj" />
-    <ProjectReference Include="..\LTRLib.Web\LTRLib.Web.csproj" Condition="'$(TargetFramework.CompareTo(`net40`))' &gt;= 0" />
     <ProjectReference Include="..\LTRLib.Windows\LTRLib.Windows.csproj" Condition="('$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net35`))' &gt;= 0) Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
     <ProjectReference Include="..\LTRLib.Windows.Shell\LTRLib.Windows.Shell.vbproj" Condition="('$(TargetFramework.CompareTo(`net5`))' &lt; 0 And '$(TargetFramework.CompareTo(`net35`))' &gt;= 0) Or '$(TargetFramework.StartsWith(`netcoreapp`))' Or '$(TargetFramework.Contains(`-windows`))'" />
     <ProjectReference Include="..\LTRLib.NativeIo\LTRLib.NativeIo.csproj" Condition="'$(TargetFramework.CompareTo(`net35`))' &gt;= 0" />

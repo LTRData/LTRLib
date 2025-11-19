@@ -1,12 +1,13 @@
+#if NET35_OR_GREATER || NETCOREAPP || NETSTANDARD
+
 // LTRLib.IO.StreamList
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-#if NET35_OR_GREATER || NETCOREAPP || NETSTANDARD
 using System.Linq;
-#endif
 using System.Threading;
+using LTRData.Extensions.Collections;
 #if NET40_OR_GREATER || NETCOREAPP || NETSTANDARD
 using System.Threading.Tasks;
 using LTRData.Extensions.Async;
@@ -147,3 +148,5 @@ public class StreamList : Stream, IList<Stream>
         base.Dispose(disposing);
     }
 }
+
+#endif

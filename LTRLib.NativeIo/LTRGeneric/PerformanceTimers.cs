@@ -12,6 +12,7 @@ using static System.Math;
 namespace LTRLib.LTRGeneric;
 
 using Extensions;
+using LTRData.Extensions.Numeric;
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 
@@ -145,16 +146,13 @@ public static class PerformanceTimers
     private static long GetTickCount64() => Environment.TickCount64;
 #else
     [DllImport("kernel32.dll", SetLastError = true)]
-    [SupportedOSPlatform("windows")]
     private static extern long GetTickCount64();
 #endif
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    [SupportedOSPlatform("windows")]
     private static extern bool QueryPerformanceFrequency(out long frequency);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    [SupportedOSPlatform("windows")]
     private static extern bool QueryPerformanceCounter(out long count);
 
     private static readonly long ticks_per_microsecond = TimeSpan.FromSeconds(1).Ticks / 1000000;
@@ -167,7 +165,7 @@ public static class PerformanceTimers
 
         PerformanceCountsPerSecond = freq;
 
-        var factor = NumericExtensions.GreatestCommonDivisor(PerformanceCountsPerSecond, TimeSpan.FromSeconds(1).Ticks);
+        var factor = MathExtensions.GreatestCommonDivisor(PerformanceCountsPerSecond, TimeSpan.FromSeconds(1).Ticks);
 
         performance_counts_per_ticks_multiplier = PerformanceCountsPerSecond / factor;
         performance_counts_per_ticks_divisor = TimeSpan.FromSeconds(1).Ticks / factor;

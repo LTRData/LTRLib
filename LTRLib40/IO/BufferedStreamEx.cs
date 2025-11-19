@@ -20,9 +20,9 @@ public class BufferedStreamEx : MemoryStream
     private readonly Stream _baseStream;
 
     public BufferedStreamEx(Stream BaseStream)
-        : base(BaseStream is not null
-            && BaseStream.CanSeek
-            && BaseStream.CanRead ? (int)BaseStream.Length : 0)
+        : base(capacity: BaseStream is not null
+            && BaseStream.CanSeek && BaseStream.CanRead
+            ? (int)BaseStream.Length : 0)
     {
         if (BaseStream is null)
         {
@@ -46,7 +46,6 @@ public class BufferedStreamEx : MemoryStream
             _baseStream.Dispose();
             _baseStream = null!;
         }
-
     }
 
     public Stream BaseStream => _baseStream;

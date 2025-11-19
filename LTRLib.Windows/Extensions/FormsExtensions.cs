@@ -5,6 +5,7 @@
 // http://ltr-data.se   https://github.com/LTRData
 // 
 
+using LTRData.Net;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,7 +17,6 @@ using System.Windows.Forms;
 
 #if NET30_OR_GREATER || NETCOREAPP
 using System.Windows.Media.Media3D;
-
 #endif
 
 using LTRLib.IO;

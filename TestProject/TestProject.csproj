@@ -31,7 +31,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LTRLib40\LTRLib40.csproj" />
-    <ProjectReference Include="..\LTRLib.Web\LTRLib.Web.csproj" />
     <ProjectReference Include="..\LTRLib.NativeIo\LTRLib.NativeIo.csproj" />
   </ItemGroup>
 

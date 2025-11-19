@@ -32,9 +32,6 @@
   <Project Path="LTRLib.NativeIo/LTRLib.NativeIo.csproj">
     <BuildType Solution="Release with doc|*" Project="Release" />
   </Project>
-  <Project Path="LTRLib.Web/LTRLib.Web.csproj">
-    <BuildType Solution="Release with doc|*" Project="Release" />
-  </Project>
   <Project Path="LTRLib.Windows.Shell/LTRLib.Windows.Shell.vbproj">
     <BuildType Solution="Release with doc|*" Project="Release" />
   </Project>

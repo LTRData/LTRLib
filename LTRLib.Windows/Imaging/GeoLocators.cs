@@ -7,6 +7,7 @@
 #if NET30_OR_GREATER || NETCOREAPP
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LTRData.Geodesy.Positions;
@@ -38,6 +39,31 @@ public static class GeoLocators
         return new WGS84Position(
             lat_direction[0], (byte)(lat_fields[0] & 0xFFul), (byte)(lat_fields[1] & 0xFFul), (lat_fields[2] & 0xFFFFul) / 1000d,
             lon_direction[0], (byte)(lon_fields[0] & 0xFFul), (byte)(lon_fields[1] & 0xFFul), (lon_fields[2] & 0xFFFFul) / 1000d);
+    }
+
+    /// <summary>
+    /// Gets photo location coordinates from bitmap metadata
+    /// </summary>
+    /// <param name="metadata">Bitmap metadata</param>
+    /// <param name="position">WGS84 coordinates</param>
+    public static bool TryGetGeoLocation(this BitmapMetadata? metadata, [NotNullWhen(true)] out WGS84Position? position)
+    {
+        position = null;
+
+        if (metadata is null ||
+            metadata.GetQuery("/app1/ifd/gps/{ushort=1}") is not string lat_direction ||
+            metadata.GetQuery("/app1/ifd/gps/{ushort=2}") is not ulong[] lat_fields ||
+            metadata.GetQuery("/app1/ifd/gps/{ushort=3}") is not string lon_direction ||
+            metadata.GetQuery("/app1/ifd/gps/{ushort=4}") is not ulong[] lon_fields)
+        {
+            return false;
+        }
+
+        position = new(
+            lat_direction[0], (byte)(lat_fields[0] & 0xFFul), (byte)(lat_fields[1] & 0xFFul), (lat_fields[2] & 0xFFFFul) / 1000d,
+            lon_direction[0], (byte)(lon_fields[0] & 0xFFul), (byte)(lon_fields[1] & 0xFFul), (lon_fields[2] & 0xFFFFul) / 1000d);
+
+        return true;
     }
 
     /// <summary>

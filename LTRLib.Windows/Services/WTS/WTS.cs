@@ -273,16 +273,16 @@ public class WTS : IDisposable
 
     public static bool IsChildSessionsEnabled => WTSIsChildSessionsEnabled(out var enabled) ? enabled : throw new Win32Exception();
 
-    public IEnumerable<WTSSessionItem> Sessions => EnumerateObjects<WTSSessionItem>.Query((out SafeWTSBuffer buf, out int count)
+    public IEnumerable<WTSSessionItem> Sessions => EnumerateObjects<WTSSessionItem>.Query((out buf, out count)
         => ServerHandle.WTSEnumerateSessions(0, 1, out buf, out count));
 
-    public IEnumerable<WTSSessionItemEx> SessionsEx => EnumerateObjects<WTSSessionItemEx>.Query((out SafeWTSBufferEx buf, out int count) =>
+    public IEnumerable<WTSSessionItemEx> SessionsEx => EnumerateObjects<WTSSessionItemEx>.Query((out buf, out count) =>
     {
         var level = 1;
         return ServerHandle.WTSEnumerateSessionsEx(ref level, 0, out buf, out count);
     }, WTSTypeClass.WTSTypeSessionInfoLevel1);
 
-    public static IEnumerable<WTSServerItem> GetServers(string domain) => EnumerateObjects<WTSServerItem>.Query((out SafeWTSBuffer buf, out int count) => WTSEnumerateServers(domain, 0, 1, out buf, out count));
+    public static IEnumerable<WTSServerItem> GetServers(string domain) => EnumerateObjects<WTSServerItem>.Query((out buf, out count) => WTSEnumerateServers(domain, 0, 1, out buf, out count));
 
     private static readonly int _sizeOfListener = Marshal.SizeOf<WTSListenerItem>();
 
@@ -312,7 +312,7 @@ public class WTS : IDisposable
     }
 
     public IEnumerable<WTSProcessItem> Processes =>
-        EnumerateMethods<WTSProcessItem.NativeWTSProcessItem>.EnumerateValues((out SafeWTSBuffer buf, out int count) => ServerHandle.WTSEnumerateProcesses(0, 1, out buf, out count))
+        EnumerateMethods<WTSProcessItem.NativeWTSProcessItem>.EnumerateValues((out buf, out count) => ServerHandle.WTSEnumerateProcesses(0, 1, out buf, out count))
         .Select(item => new WTSProcessItem(item));
 
     public IEnumerable<WTSProcessItemEx> ProcessesEx => EnumerateSessionProcesses(_allSessions);
@@ -320,7 +320,7 @@ public class WTS : IDisposable
     public static IEnumerable<WTSProcessItemEx> CurrentSessionProcesses => LocalServer.EnumerateSessionProcesses(_currentSession);
 
     public IEnumerable<WTSProcessItemEx> EnumerateSessionProcesses(int sessionId) =>
-        EnumerateMethods<WTSProcessItemEx.NativeWTSProcessItemEx>.EnumerateValues((out SafeWTSBufferEx buf, out int count) =>
+        EnumerateMethods<WTSProcessItemEx.NativeWTSProcessItemEx>.EnumerateValues((out buf, out count) =>
         {
             var level = 1;
             return ServerHandle.WTSEnumerateProcessesEx(ref level, sessionId, out buf, out count);
